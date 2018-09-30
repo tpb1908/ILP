@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "225676933702",
+    "firebase_url": "https://coinz-61c59.firebaseio.com",
+    "project_id": "coinz-61c59",
+    "storage_bucket": "coinz-61c59.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225676933702:android:b429348f49ef657f",
+        "android_client_info": {
+          "package_name": "com.tpb.coinz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "225676933702-e2m16ppt3lr3g780n05bfqhi4vapajfs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzxm3I2V839mSTz0_JzJVch5xOQV8mYfU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
