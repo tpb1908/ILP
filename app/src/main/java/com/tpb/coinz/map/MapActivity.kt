@@ -4,27 +4,33 @@ import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineListener
+import com.mapbox.android.core.location.LocationEngineProvider
+import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.annotations.PolygonOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.LocationListener
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_map.*
+import kotlinx.android.synthetic.main.activity_map.view.*
 
 class MapActivity : AppCompatActivity() {
-    private val viewModel: MapViewModel by lazy {
-        ViewModelProviders.of(this).get(MapViewModel::class.java)
-    }
 
-    private lateinit var locationListener: LocationListener
-    private val markerOptions = MarkerOptions().position(LatLng(0.0, 0.0))
-    private var marker: Marker = markerOptions.marker
+    private lateinit var locationEngine: LocationEngine
+    private lateinit var locationLayer: LocationLayerPlugin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,15 +39,52 @@ class MapActivity : AppCompatActivity() {
 
         mapview.onCreate(savedInstanceState)
 
-        locationListener = LocationListener(this, updateMapLocationMarker)
-        lifecycle.addObserver(locationListener)
 
+        moveToInitialLocation()
+        fab_coin_area.setOnClickListener(coinLocationOnClick)
+        fab_my_location.setOnClickListener(myLocationOnClick)
 
+        locationEngine = LocationEngineProvider(applicationContext).obtainBestLocationEngineAvailable()
+        locationEngine.activate()
+        locationEngine.addLocationEngineListener(object: LocationEngineListener {
+            override fun onLocationChanged(location: Location?) {
+                Log.i("LocationEngine", "Location update $location")
+            }
+
+            override fun onConnected() {
+                Log.i("LocationEngine", "Location engine connected")
+            }
+        })
+
+        mapview.getMapAsync {
+            locationLayer = LocationLayerPlugin(mapview, it, locationEngine)
+            locationLayer.renderMode = RenderMode.COMPASS
+            lifecycle.addObserver(locationLayer)
+        }
+
+    }
+
+    private fun checkLocation() {
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            //TODO
+        }
+    }
+
+    private val myLocationOnClick: View.OnClickListener = View.OnClickListener {_ ->
+        mapview.getMapAsync {
+            it.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationEngine.lastLocation), 15.0))
+        }
+    }
+
+    private val coinLocationOnClick: View.OnClickListener = View.OnClickListener {
+        moveToInitialLocation()
+    }
+
+    private fun moveToInitialLocation() {
         val bounds = LatLngBounds.Builder().include(LatLng(55.946233, -3.192473))
                 .include(LatLng(55.946233, -3.184319))
                 .include(LatLng(55.942617, -3.192473))
                 .include(LatLng(55.942617, -3.184319)).build()
-
         mapview.getMapAsync {
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10))
             val p = PolygonOptions()
@@ -56,19 +99,6 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
-    private val updateMapLocationMarker: (Location) -> Unit = { location ->
-        mapview.getMapAsync {
-            Log.i("Location callback", "Adding marker from $location")
-            val pos = LatLng(location)
-            if (it.markers.contains(marker)) {
-                marker.position = pos
-                it.updateMarker(marker)
-            } else {
-                markerOptions.position = pos
-                marker = it.addMarker(markerOptions)
-            }
-        }
-    }
 
     public override fun onResume() {
         super.onResume()

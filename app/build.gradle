@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-firestore:17.1.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.8.2'
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 

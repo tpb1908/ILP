@@ -1,0 +1,3 @@
+- A view observes only one observable, e.g. LiveData with the view-model
+- A view-model can observe multiple sources (i.e. LiveData, LocationProvider, use-cases, etc)
+- All view interactions are calls to the view-model

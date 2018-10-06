@@ -8,7 +8,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnCompleteListener
 import java.util.concurrent.TimeUnit
 
 class LocationListener(private val context: Context,
@@ -33,12 +32,17 @@ class LocationListener(private val context: Context,
         }
     }
 
+    fun requestLastLocation(callback: (Location) -> Unit) {
+        fusedLocationProviderClient.lastLocation.addOnCompleteListener {
+            val loc = it.result
+            if (loc != null) callback(loc)
+        }
+    }
 
     override fun onLocationResult(result: LocationResult?) {
         super.onLocationResult(result)
         Log.i(LocationListener::class.java.name, "Location result " + result?.lastLocation.toString())
         if (result != null) callback(result.lastLocation)
-
     }
 
     override fun onLocationAvailability(p0: LocationAvailability?) {
