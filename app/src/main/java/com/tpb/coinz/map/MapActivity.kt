@@ -1,13 +1,16 @@
 package com.tpb.coinz.map
 
+import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_map.*
 
@@ -18,6 +21,8 @@ class MapActivity : AppCompatActivity() {
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         setContentView(R.layout.activity_map)
 
+        mapview.onCreate(savedInstanceState)
+
         val bounds = LatLngBounds.Builder().include(LatLng(55.946233, -3.192473))
                 .include(LatLng(55.946233, -3.184319))
                 .include(LatLng(55.942617, -3.192473))
@@ -25,6 +30,51 @@ class MapActivity : AppCompatActivity() {
 
         mapview.getMapAsync {
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10))
+            val p = PolygonOptions()
+                    .add(LatLng(55.946233, -3.192473))
+                    .add(LatLng(55.946233, -3.184319))
+                    .add(LatLng(55.942617, -3.184319))
+                    .add(LatLng(55.942617, -3.192473))
+                    .add(LatLng(55.946233, -3.192473))
+                    .strokeColor(Color.RED)
+                    .fillColor(Color.TRANSPARENT)
+            it.addPolygon(p)
         }
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        mapview.onResume()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapview.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapview.onStop()
+    }
+
+    public override fun onPause() {
+        super.onPause()
+        mapview.onPause()
+    }
+
+    public override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapview.onSaveInstanceState(outState)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapview.onLowMemory()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapview.onDestroy()
     }
 }
