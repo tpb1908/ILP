@@ -1,6 +1,7 @@
 package com.tpb.coinz.map
 
-import android.graphics.Color
+import android.content.Context
+import android.graphics.*
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,8 @@ import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -20,6 +23,14 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_map.*
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import androidx.core.graphics.drawable.DrawableCompat
+import android.os.Build
+import androidx.core.content.ContextCompat
+import android.graphics.drawable.Drawable
+
+
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
 
@@ -107,6 +118,16 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                     .strokeColor(Color.RED)
                     .fillColor(Color.TRANSPARENT)
             it.addPolygon(p)
+        }
+        mapview.getMapAsync {
+            val markerOptions = MarkerOptions()
+            markerOptions.position = LatLng(55.9456215,-3.1631175)
+            markerOptions.title = "5"
+            markerOptions.snippet = "PENY"
+            val bitmap = Utils.loadAndTintBitMap(this@MapActivity, R.drawable.ic_location_white_24dp, Color.BLUE)
+
+            markerOptions.icon = IconFactory.getInstance(this@MapActivity).fromBitmap(bitmap)
+            it.addMarker(markerOptions)
         }
     }
 
