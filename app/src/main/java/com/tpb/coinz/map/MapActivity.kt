@@ -29,7 +29,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         setContentView(R.layout.activity_map)
 
         mapview.onCreate(savedInstanceState)
@@ -146,7 +145,5 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         super.onDestroy()
         mapview.onDestroy()
     }
-
-
 
 }
