@@ -25,11 +25,13 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_map.*
 import com.firebase.ui.auth.AuthUI
+import com.tpb.coinz.LocationConstants
+import com.tpb.coinz.LocationListener
+import com.tpb.coinz.asCameraUpdate
 
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
 
-    private lateinit var locationEngine: LocationEngine
     private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
 
@@ -51,9 +53,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             fab_coin_area.setOnClickListener(coinLocationOnClick)
             fab_my_location.setOnClickListener(myLocationOnClick)
 
-            locationEngine = LocationEngineProvider(applicationContext).obtainBestLocationEngineAvailable()
-            locationEngine.activate()
-            locationEngine.addLocationEngineListener(object: LocationEngineListener {
+            LocationListener.addListener(object: LocationEngineListener {
                 override fun onLocationChanged(location: Location?) {
                     Log.i("LocationEngine", "Location update $location")
                 }
@@ -64,7 +64,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             })
 
             mapview.getMapAsync {
-                locationLayer = LocationLayerPlugin(mapview, it, locationEngine)
+                locationLayer = LocationLayerPlugin(mapview, it, LocationListener.getEngine())
                 locationLayer.renderMode = RenderMode.GPS
                 lifecycle.addObserver(locationLayer)
             }
@@ -90,7 +90,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     private val myLocationOnClick: View.OnClickListener = View.OnClickListener { _ ->
         //TODO: First click for location, second for zoom
         mapview.getMapAsync {
-            it.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationEngine.lastLocation), 15.0))
+            it.animateCamera(LocationListener.lastLocation().asCameraUpdate())
         }
     }
 
@@ -99,21 +99,11 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun moveToInitialLocation() {
-        val bounds = LatLngBounds.Builder().include(LatLng(55.946233, -3.192473))
-                .include(LatLng(55.946233, -3.184319))
-                .include(LatLng(55.942617, -3.192473))
-                .include(LatLng(55.942617, -3.184319)).build()
         mapview.getMapAsync {
-            it.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10))
-            val p = PolygonOptions()
-                    .add(LatLng(55.946233, -3.192473))
-                    .add(LatLng(55.946233, -3.184319))
-                    .add(LatLng(55.942617, -3.184319))
-                    .add(LatLng(55.942617, -3.192473))
-                    .add(LatLng(55.946233, -3.192473))
+            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationConstants.bounds, 10))
+            it.addPolygon(LocationConstants.polygon
                     .strokeColor(Color.RED)
-                    .fillColor(Color.TRANSPARENT)
-            it.addPolygon(p)
+                    .fillColor(Color.TRANSPARENT))
         }
         mapview.getMapAsync {
             val markerOptions = MarkerOptions()

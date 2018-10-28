@@ -1,58 +1,34 @@
 package com.tpb.coinz
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Location
-import android.os.Looper
-import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.google.android.gms.location.*
-import java.util.concurrent.TimeUnit
+import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineListener
+import com.mapbox.android.core.location.LocationEngineProvider
 
-class LocationListener(private val context: Context,
-                       private val callback: (Location) -> Unit,
-                       private val fusedLocationProviderClient: FusedLocationProviderClient = FusedLocationProviderClient(context)
-): LocationCallback(), LifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun start() {
-        Log.i(LocationListener::class.java.name, "Lifecyle onStart called")
-        try {
-            val req = LocationRequest()
-            req.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            req.interval = TimeUnit.SECONDS.toMillis(1)
+object LocationListener {
 
-            fusedLocationProviderClient.requestLocationUpdates(req, this, Looper.myLooper())
-            fusedLocationProviderClient.lastLocation.addOnCompleteListener {
-                Log.i(LocationListener::class.java.name, "Last location ${it.result}")
-            }
-        } catch (se: SecurityException) {
-            Log.e(LocationListener::class.java.name, "Missing permission", se)
-        }
+    private lateinit var locationEngine: LocationEngine
+
+    public fun init(context: Context) {
+        locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
+        locationEngine.activate()
     }
 
-    fun requestLastLocation(callback: (Location) -> Unit) {
-        fusedLocationProviderClient.lastLocation.addOnCompleteListener {
-            val loc = it.result
-            if (loc != null) callback(loc)
-        }
+    public fun activate() {
+        locationEngine.activate()
     }
 
-    override fun onLocationResult(result: LocationResult?) {
-        super.onLocationResult(result)
-        Log.i(LocationListener::class.java.name, "Location result " + result?.lastLocation.toString())
-        if (result != null) callback(result.lastLocation)
+    public fun deactivate() {
+        locationEngine.deactivate()
     }
 
-    override fun onLocationAvailability(p0: LocationAvailability?) {
-        super.onLocationAvailability(p0)
-    }
+    @SuppressLint("MissingPermission")
+    public fun lastLocation() = locationEngine.lastLocation
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun stop() {
-        Log.i(LocationListener::class.java.name, "Location listener pausing")
-        // disconnect if connected
-        fusedLocationProviderClient.removeLocationUpdates(this)
-    }
+    public fun addListener(listener: LocationEngineListener) = locationEngine.addLocationEngineListener(listener)
+
+    public fun getEngine(): LocationEngine = locationEngine
+
 }

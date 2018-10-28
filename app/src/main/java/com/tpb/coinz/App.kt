@@ -15,6 +15,8 @@ class App : Application() {
 
     private fun init() {
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
+        LocationListener.init(applicationContext)
+
     }
 
 }

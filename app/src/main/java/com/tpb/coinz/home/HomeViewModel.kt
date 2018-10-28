@@ -16,6 +16,12 @@ class HomeViewModel : BaseViewModel<HomeNavigator>() {
         if (user == null) {
             navigator.get()?.beginLoginFlow()
         }
-
     }
+
+    fun userLoggedIn() {}
+
+    fun userLoginFailed() {
+        navigator.get()?.beginLoginFlow()
+    }
+
 }
