@@ -22,4 +22,5 @@ object Utils {
         return bitmap
     }
 
+
 }

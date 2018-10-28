@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -23,13 +24,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_map.*
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
-import androidx.core.graphics.drawable.DrawableCompat
-import android.os.Build
-import androidx.core.content.ContextCompat
-import android.graphics.drawable.Drawable
-
+import com.firebase.ui.auth.AuthUI
 
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
@@ -43,10 +38,11 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         setContentView(R.layout.activity_map)
 
         mapview.onCreate(savedInstanceState)
-
         moveToInitialLocation()
 
         initLocationSystem()
+
+
     }
 
     private fun initLocationSystem() {
@@ -130,7 +126,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             it.addMarker(markerOptions)
         }
     }
-
 
     public override fun onResume() {
         super.onResume()
