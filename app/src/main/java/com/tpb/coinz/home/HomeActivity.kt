@@ -9,7 +9,11 @@ import androidx.lifecycle.ViewModelProviders
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.LocationConstants
+import com.tpb.coinz.LocationListener
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_home.*
 
@@ -29,6 +33,10 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
     private fun initViews(savedInstanceState: Bundle?) {
         home_minimap.onCreate(savedInstanceState)
         home_minimap.getMapAsync {
+            val locationLayer = LocationLayerPlugin(home_minimap, it, LocationListener.getEngine())
+            locationLayer.renderMode = RenderMode.COMPASS
+            locationLayer.cameraMode = CameraMode.TRACKING_COMPASS
+            lifecycle.addObserver(locationLayer)
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationConstants.bounds, 10))
         }
     }
