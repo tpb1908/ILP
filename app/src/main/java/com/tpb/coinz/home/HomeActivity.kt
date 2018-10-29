@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.firebase.ui.auth.AuthUI
@@ -17,6 +19,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.LocationListener
 import com.tpb.coinz.R
+import com.tpb.coinz.map.MapActivity
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity(), HomeNavigator {
@@ -27,6 +30,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        home_minimap.onCreate(savedInstanceState)
 
         initViews(savedInstanceState)
         bindViewModel()
@@ -40,6 +44,16 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
             locationLayer.cameraMode = CameraMode.TRACKING_COMPASS
             lifecycle.addObserver(locationLayer)
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
+            it.addOnMapClickListener {latLng ->
+                val cameraPosition = it.cameraPosition
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                        home_minimap,
+                        ViewCompat.getTransitionName(home_minimap)!!
+                )
+                val intent = Intent(this, MapActivity::class.java)
+                intent.putExtra(getString(R.string.extra_camera_position), cameraPosition)
+                startActivity(intent, options.toBundle())
+            }
         }
     }
 
@@ -80,7 +94,6 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
             }
         }
     }
-
 
 
 }

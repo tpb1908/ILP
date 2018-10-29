@@ -1,5 +1,6 @@
 package com.tpb.coinz.home
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -8,7 +9,7 @@ import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.CoinDownloader
 import java.util.*
 
-class HomeViewModel : BaseViewModel<HomeNavigator>() {
+class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(application) {
 
     private var fbUser: FirebaseUser? = null
 

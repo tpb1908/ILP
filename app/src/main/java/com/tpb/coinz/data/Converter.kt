@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.mapbox.geojson.GeoJson
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.gson.GeoJsonAdapterFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.HashMap
@@ -34,7 +35,7 @@ object Converter {
             val long = coordinates.get(0).asDouble
             val lat = coordinates.get(1).asDouble
             coins.add(
-                    Coin(id, value, currency, markerSymbol, markerColor, Point.fromLngLat(long, lat)))
+                    Coin(id, value, currency, markerSymbol, markerColor, LatLng(lat, long)))
         }
         return Map(Date(), rates, coins)
     }

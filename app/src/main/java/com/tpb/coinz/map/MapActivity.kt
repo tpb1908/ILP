@@ -6,11 +6,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
@@ -22,21 +25,40 @@ import com.tpb.coinz.LocationListener
 import com.tpb.coinz.asCameraUpdate
 
 
-class MapActivity : AppCompatActivity(), PermissionsListener {
+class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
 
     private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
+
+    private lateinit var vm: MapViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
         mapview.onCreate(savedInstanceState)
-        moveToInitialLocation()
+        bindViewModel()
 
         initLocationSystem()
+        if (intent.hasExtra(getString(R.string.extra_camera_position))) {
+            val position = intent.getParcelableExtra<CameraPosition>(getString(R.string.extra_camera_position))
+            Log.i("MapActivity", "Moving to initial camera position $position")
+            setCameraPosition(position)
+        } else {
+            moveToInitialLocation()
+        }
 
+    }
 
+    private fun bindViewModel() {
+        vm = ViewModelProviders.of(this).get(MapViewModel::class.java)
+        vm.setNavigator(this)
+        vm.init()
+        vm.coins.observeForever { markers ->
+            mapview.getMapAsync {
+                it.addMarkers(markers)
+            }
+        }
     }
 
     private fun initLocationSystem() {
@@ -88,6 +110,18 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     private val coinLocationOnClick: View.OnClickListener = View.OnClickListener {
         moveToInitialLocation()
+    }
+
+    private fun setCameraPosition(position: CameraPosition) {
+        mapview.getMapAsync {
+            it.cameraPosition = position
+        }
+    }
+
+    override fun addMarkers(markers: List<MarkerOptions>, callback: (List<Marker>) -> Unit) {
+        mapview.getMapAsync {
+            callback(it.addMarkers(markers))
+        }
     }
 
     private fun moveToInitialLocation() {

@@ -1,9 +1,11 @@
 package com.tpb.coinz.base
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import java.lang.ref.WeakReference
 
-abstract class BaseViewModel<N> : ViewModel() {
+abstract class BaseViewModel<N>(application: Application) : AndroidViewModel(application) {
 
     protected lateinit var navigator: WeakReference<N>
 

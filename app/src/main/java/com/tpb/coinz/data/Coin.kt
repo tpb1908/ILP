@@ -1,9 +1,9 @@
 package com.tpb.coinz.data
 
 import android.util.Log
-import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.geometry.LatLng
 
-data class Coin(val id: String, val value: Double, val currency: Currency,val markerSymbol: Int, val markerColor: Int, val location: Point)
+data class Coin(val id: String, val value: Double, val currency: Currency,val markerSymbol: Int, val markerColor: Int, val location: LatLng)
 
 enum class Currency {
     PENY, DOLR, SHIL, QUID;
