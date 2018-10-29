@@ -3,16 +3,18 @@ package com.tpb.coinz.home
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
+import com.google.firebase.auth.FirebaseUser
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
-import com.tpb.coinz.LocationConstants
+import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.LocationListener
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_home.*
@@ -37,7 +39,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
             locationLayer.renderMode = RenderMode.COMPASS
             locationLayer.cameraMode = CameraMode.TRACKING_COMPASS
             lifecycle.addObserver(locationLayer)
-            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationConstants.bounds, 10))
+            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
         }
     }
 
@@ -45,6 +47,13 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
         vm = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         vm.setNavigator(this)
         vm.init()
+
+        vm.user.observe(this, userObserver)
+    }
+
+    private val userObserver = Observer<FirebaseUser> {
+        Log.i("UserObserver", "User updated $it")
+        user_email.text = it.email
     }
 
     override fun beginLoginFlow() {
@@ -64,7 +73,6 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_LOGIN) {
             val response = IdpResponse.fromResultIntent(data)
-
             if (resultCode == Activity.RESULT_OK) {
                 vm.userLoggedIn()
             } else {

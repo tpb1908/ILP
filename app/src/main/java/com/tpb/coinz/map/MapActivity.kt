@@ -1,31 +1,23 @@
 package com.tpb.coinz.map
 
-import android.content.Context
 import android.graphics.*
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
-import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
-import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.R
 import kotlinx.android.synthetic.main.activity_map.*
-import com.firebase.ui.auth.AuthUI
-import com.tpb.coinz.LocationConstants
+import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.LocationListener
 import com.tpb.coinz.asCameraUpdate
 
@@ -100,8 +92,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     private fun moveToInitialLocation() {
         mapview.getMapAsync {
-            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationConstants.bounds, 10))
-            it.addPolygon(LocationConstants.polygon
+            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
+            it.addPolygon(LocationUtils.polygon
                     .strokeColor(Color.RED)
                     .fillColor(Color.TRANSPARENT))
         }
