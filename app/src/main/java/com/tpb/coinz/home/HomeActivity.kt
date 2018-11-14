@@ -16,9 +16,11 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
+import com.tpb.coinz.App
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.LocationListener
 import com.tpb.coinz.R
+import com.tpb.coinz.dagger.component.HomeComponent
 import com.tpb.coinz.map.MapActivity
 import kotlinx.android.synthetic.main.activity_home.*
 
@@ -30,6 +32,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        (application as App).homeComponent.inject(this)
         home_minimap.onCreate(savedInstanceState)
 
         initViews(savedInstanceState)

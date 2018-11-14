@@ -5,28 +5,43 @@ import android.os.AsyncTask
 import android.util.Log
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
-class CoinDownloader(val listener: (Map?) -> Unit) : AsyncTask<Calendar, Void, Map>() {
+class CoinDownloader : CoinLoader {
 
-    override fun doInBackground(vararg cal: Calendar): Map? {
+    private var listeners: ArrayList<(Map?) -> Unit> = arrayListOf()
+
+    override fun loadCoins(date: Calendar, listener: (Map?) -> Unit) {
+        listeners.add(listener)
+
+        GlobalScope.launch(Dispatchers.IO) {
+            loadCoinsFromUrl(date)
+        }
+
+    }
+
+    private fun loadCoinsFromUrl(date: Calendar) {
         try {
-            val datePath = convertToDatePath(cal[0])
+            val datePath = convertToDatePath(date)
             val urlString = "http://homepages.inf.ed.ac.uk/stg/coinz/$datePath/coinzmap.geojson"
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
-            return Converter.convert(json)
+            val map = Converter.convert(json)
+            listeners.forEach {it(map)}
+            listeners.clear()
         } catch (ioe: IOException) {
             Log.e("CoinDownloader", "IOE $ioe")
         }
-        return null
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -34,11 +49,6 @@ class CoinDownloader(val listener: (Map?) -> Unit) : AsyncTask<Calendar, Void, M
         return SimpleDateFormat("yyyy/MM/dd").format(cal.time)
     }
 
-    override fun onPostExecute(result: Map?) {
-        super.onPostExecute(result)
-
-        listener(result)
-    }
 
     // Given a string representation of a URL, sets up a connection and gets an input stream.
     @Throws(IOException::class)
@@ -53,11 +63,6 @@ class CoinDownloader(val listener: (Map?) -> Unit) : AsyncTask<Calendar, Void, M
             requestMethod = "GET"
             connect()
         }
-//        conn.readTimeout = 10000 // milliseconds
-//        conn.connectTimeout = 15000 // milliseconds
-//        conn.requestMethod = "GET"
-//        conn.doInput = true
-//        conn.connect() // Starts the query
         return conn.inputStream
     }
 }

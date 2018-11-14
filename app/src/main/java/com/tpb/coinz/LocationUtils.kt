@@ -1,7 +1,6 @@
 package com.tpb.coinz
 
 import android.app.Activity
-import android.content.Context
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.PolygonOptions

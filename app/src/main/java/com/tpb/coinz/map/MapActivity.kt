@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.IconFactory
@@ -18,14 +17,17 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
-import com.tpb.coinz.R
+import com.tpb.coinz.*
+import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
-import com.tpb.coinz.LocationUtils
-import com.tpb.coinz.LocationListener
-import com.tpb.coinz.asCameraUpdate
+import java.lang.Exception
+import javax.inject.Inject
 
 
 class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
+
+    @Inject
+    lateinit var locationProvider: LocationProvider
 
     private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
@@ -35,7 +37,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
-
+        (application as App).mapComponent.inject(this)
         mapview.onCreate(savedInstanceState)
         bindViewModel()
 
@@ -62,26 +64,35 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
     }
 
     private fun initLocationSystem() {
+        locationProvider.start()
         permissionsManager = PermissionsManager(this)
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             fab_coin_area.setOnClickListener(coinLocationOnClick)
             fab_my_location.setOnClickListener(myLocationOnClick)
 
-            LocationListener.addListener(object: LocationEngineListener {
-                override fun onLocationChanged(location: Location?) {
-                    Log.i("LocationEngine", "Location update $location")
-                }
-
-                override fun onConnected() {
-                    Log.i("LocationEngine", "Location engine connected")
-                }
-            })
 
             mapview.getMapAsync {
                 locationLayer = LocationLayerPlugin(mapview, it, LocationListener.getEngine())
-                locationLayer.renderMode = RenderMode.GPS
+                locationLayer.renderMode = RenderMode.COMPASS
+
                 lifecycle.addObserver(locationLayer)
+
             }
+            locationProvider.addListener(object: com.tpb.coinz.data.location.LocationListener {
+                override fun locationUpdate(location: Location) {
+                    Log.i("MapActivityLocation", "Forcing location update to  " + location)
+                    locationLayer.forceLocationUpdate(location)
+                }
+
+                override fun locationAvailable() {
+                }
+
+                override fun locationUnavailable() {
+                }
+
+                override fun locationUpdateError(exception: Exception) {
+                }
+            })
         } else {
             permissionsManager.requestLocationPermissions(this)
         }
@@ -101,10 +112,12 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         initLocationSystem()
     }
 
-    private val myLocationOnClick: View.OnClickListener = View.OnClickListener { _ ->
+    private val myLocationOnClick: View.OnClickListener = View.OnClickListener {
         //TODO: First click for location, second for zoom
-        mapview.getMapAsync {
-            it.animateCamera(LocationListener.lastLocation().asCameraUpdate())
+        mapview.getMapAsync {map ->
+            locationProvider.lastLocationUpdate()?.apply {
+                map.animateCamera(this.asCameraUpdate())
+            }
         }
     }
 
@@ -146,6 +159,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
     public override fun onResume() {
         super.onResume()
         mapview.onResume()
+        locationProvider.start()
     }
 
     override fun onStart() {
@@ -156,6 +170,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
     override fun onStop() {
         super.onStop()
         mapview.onStop()
+        locationProvider.stop()
     }
 
     public override fun onPause() {

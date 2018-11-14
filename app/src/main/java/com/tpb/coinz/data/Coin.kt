@@ -3,7 +3,17 @@ package com.tpb.coinz.data
 import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-data class Coin(val id: String, val value: Double, val currency: Currency,val markerSymbol: Int, val markerColor: Int, val location: LatLng)
+data class Coin(val id: String, val value: Double, val currency: Currency, val markerSymbol: Int, val markerColor: Int, val location: LatLng) {
+
+    fun toMap(): HashMap<String, Any> {
+        val map = HashMap<String, Any>()
+        map["id"] = id
+        map["value"] = value
+        map["currency"] = currency.name
+        return map
+    }
+
+}
 
 enum class Currency {
     PENY, DOLR, SHIL, QUID;
