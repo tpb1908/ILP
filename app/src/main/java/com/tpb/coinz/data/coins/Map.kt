@@ -1,5 +1,6 @@
-package com.tpb.coinz.data
+package com.tpb.coinz.data.coins
 
+import androidx.room.Embedded
 import java.util.*
 import kotlin.collections.Map
 

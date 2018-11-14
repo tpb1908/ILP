@@ -7,8 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.tpb.coinz.App
 import com.tpb.coinz.base.BaseViewModel
-import com.tpb.coinz.data.CoinDownloader
-import com.tpb.coinz.data.CoinLoader
+import com.tpb.coinz.data.coins.CoinLoader
 import java.util.*
 import javax.inject.Inject
 

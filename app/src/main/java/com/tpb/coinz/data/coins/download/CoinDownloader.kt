@@ -1,10 +1,12 @@
-package com.tpb.coinz.data
+package com.tpb.coinz.data.coins.download
 
 import android.annotation.SuppressLint
-import android.os.AsyncTask
 import android.util.Log
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.tpb.coinz.data.Converter
+import com.tpb.coinz.data.coins.CoinLoader
+import com.tpb.coinz.data.coins.Map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

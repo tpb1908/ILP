@@ -5,6 +5,11 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions
 
 interface MapNavigator {
 
-    fun addMarkers(markers: List<MarkerOptions>, callback: (List<Marker>) -> Unit)
+
+    fun removeMarker(marker: Marker)
+
+    fun requestLocationPermission()
+
+    fun beginLocationTracking()
 
 }

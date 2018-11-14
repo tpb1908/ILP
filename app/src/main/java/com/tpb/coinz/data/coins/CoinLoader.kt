@@ -1,4 +1,4 @@
-package com.tpb.coinz.data
+package com.tpb.coinz.data.coins
 
 import java.util.*
 

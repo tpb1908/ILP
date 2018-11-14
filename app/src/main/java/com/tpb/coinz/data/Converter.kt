@@ -2,13 +2,11 @@ package com.tpb.coinz.data
 
 import android.graphics.Color
 import com.google.gson.JsonObject
-import com.mapbox.geojson.GeoJson
-import com.mapbox.geojson.Point
-import com.mapbox.geojson.gson.GeoJsonAdapterFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import org.json.JSONObject
+import com.tpb.coinz.data.coins.Coin
+import com.tpb.coinz.data.coins.Currency
+import com.tpb.coinz.data.coins.Map
 import java.util.*
-import kotlin.collections.HashMap
 
 object Converter {
 

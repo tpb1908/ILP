@@ -7,8 +7,10 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -18,6 +20,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.*
+import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
 import java.lang.Exception
@@ -32,6 +35,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
     private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
 
+    private lateinit var iconFactory: IconFactory
+
     private lateinit var vm: MapViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +44,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         setContentView(R.layout.activity_map)
         (application as App).mapComponent.inject(this)
         mapview.onCreate(savedInstanceState)
+        iconFactory = IconFactory.getInstance(this)
         bindViewModel()
 
         initLocationSystem()
@@ -56,11 +62,29 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         vm = ViewModelProviders.of(this).get(MapViewModel::class.java)
         vm.setNavigator(this)
         vm.init()
-        vm.coins.observeForever { markers ->
+        vm.coins.observeForever { coins ->
             mapview.getMapAsync {
-                it.addMarkers(markers)
+
+                vm.mapMarkers(coins.zip(it.addMarkers(coins.map(::coinToMarkerOption))).toMap().toMutableMap())
             }
         }
+    }
+
+    private fun coinToMarkerOption(coin: Coin): MarkerOptions {
+        return MarkerOptions()
+                .position(coin.location)
+                .title(coin.currency.name)
+                .snippet(coin.value.toString())
+                .setIcon(getCoinIcon(coin))
+    }
+
+    private fun getCoinIcon(coin: Coin): Icon {
+        val bitmap = Utils.loadAndTintBitMap(this, R.drawable.ic_location_white_24dp, coin.markerColor)
+        return iconFactory.fromBitmap(bitmap)
+    }
+
+    override fun beginLocationTracking() {
+        locationProvider.start()
     }
 
     private fun initLocationSystem() {
@@ -72,30 +96,34 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
 
 
             mapview.getMapAsync {
-                locationLayer = LocationLayerPlugin(mapview, it, LocationListener.getEngine())
+                locationLayer = LocationLayerPlugin(mapview, it, LocationEngineProvider(applicationContext).obtainBestLocationEngineAvailable())
                 locationLayer.renderMode = RenderMode.COMPASS
 
                 lifecycle.addObserver(locationLayer)
+                locationProvider.addListener(object: com.tpb.coinz.data.location.LocationListener {
+                    override fun locationUpdate(location: Location) {
+                        Log.i("MapActivityLocation", "Forcing location update to  " + location)
+                        locationLayer.forceLocationUpdate(location)
+                    }
 
+                    override fun locationAvailable() {
+                    }
+
+                    override fun locationUnavailable() {
+                    }
+
+                    override fun locationUpdateError(exception: Exception) {
+                    }
+                })
             }
-            locationProvider.addListener(object: com.tpb.coinz.data.location.LocationListener {
-                override fun locationUpdate(location: Location) {
-                    Log.i("MapActivityLocation", "Forcing location update to  " + location)
-                    locationLayer.forceLocationUpdate(location)
-                }
 
-                override fun locationAvailable() {
-                }
-
-                override fun locationUnavailable() {
-                }
-
-                override fun locationUpdateError(exception: Exception) {
-                }
-            })
         } else {
             permissionsManager.requestLocationPermissions(this)
         }
+    }
+
+    override fun requestLocationPermission() {
+        permissionsManager.requestLocationPermissions(this)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -131,11 +159,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         }
     }
 
-    override fun addMarkers(markers: List<MarkerOptions>, callback: (List<Marker>) -> Unit) {
-        mapview.getMapAsync {
-            callback(it.addMarkers(markers))
-        }
-    }
+    override fun removeMarker(marker: Marker) = mapview.getMapAsync { it.removeMarker(marker) }
+
 
     private fun moveToInitialLocation() {
         mapview.getMapAsync {

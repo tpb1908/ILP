@@ -1,4 +1,4 @@
-package com.tpb.coinz.data
+package com.tpb.coinz.data.coins
 
 import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -12,6 +12,7 @@ data class Coin(val id: String, val value: Double, val currency: Currency, val m
         map["currency"] = currency.name
         return map
     }
+
 
 }
 
