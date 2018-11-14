@@ -55,7 +55,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         } else {
             moveToInitialLocation()
         }
-
     }
 
     private fun bindViewModel() {

@@ -1,11 +1,14 @@
 package com.tpb.coinz.data.coins.download
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.util.Log
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.tpb.coinz.data.Converter
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.CoinLoader
+import com.tpb.coinz.data.coins.Currency
 import com.tpb.coinz.data.coins.Map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -38,7 +41,7 @@ class CoinDownloader : CoinLoader {
             val urlString = "http://homepages.inf.ed.ac.uk/stg/coinz/$datePath/coinzmap.geojson"
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
-            val map = Converter.convert(json)
+            val map = convert(json)
             listeners.forEach {it(map)}
             listeners.clear()
         } catch (ioe: IOException) {
@@ -66,5 +69,33 @@ class CoinDownloader : CoinLoader {
             connect()
         }
         return conn.inputStream
+    }
+
+    fun convert(obj: JsonObject): Map {
+
+        val ratesObj = obj.getAsJsonObject("rates")
+        val rates = ratesObj.entrySet().map {
+            Currency.fromString(it.key) to it.value.asDouble
+        }.toMap()
+
+        val features = obj.getAsJsonArray("features")
+
+        val coins = arrayListOf<Coin>()
+
+        for (i in 0 until features.size()) {
+            val feature = features.get(i).asJsonObject
+            val properties = feature.getAsJsonObject("properties")
+            val id = properties.getAsJsonPrimitive("id").asString
+            val value = properties.getAsJsonPrimitive("value").asDouble
+            val currency = Currency.fromString(properties.getAsJsonPrimitive("currency").asString)
+            val markerSymbol = properties.getAsJsonPrimitive("marker-symbol").asInt
+            val markerColor = Color.parseColor(properties.getAsJsonPrimitive("marker-color").asString)
+            val coordinates = feature.getAsJsonObject("geometry").getAsJsonArray("coordinates")
+            val long = coordinates.get(0).asDouble
+            val lat = coordinates.get(1).asDouble
+            coins.add(
+                    Coin(id, value, currency, markerSymbol, markerColor, LatLng(lat, long)))
+        }
+        return Map(Date(), rates, coins)
     }
 }

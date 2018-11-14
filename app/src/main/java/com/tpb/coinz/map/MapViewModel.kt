@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.App
@@ -15,6 +16,7 @@ import com.tpb.coinz.data.coins.CoinLoader
 import com.tpb.coinz.data.coins.Map
 import com.tpb.coinz.data.coins.MapStore
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.db.collected
 import com.tpb.coinz.db.collectionDistance
 import java.lang.Exception
 import java.util.*
@@ -85,7 +87,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         } else {
             Log.e("MapViewModel", "No marker for $coin")
         }
-        //store.collection(collected).document(user?.uid ?: "").set(coin, SetOptions.merge())
+        store.collection(collected).document(user?.uid ?: "").set(coin, SetOptions.merge())
     }
 
 }
