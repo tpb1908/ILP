@@ -1,17 +1,13 @@
 package com.tpb.coinz
 
 import android.app.Application
-import android.util.Log
 import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.dagger.component.DaggerHomeComponent
 import com.tpb.coinz.dagger.component.DaggerMapComponent
 import com.tpb.coinz.dagger.component.HomeComponent
 import com.tpb.coinz.dagger.component.MapComponent
-import com.tpb.coinz.dagger.module.LoaderModule
-import com.tpb.coinz.dagger.module.LocationModule
-import com.tpb.coinz.dagger.module.StoreModule
-import android.content.IntentFilter
-import com.tpb.coinz.dagger.module.ConnectivityModule
+import com.google.firebase.FirebaseApp
+import com.tpb.coinz.dagger.module.*
 
 
 class App : Application() {
@@ -25,11 +21,13 @@ class App : Application() {
     }
 
     private fun init() {
-        Log.i("App", "onCreate init called")
+        val fbApp = FirebaseApp.initializeApp(this)!!
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         homeComponent = DaggerHomeComponent.builder()
                 .loaderModule(LoaderModule())
                 .locationModule(LocationModule(this))
+                .storeModule(StoreModule(this))
+                .backendModule(BackendModule())
                 .build()
         mapComponent = DaggerMapComponent.builder()
                 .loaderModule(LoaderModule())

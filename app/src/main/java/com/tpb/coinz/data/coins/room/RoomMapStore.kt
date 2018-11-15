@@ -1,6 +1,7 @@
 package com.tpb.coinz.data.coins.room
 
 import androidx.room.*
+import com.tpb.coinz.Result
 import com.tpb.coinz.data.coins.Map
 import com.tpb.coinz.data.coins.MapStore
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,9 @@ class RoomMapStore(database: Database): MapStore {
         @Query("SELECT * FROM map")
         fun getAllMaps(): List<RoomMap>
 
+        @Query("SELECT * FROM map ORDER BY uid DESC LIMIT 1")
+        fun getMostRecent(): RoomMap?
+
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         fun insert(map: RoomMap): Long
 
@@ -39,18 +43,21 @@ class RoomMapStore(database: Database): MapStore {
 
     override fun getLastStoreDate(callback: (Calendar) -> Unit) {
         getLatest {
-            if (it != null) {
-                val cal = Calendar.getInstance()
-                cal.time = it.dateGenerated
-                callback(cal)
+            if (it is Result.Value<Map>) {
+                callback(it.v.dateGenerated)
             }
         }
     }
 
-    override fun getLatest(callback: (Map?) -> Unit) {
+    override fun getLatest(callback: (Result<Map>) -> Unit) {
         GlobalScope.launch(Dispatchers.IO) {
-            val maps = dao.getAllMaps()
-            callback(if (maps.isEmpty()) null else maps.last().map)
+            val map = dao.getMostRecent()
+            if (map == null) {
+                callback(Result.None)
+            } else {
+                map.apply { callback(Result.Value(this.map)) }
+            }
+
         }
     }
 }

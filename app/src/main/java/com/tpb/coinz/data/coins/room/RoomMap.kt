@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.coins.room
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.tpb.coinz.data.coins.Map

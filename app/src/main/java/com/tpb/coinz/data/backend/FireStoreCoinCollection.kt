@@ -1,22 +1,30 @@
 package com.tpb.coinz.data.backend
 
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import android.util.Log
+import com.google.firebase.firestore.*
 import com.tpb.coinz.data.coins.Coin
 
-class FireStoreCoinCollection(val store: FirebaseFirestore) : CoinCollection {
+class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollection {
 
     private val collected = "collected"
     private val scoreboard = "scoreboard"
     private val scoreboardAll = "all"
+
     override fun collectCoin(id: String, coin: Coin) {
         //TODO: Result
-        store.collection(collected).document(id).set(coin, SetOptions.merge())
-        //store.collection(scoreboard).document(scoreboardAll).set(Any(), SetOptions.merge())
+        Log.i("FireStore", "Collecting ${coin.toMap()} for $id")
+        store.collection(collected).document(id).update(coin.toMap())
         //TODO: Write to scoreboard
     }
 
-    override fun getCollectedCoins(id: String) {
-        store.collection(collected).document(id)
+    override fun getCollectedCoins(id: String, listener: EventListener<DocumentSnapshot>) {
+        store.collection(collected).document(id).addSnapshotListener(object: EventListener<DocumentSnapshot> {
+            override fun onEvent(d: DocumentSnapshot?, e: FirebaseFirestoreException?) {
+                d?.data?.forEach { s, any ->
+                    Log.i("FireStore", "Key $s, Value $any")
+                }
+            }
+        })
     }
+
 }

@@ -5,19 +5,17 @@ import android.location.Location
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.App
+import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
-import com.tpb.coinz.data.ConnectionLiveData
+import com.tpb.coinz.data.backend.CoinCollection
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.CoinLoader
 import com.tpb.coinz.data.coins.Map
 import com.tpb.coinz.data.coins.MapStore
 import com.tpb.coinz.data.location.LocationProvider
-import com.tpb.coinz.db.collected
 import com.tpb.coinz.db.collectionDistance
 import java.lang.Exception
 import java.util.*
@@ -37,7 +35,8 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
     lateinit var locationProvider: LocationProvider
 
     private val user = FirebaseAuth.getInstance().currentUser
-    private val store: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Inject lateinit var coinCollection: CoinCollection
 
     private var map: Map? = null
     private var markers: MutableMap<Coin, Marker> = HashMap()
@@ -45,10 +44,13 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
     override fun init() {
         (getApplication() as App).mapComponent.inject(this)
         mapStore.getLatest {
-            if(it?.dateGenerated?.before(Calendar.getInstance().time) == true) {
-                coinLoader.loadCoins(Calendar.getInstance(), mapLoadCallback)
+            if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
+                map = it.v
+                Log.i("MapViewModel", "Coins loaded from room")
+                coins.postValue(it.v.remainingCoins)
             } else {
-                map = it
+                Log.i("MapViewModel", "Loading remainingCoins")
+                coinLoader.loadCoins(Calendar.getInstance(), mapLoadCallback)
             }
         }
         locationProvider.addListener(this)
@@ -58,7 +60,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         if (m != null) {
             map = m
             mapStore.store(m)
-            coins.postValue(m.coins)
+            coins.postValue(m.remainingCoins)
         }
     }
 
@@ -90,13 +92,16 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         if (markers.containsKey(coin)) {
             navigator.get()?.removeMarker(markers.getValue(coin))
             markers.remove(coin)
+            map?.remainingCoins?.remove(coin)
+            map?.collectedCoins?.add(coin)
             if (markers.isEmpty()) {
-                //TODO: Notification of all coins collected
+                //TODO: Notification of all remainingCoins collected
             }
         } else {
             Log.e("MapViewModel", "No marker for $coin")
         }
-        store.collection(collected).document(user?.uid ?: "").set(coin, SetOptions.merge())
+        //TODO: Cleanup
+        coinCollection.collectCoin(user?.uid ?: "", coin)
     }
 
 }

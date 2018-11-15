@@ -1,16 +1,13 @@
 package com.tpb.coinz.dagger.component
 
-import com.tpb.coinz.dagger.module.ConnectivityModule
-import com.tpb.coinz.dagger.module.LoaderModule
-import com.tpb.coinz.dagger.module.LocationModule
-import com.tpb.coinz.dagger.module.StoreModule
+import com.tpb.coinz.dagger.module.*
 import com.tpb.coinz.map.MapActivity
 import com.tpb.coinz.map.MapViewModel
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [LoaderModule::class, LocationModule::class, StoreModule::class, ConnectivityModule::class])
+@Component(modules = [LoaderModule::class, LocationModule::class, StoreModule::class, ConnectivityModule::class, BackendModule::class])
 interface MapComponent {
 
 

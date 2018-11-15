@@ -96,6 +96,6 @@ class CoinDownloader : CoinLoader {
             coins.add(
                     Coin(id, value, currency, markerSymbol, markerColor, LatLng(lat, long)))
         }
-        return Map(Date(), rates, coins)
+        return Map(Calendar.getInstance(), rates, coins)
     }
 }

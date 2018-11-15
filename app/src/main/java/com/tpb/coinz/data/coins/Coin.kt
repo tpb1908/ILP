@@ -6,13 +6,21 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 data class Coin(val id: String, val value: Double, val currency: Currency, val markerSymbol: Int, val markerColor: Int, val location: LatLng) {
 
     fun toMap(): HashMap<String, Any> {
-        val map = HashMap<String, Any>()
-        map["id"] = id
-        map["value"] = value
-        map["currency"] = currency.name
-        return map
+        return hashMapOf(id to hashMapOf(
+                "value" to value,
+                "currency" to currency.name,
+                "markerSymbol" to markerSymbol,
+                "markerColor" to markerColor,
+                "latitude" to location.latitude,
+                "longitude" to location.longitude))
+
     }
 
+    companion object {
+//        fun fromMap(id: String, map: HashMap<String, Any>): Coin {
+//            return Coin(id, map["value"])
+//        }
+    }
 
 }
 

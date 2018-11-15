@@ -1,5 +1,6 @@
 package com.tpb.coinz.data.coins
 
+import com.tpb.coinz.Result
 import java.util.*
 
 interface MapStore {
@@ -8,5 +9,5 @@ interface MapStore {
 
     fun getLastStoreDate(callback: (Calendar) -> Unit)
 
-    fun getLatest(callback: (Map?) -> Unit)
+    fun getLatest(callback: (Result<Map>) -> Unit)
 }
