@@ -92,8 +92,11 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         if (markers.containsKey(coin)) {
             navigator.get()?.removeMarker(markers.getValue(coin))
             markers.remove(coin)
-            map?.remainingCoins?.remove(coin)
-            map?.collectedCoins?.add(coin)
+            map?.let {
+                it.remainingCoins.remove(coin)
+                it.collectedCoins.add(coin)
+                mapStore.update(it)
+            }
             if (markers.isEmpty()) {
                 //TODO: Notification of all remainingCoins collected
             }

@@ -5,4 +5,4 @@ import androidx.room.PrimaryKey
 import com.tpb.coinz.data.coins.Map
 
 @Entity(tableName = "map")
-data class RoomMap(@PrimaryKey(autoGenerate = true) var uid: Long = 0, val map: Map)
+data class RoomMap(val map: Map, @PrimaryKey var uid: Long = map.dateGenerated.timeInMillis)

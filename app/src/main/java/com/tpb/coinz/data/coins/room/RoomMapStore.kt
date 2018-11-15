@@ -1,5 +1,6 @@
 package com.tpb.coinz.data.coins.room
 
+import android.util.Log
 import androidx.room.*
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coins.Map
@@ -33,11 +34,20 @@ class RoomMapStore(database: Database): MapStore {
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         fun insert(map: RoomMap): Long
 
+        @Update()
+        fun update(map: RoomMap)
+
     }
 
     override fun store(map: Map) {
         GlobalScope.launch(Dispatchers.IO) {
             dao.insert(RoomMap(map=map))
+        }
+    }
+
+    override fun update(map: Map) {
+        GlobalScope.launch(Dispatchers.IO) {
+            dao.update(RoomMap(map))
         }
     }
 
@@ -55,6 +65,7 @@ class RoomMapStore(database: Database): MapStore {
             if (map == null) {
                 callback(Result.None)
             } else {
+                Log.i("RoomMapStore", "Loaded map $map")
                 map.apply { callback(Result.Value(this.map)) }
             }
 

@@ -5,7 +5,6 @@ import com.tpb.coinz.data.backend.CoinCollection
 import com.tpb.coinz.data.backend.FireStoreCoinCollection
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
