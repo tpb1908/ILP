@@ -38,7 +38,13 @@ class RoomMapStore(database: Database): MapStore {
     }
 
     override fun getLastStoreDate(callback: (Calendar) -> Unit) {
-
+        getLatest {
+            if (it != null) {
+                val cal = Calendar.getInstance()
+                cal.time = it.dateGenerated
+                callback(cal)
+            }
+        }
     }
 
     override fun getLatest(callback: (Map?) -> Unit) {

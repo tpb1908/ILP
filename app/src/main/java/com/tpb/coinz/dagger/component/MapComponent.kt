@@ -1,5 +1,6 @@
 package com.tpb.coinz.dagger.component
 
+import com.tpb.coinz.dagger.module.ConnectivityModule
 import com.tpb.coinz.dagger.module.LoaderModule
 import com.tpb.coinz.dagger.module.LocationModule
 import com.tpb.coinz.dagger.module.StoreModule
@@ -9,12 +10,11 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [LoaderModule::class, LocationModule::class, StoreModule::class])
+@Component(modules = [LoaderModule::class, LocationModule::class, StoreModule::class, ConnectivityModule::class])
 interface MapComponent {
 
 
     fun inject(activity: MapActivity)
-
 
     fun inject(viewModel: MapViewModel)
 

@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.App
 import com.tpb.coinz.base.BaseViewModel
+import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.CoinLoader
 import com.tpb.coinz.data.coins.Map
@@ -43,10 +44,14 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
 
     override fun init() {
         (getApplication() as App).mapComponent.inject(this)
-        coinLoader.loadCoins(Calendar.getInstance(), mapLoadCallback)
+        mapStore.getLatest {
+            if(it?.dateGenerated?.before(Calendar.getInstance().time) == true) {
+                coinLoader.loadCoins(Calendar.getInstance(), mapLoadCallback)
+            } else {
+                map = it
+            }
+        }
         locationProvider.addListener(this)
-
-
     }
 
     private val mapLoadCallback = { m: Map? ->
@@ -67,6 +72,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
 
 
     override fun locationAvailable() {
+
     }
 
     override fun locationUnavailable() {
@@ -84,6 +90,9 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         if (markers.containsKey(coin)) {
             navigator.get()?.removeMarker(markers.getValue(coin))
             markers.remove(coin)
+            if (markers.isEmpty()) {
+                //TODO: Notification of all coins collected
+            }
         } else {
             Log.e("MapViewModel", "No marker for $coin")
         }

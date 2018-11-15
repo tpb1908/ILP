@@ -10,6 +10,9 @@ import com.tpb.coinz.dagger.component.MapComponent
 import com.tpb.coinz.dagger.module.LoaderModule
 import com.tpb.coinz.dagger.module.LocationModule
 import com.tpb.coinz.dagger.module.StoreModule
+import android.content.IntentFilter
+import com.tpb.coinz.dagger.module.ConnectivityModule
+
 
 class App : Application() {
 
@@ -32,6 +35,7 @@ class App : Application() {
                 .loaderModule(LoaderModule())
                 .locationModule(LocationModule(this))
                 .storeModule(StoreModule(this))
+                .connectivityModule(ConnectivityModule(this))
                 .build()
     }
 

@@ -5,7 +5,9 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -20,6 +22,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.*
+import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
@@ -31,6 +34,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
 
     @Inject
     lateinit var locationProvider: LocationProvider
+
+    @Inject lateinit var connection: ConnectionLiveData
 
     private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
@@ -50,7 +55,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         initLocationSystem()
         if (intent.hasExtra(getString(R.string.extra_camera_position))) {
             val position = intent.getParcelableExtra<CameraPosition>(getString(R.string.extra_camera_position))
-            Log.i("MapActivity", "Moving to initial camera position $position")
             setCameraPosition(position)
         } else {
             moveToInitialLocation()
@@ -61,12 +65,14 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         vm = ViewModelProviders.of(this).get(MapViewModel::class.java)
         vm.setNavigator(this)
         vm.init()
-        vm.coins.observeForever { coins ->
+        vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {
-
                 vm.mapMarkers(coins.zip(it.addMarkers(coins.map(::coinToMarkerOption))).toMap().toMutableMap())
             }
-        }
+        })
+        connection.observe(this, Observer<Boolean> {
+
+        })
     }
 
     private fun coinToMarkerOption(coin: Coin): MarkerOptions {
@@ -77,6 +83,10 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
                 .setIcon(getCoinIcon(coin))
     }
 
+    /**
+     * Load a marker icon as a tinted [Bitmap] and pass to [IconFactory.fromBitmap] which wraps
+     * it to be displayed on the map
+     */
     private fun getCoinIcon(coin: Coin): Icon {
         val bitmap = Utils.loadAndTintBitMap(this, R.drawable.ic_location_white_24dp, coin.markerColor)
         return iconFactory.fromBitmap(bitmap)
@@ -121,22 +131,10 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         }
     }
 
-    override fun requestLocationPermission() {
-        permissionsManager.requestLocationPermissions(this)
-    }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
 
-    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-        Log.i(MapActivity::class.java.name, "Permissions to explain $permissionsToExplain")
-    }
-
-    override fun onPermissionResult(granted: Boolean) {
-        Log.i(MapActivity::class.java.name, "Permission result $granted")
-        initLocationSystem()
+    private val coinLocationOnClick: View.OnClickListener = View.OnClickListener {
+        moveToInitialLocation()
     }
 
     private val myLocationOnClick: View.OnClickListener = View.OnClickListener {
@@ -148,17 +146,13 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         }
     }
 
-    private val coinLocationOnClick: View.OnClickListener = View.OnClickListener {
-        moveToInitialLocation()
+    private fun setCameraPosition(position: CameraPosition)  = mapview.getMapAsync {
+        it.animateCamera(CameraUpdateFactory.newCameraPosition(position))
     }
 
-    private fun setCameraPosition(position: CameraPosition) {
-        mapview.getMapAsync {
-            it.cameraPosition = position
-        }
+    override fun removeMarker(marker: Marker) = mapview.getMapAsync {
+        it.removeMarker(marker)
     }
-
-    override fun removeMarker(marker: Marker) = mapview.getMapAsync { it.removeMarker(marker) }
 
 
     private fun moveToInitialLocation() {
@@ -178,6 +172,28 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
             markerOptions.icon = IconFactory.getInstance(this@MapActivity).fromBitmap(bitmap)
             it.addMarker(markerOptions)
         }
+    }
+
+    override fun displayMessage(resId: Int) {
+        Toast.makeText(this, resId, Toast.LENGTH_LONG).show()
+    }
+
+    override fun requestLocationPermission() {
+        permissionsManager.requestLocationPermissions(this)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
+        Log.i(MapActivity::class.java.name, "Permissions to explain $permissionsToExplain")
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        Log.i(MapActivity::class.java.name, "Permission result $granted")
+        initLocationSystem()
     }
 
     public override fun onResume() {
