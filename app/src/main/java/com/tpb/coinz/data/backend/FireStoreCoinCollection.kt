@@ -5,7 +5,6 @@ import com.google.firebase.firestore.*
 import com.tpb.coinz.data.coins.Coin
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.DocumentReference
 
 
 
@@ -19,8 +18,6 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     override fun collectCoin(id: String, coin: Coin) {
         Log.i("FireStore", "Collecting ${coin.toMap()} for $id")
         store.collection(collected).document(id).update(coin.toMap())
-        //TODO: Write to scoreboard
-        updateScoreboard(id, coin)
     }
 
     private fun updateScoreboard(id: String, coin: Coin) {

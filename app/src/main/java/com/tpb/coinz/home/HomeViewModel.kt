@@ -32,6 +32,8 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
 
     val user = MutableLiveData<FirebaseUser>()
 
+    val collectionInfo = MutableLiveData<MapInfo>()
+
     override fun init() {
         (getApplication() as App).homeComponent.inject(this)
         fbUser = FirebaseAuth.getInstance().currentUser
@@ -40,10 +42,16 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
             navigator.get()?.beginLoginFlow()
         } else {
             user.postValue(fbUser)
+            checkForCurrentMap()
         }
+
+    }
+
+    // Check whether we have a valid
+    private fun checkForCurrentMap() {
         mapStore.getLatest {
             if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
-                postCoinCollectionInfo()
+                postCoinCollectionInfo(it.v)
             } else {
                 coinLoader.loadCoins(Calendar.getInstance()) {
                     map -> map?.apply { mapStore.store(this) }
@@ -55,23 +63,17 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
 
     // If we haven't collected any remainingCoins
     private fun postEmptyCollectionInfo() {
-
+        collectionInfo.postValue(MapInfo(0, 50))
     }
 
-    private fun postCoinCollectionInfo() {
-        fbUser?.let {
-          coinCollection.get().getCollectedCoins(it.uid, object: EventListener<DocumentSnapshot> {
-              override fun onEvent(p0: DocumentSnapshot?, p1: FirebaseFirestoreException?) {
-
-              }
-          })
-        }
+    private fun postCoinCollectionInfo(map: Map) {
+        collectionInfo.postValue(MapInfo(map.collectedCoins.size, map.remainingCoins.size))
     }
 
     fun userLoggedIn() {
         fbUser = FirebaseAuth.getInstance().currentUser
         user.postValue(fbUser)
-        postCoinCollectionInfo()
+        checkForCurrentMap()
     }
 
     fun userLoginFailed() {

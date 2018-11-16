@@ -65,11 +65,16 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
         vm.init()
 
         vm.user.observe(this, userObserver)
+        vm.collectionInfo.observe(this, collectionObserver)
     }
 
     private val userObserver = Observer<FirebaseUser> {
         Log.i("UserObserver", "User updated $it")
         user_email.text = it.email
+    }
+
+    private val collectionObserver = Observer<MapInfo> {
+        map_collection_info.text = getString(R.string.home_coin_collection_info, it.numCollected, it.numRemaining)
     }
 
     override fun beginLoginFlow() {
