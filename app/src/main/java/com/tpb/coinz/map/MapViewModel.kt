@@ -5,6 +5,7 @@ import android.location.Location
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.App
@@ -34,7 +35,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
     @Inject
     lateinit var locationProvider: LocationProvider
 
-    private val user = FirebaseAuth.getInstance().currentUser
+    private var user: FirebaseUser? = null
 
     @Inject lateinit var coinCollection: CoinCollection
 
@@ -43,6 +44,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
 
     override fun init() {
         (getApplication() as App).mapComponent.inject(this)
+        user = FirebaseAuth.getInstance().currentUser
         mapStore.getLatest {
             if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
                 map = it.v
@@ -103,8 +105,8 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         } else {
             Log.e("MapViewModel", "No marker for $coin")
         }
-        //TODO: Cleanup
-        coinCollection.collectCoin(user?.uid ?: "", coin)
+        //TODO: Cleanup. Error if user null
+        user?.let { coinCollection.collectCoin(it.uid, coin) }
     }
 
 }

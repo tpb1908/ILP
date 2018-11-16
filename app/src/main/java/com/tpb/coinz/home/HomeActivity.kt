@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.App
+import com.tpb.coinz.BuildConfig
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.R
 import com.tpb.coinz.map.MapActivity
@@ -85,7 +86,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setIsSmartLockEnabled(false)
+                        .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
                         .setAvailableProviders(providers)
                         .build(),
                 RC_LOGIN)
