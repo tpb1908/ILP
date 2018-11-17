@@ -38,14 +38,18 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
 
     }
 
-    override fun getCollectedCoins(id: String, listener: EventListener<DocumentSnapshot>) {
-        store.collection(collected).document(id).addSnapshotListener(object: EventListener<DocumentSnapshot> {
-            override fun onEvent(d: DocumentSnapshot?, e: FirebaseFirestoreException?) {
-                d?.data?.forEach { s, any ->
-                    Log.i("FireStore", "Key $s, Value $any")
+    override fun getCollectedCoins(id: String, listener: (List<Coin>) -> Unit) {
+        Log.i("FireStoreCoinCollection", "Loading collected coins for $id")
+        store.collection(collected).document(id).addSnapshotListener { d, e ->
+            d?.data?.let { data ->
+                data.keys.forEach { key ->
+                    Log.i("FireStoreCoinCollection", "Coin $key map ${data[key]}")
+                    //coins.add(Coin.fromMap(key, it[key] as MutableMap<String, Any>))
                 }
+                //TODO: Error handling
+                listener(data.keys.map { Coin.fromMap(it, data[it] as MutableMap<String, Any>) })
             }
-        })
+        }
     }
 
 }

@@ -15,6 +15,7 @@
     </string>
 
     <string name="home_coin_collection_info">%1$d coinz collected. %2$d remaining</string>
-    
+    <string name="recycler_section_collected_coins">Collected coinz</string>
+    <string name="recycler_section_received_coins">Received coinz</string>
     <string name="extra_camera_position">camera_position</string>
 </resources>

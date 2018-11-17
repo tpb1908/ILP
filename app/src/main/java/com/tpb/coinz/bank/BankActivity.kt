@@ -1,9 +1,12 @@
 package com.tpb.coinz.bank
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 import kotlinx.android.synthetic.main.activity_bank.*
@@ -26,12 +29,18 @@ class BankActivity : AppCompatActivity(), BankNavigator{
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(BankViewModel::class.java)
         vm.availableCoins.observe(this, Observer<Pair<List<Coin>, List<Coin>>> {
+            Log.i("BankActivity", "Available coins changed $it")
             adapter.loadItems(it.first, it.second)
         })
+        vm.init()
     }
 
     private fun initViews() {
         available_coins_recycler.adapter = adapter
+        available_coins_recycler.layoutManager = LinearLayoutManager(this)
+        adapter.onClick = {
+            Toast.makeText(this, "${it.currency} clicked", Toast.LENGTH_LONG).show()
+        }
     }
 
 }

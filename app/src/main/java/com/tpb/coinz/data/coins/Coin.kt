@@ -17,9 +17,9 @@ data class Coin(val id: String, val value: Double, val currency: Currency, val m
     }
 
     companion object {
-        fun fromMap(id: String, map: HashMap<String, Any>): Coin {
+        fun fromMap(id: String, map: MutableMap<String, Any>): Coin {
             return Coin(id, map["value"] as Double, Currency.fromString(map["currency"] as String),
-                    map["markerSymbol"] as Int, map["markerColor"] as Int,
+                    (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
                     LatLng(map["latitude"] as Double, map["longitude"] as Double))
         }
     }

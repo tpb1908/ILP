@@ -8,7 +8,7 @@ interface CoinCollection {
 
     fun collectCoin(id: String, coin: Coin)
 
-    fun getCollectedCoins(id: String, listener: EventListener<DocumentSnapshot>)
+    fun getCollectedCoins(id: String, listener: (List<Coin>) -> Unit)
 
 
 
