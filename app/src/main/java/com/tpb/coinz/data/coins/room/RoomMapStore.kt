@@ -14,7 +14,7 @@ class RoomMapStore(database: Database): MapStore {
 
     private val dao: MapDao = database.mapDao()
 
-    @androidx.room.Database(entities = [RoomMap::class], version = 1)
+    @androidx.room.Database(entities = [RoomMap::class], version = 2)
     @TypeConverters(MapTypeConverter::class)
     public abstract class Database: RoomDatabase() {
 

@@ -9,9 +9,28 @@ import com.tpb.coinz.dagger.module.*
 
 class App : Application() {
 
-    lateinit var homeComponent: HomeComponent
-    lateinit var mapComponent: MapComponent
-    lateinit var bankComponent: BankComponent
+    val homeComponent: HomeComponent by lazy {
+        DaggerHomeComponent.builder()
+                .loaderModule(LoaderModule())
+                .locationModule(LocationModule(this))
+                .storeModule(StoreModule(this))
+                .backendModule(BackendModule())
+                .build()
+    }
+    val mapComponent: MapComponent by lazy {
+        DaggerMapComponent.builder()
+                .loaderModule(LoaderModule())
+                .locationModule(LocationModule(this))
+                .storeModule(StoreModule(this))
+                .connectivityModule(ConnectivityModule(this))
+                .build()
+    }
+    val bankComponent: BankComponent by lazy {
+        DaggerBankComponent.builder()
+                .connectivityModule(ConnectivityModule(this))
+                .backendModule(BackendModule())
+                .build()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -21,22 +40,6 @@ class App : Application() {
     private fun init() {
         val fbApp = FirebaseApp.initializeApp(this)!!
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
-        homeComponent = DaggerHomeComponent.builder()
-                .loaderModule(LoaderModule())
-                .locationModule(LocationModule(this))
-                .storeModule(StoreModule(this))
-                .backendModule(BackendModule())
-                .build()
-        mapComponent = DaggerMapComponent.builder()
-                .loaderModule(LoaderModule())
-                .locationModule(LocationModule(this))
-                .storeModule(StoreModule(this))
-                .connectivityModule(ConnectivityModule(this))
-                .build()
-        bankComponent = DaggerBankComponent.builder()
-                .connectivityModule(ConnectivityModule(this))
-                .backendModule(BackendModule())
-                .build()
     }
 
 }
