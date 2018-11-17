@@ -2,11 +2,8 @@ package com.tpb.coinz
 
 import android.app.Application
 import com.mapbox.mapboxsdk.Mapbox
-import com.tpb.coinz.dagger.component.DaggerHomeComponent
-import com.tpb.coinz.dagger.component.DaggerMapComponent
-import com.tpb.coinz.dagger.component.HomeComponent
-import com.tpb.coinz.dagger.component.MapComponent
 import com.google.firebase.FirebaseApp
+import com.tpb.coinz.dagger.component.*
 import com.tpb.coinz.dagger.module.*
 
 
@@ -14,6 +11,7 @@ class App : Application() {
 
     lateinit var homeComponent: HomeComponent
     lateinit var mapComponent: MapComponent
+    lateinit var bankComponent: BankComponent
 
     override fun onCreate() {
         super.onCreate()
@@ -34,6 +32,10 @@ class App : Application() {
                 .locationModule(LocationModule(this))
                 .storeModule(StoreModule(this))
                 .connectivityModule(ConnectivityModule(this))
+                .build()
+        bankComponent = DaggerBankComponent.builder()
+                .connectivityModule(ConnectivityModule(this))
+                .backendModule(BackendModule())
                 .build()
     }
 
