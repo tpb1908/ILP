@@ -1,10 +1,9 @@
 package com.tpb.coinz.bank
 
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.viewholder_divider.view.*
 
-class DividerViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+class DividerViewHolder(val view: View) : SelectableViewHolder(view) {
 
     var text: String? = ""
         set(value) {
@@ -12,4 +11,10 @@ class DividerViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             view.viewholder_divider_text.text = value
         }
 
+    override fun select() {
+        //TODO: Some form of selection when all viewholders in section are selected
+    }
+
+    override fun deselect() {
+    }
 }

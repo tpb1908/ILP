@@ -41,6 +41,7 @@ class BankActivity : AppCompatActivity(), BankNavigator{
         adapter.onClick = {
             Toast.makeText(this, "${it.currency} clicked", Toast.LENGTH_LONG).show()
         }
+        adapter.setNumStillBankable(10)
     }
 
 }

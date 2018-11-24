@@ -6,23 +6,54 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 
-class CoinRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CoinRecyclerAdapter: RecyclerView.Adapter<SelectableViewHolder>() {
 
-    private var userCoins: List<Coin> = emptyList()
-    private var sentCoins: List<Coin> = emptyList()
+    private var userCoins: List<SelectableItem> = emptyList()
+    private var sentCoins: List<SelectableItem> = emptyList()
+    var isSelectionEnabled = true
+    private var numStillBankable = 0
+    private var numCollectedCoinsSelected = 0
+
+    data class SelectableItem(var selected: Boolean, val coin: Coin)
 
     fun loadItems(newUserCoins: List<Coin>, newSentCoins: List<Coin>) {
-        userCoins = newUserCoins
-        sentCoins = newSentCoins
+        userCoins = newUserCoins.map { SelectableItem(false, it) }
+        sentCoins = newSentCoins.map { SelectableItem(false, it) }
         //TODO: Diff and notify for exact changes
         notifyDataSetChanged()
     }
 
-    var onClick: (Coin) -> Unit =  {
+    fun getSelectedCoins(): List<Coin> =
+            (userCoins + sentCoins).filter(SelectableItem::selected).map(SelectableItem::coin)
 
+    fun setNumStillBankable(stillBankable: Int) {
+        numStillBankable = stillBankable
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    var onClick: (Coin) -> Unit =  {}
+
+
+    private fun select(vh: CoinViewHolder, position: Int) {
+        val item = getStateForPosition(position)
+        if (position <= sentCoins.size) { // received coin
+            if (item.selected) vh.deselect() else vh.select()
+            item.selected = !item.selected
+        } else if(!item.selected) {
+            if (numCollectedCoinsSelected < numStillBankable ) {
+                vh.select()
+                item.selected = true
+                numCollectedCoinsSelected++
+            } else {
+                //TODO: Error should be handled in BankActivity
+            }
+        } else {
+            vh.deselect()
+            item.selected = false
+            numCollectedCoinsSelected--
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectableViewHolder =
             if (viewType == 1)
                 DividerViewHolder(LayoutInflater.from(parent.context).inflate(
                         R.layout.viewholder_divider, parent, false)
@@ -39,15 +70,24 @@ class CoinRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return if (position == 0 || position == Math.max(1, sentCoins.size)) 1 else 0
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder.itemViewType == 0) {
-            val coin = if (position > sentCoins.size) {
-                userCoins[position - sentCoins.size - 2]
-            } else {
-                sentCoins[position - 1]
+    private fun getStateForPosition(position: Int): SelectableItem = if (position > sentCoins.size) {
+        userCoins[position - sentCoins.size - 2]
+    } else {
+        sentCoins[position - 1]
+    }
+
+    override fun onBindViewHolder(holder: SelectableViewHolder, position: Int) {
+        // we also have holder.itemViewType, but auto-casts are nice
+        if (holder is CoinViewHolder) {
+            val coin = getStateForPosition(position).coin
+            holder.itemView.setOnClickListener {
+                if (isSelectionEnabled) {
+                    select(holder, position)
+                } else {
+                    onClick(coin)
+                }
             }
-            (holder as CoinViewHolder).coin = coin
-            holder.itemView.setOnClickListener { onClick(coin) }
+            holder.coin = coin
         } else {
             (holder as DividerViewHolder).text = holder.itemView.context.getString(
                     if (position == 0)

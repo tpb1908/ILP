@@ -5,9 +5,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.tpb.coinz.App
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel

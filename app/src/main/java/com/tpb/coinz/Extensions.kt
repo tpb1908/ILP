@@ -10,3 +10,4 @@ public sealed class Result<out T> {
     object None: Result<Nothing>()
     data class Value<T>(val v: T) : Result<T>()
 }
+

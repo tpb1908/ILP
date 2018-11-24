@@ -21,7 +21,6 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     }
 
     private fun updateScoreboard(id: String, coin: Coin) {
-        store.collection(scoreboardAll).document(id)
         val userScore = store.collection(scoreboardAll).document(id)
         store.runTransaction {
             val snapshot = it.get(userScore)
@@ -35,7 +34,6 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }.addOnFailureListener {
             Log.e("FireStore", "Failed to update scoreboard for $id", it)
         }
-
     }
 
     override fun getCollectedCoins(id: String, listener: (List<Coin>) -> Unit) {

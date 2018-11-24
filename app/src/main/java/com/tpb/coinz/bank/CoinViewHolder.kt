@@ -2,14 +2,12 @@ package com.tpb.coinz.bank
 
 import android.view.View
 import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
-import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.Currency
 import kotlinx.android.synthetic.main.viewholder_coin.view.*
 
-class CoinViewHolder(val view: View): RecyclerView.ViewHolder(view) {
+class CoinViewHolder(val view: View): SelectableViewHolder(view) {
     var coin: Coin? = null
         set(value) {
             field = value
@@ -29,4 +27,13 @@ class CoinViewHolder(val view: View): RecyclerView.ViewHolder(view) {
         }
     }
 
+    private val originalBackground = view.viewholder_coin_card.cardBackgroundColor
+
+    override fun select() {
+        view.viewholder_coin_card.setCardBackgroundColor(view.context.resources.getColor(R.color.colorAccent))
+    }
+
+    override fun deselect() {
+        view.viewholder_coin_card.setCardBackgroundColor(originalBackground)
+    }
 }
