@@ -1,6 +1,7 @@
 package com.tpb.coinz.messaging
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
@@ -14,16 +15,24 @@ class MessagesViewModel(application: Application) : BaseViewModel<MessagesNaviga
 
     @Inject lateinit var userCollection: UserCollection
 
-    val threadIntents = MutableLiveData<String>()
-    override fun bind() {
+    val threads = MutableLiveData<List<ChatCollection.Thread>>()
 
+    val threadIntents = MutableLiveData<ChatCollection.Thread>()
+    override fun bind() {
+        chatCollection.getThreads(userCollection.getCurrentUser()) {
+            if (it is Result.Value<List<ChatCollection.Thread>>) {
+                Log.i("MessagesViewModel", "Retrieved threads ${it.v}")
+                threads.postValue(it.v)
+            }
+        }
     }
 
     fun createChat(userEmail: String) {
         userCollection.retrieveUserFromEmail(userEmail) { user ->
             if (user is Result.Value<UserCollection.User>) {
-                chatCollection.createThread(userCollection.getCurrentUser() ,user.v) {
-                    if (it is Result.Value<String>) {
+                chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
+                    if (it is Result.Value<ChatCollection.Thread>) {
+                        threads.postValue(threads.value?.plus(it.v))
                         threadIntents.postValue(it.v)
                     }
                 }

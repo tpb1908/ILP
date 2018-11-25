@@ -5,7 +5,7 @@ import com.tpb.coinz.Result
 
 interface ChatCollection {
 
-    fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (Result<String>) -> Unit)
+    fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (Result<Thread>) -> Unit)
 
     fun openThread(creator: User, partner: User)
 

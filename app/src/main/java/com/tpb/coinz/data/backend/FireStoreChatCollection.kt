@@ -11,7 +11,7 @@ import com.tpb.coinz.db.threads
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
 
 
-    override fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (com.tpb.coinz.Result<String>) -> Unit) {
+    override fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (com.tpb.coinz.Result<ChatCollection.Thread>) -> Unit) {
         // Create empty thread in threads
         // Then Add thread id to both users
         val collection = store.collection(threads)
@@ -29,14 +29,20 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
     }
 
-    private fun addThreadToUserChats(threadId: String, creator: UserCollection.User, partner: UserCollection.User, callback: (com.tpb.coinz.Result<String>) -> Unit) {
+    private fun addThreadToUserChats(threadId: String, creator: UserCollection.User, partner: UserCollection.User, callback: (com.tpb.coinz.Result<ChatCollection.Thread>) -> Unit) {
         val chats = store.collection(chats)
         val userDoc = chats.document(creator.uid)
         val partnerDoc = chats.document(partner.uid)
         store.runTransaction {
-            it.set(userDoc, mapOf(threadId to partner.uid), SetOptions.merge())
-            it.set(partnerDoc, mapOf(threadId to creator.uid))
-            callback(Result.Value(threadId))
+            it.set(userDoc,
+                    mapOf(threadId to mapOf("partner_uid" to partner.uid, "partner_email" to partner.email)),
+                    SetOptions.merge()
+            )
+            it.set(partnerDoc,
+                    mapOf(threadId to mapOf("partner_uid" to creator.uid, "partner_email" to partner.email)),
+                    SetOptions.merge()
+            )
+            callback(Result.Value(ChatCollection.Thread(threadId, partner)))
         }
     }
 
@@ -56,8 +62,8 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                     val threads = mutableListOf<ChatCollection.Thread>()
                     data.keys.forEach { key ->
                         threads.add(ChatCollection.Thread(key, UserCollection.User(
-                                (data[key] as Map<String, Any>)["uid"] as String,
-                                (data[key] as Map<String, Any>)["email"] as String
+                                (data[key] as Map<String, Any>)["partner_uid"] as String,
+                                (data[key] as Map<String, Any>)["partner_email"] as String
                         )))
                         Log.i("FireStoreChatCollection", "Thread $key, ")
                     }
