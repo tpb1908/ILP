@@ -37,6 +37,12 @@ class App : Application() {
                 .chatModule(ChatModule())
                 .build()
     }
+    val threadComponent: ThreadComponent by lazy {
+        DaggerThreadComponent.builder()
+                .connectivityModule(ConnectivityModule(this))
+                .chatModule(ChatModule())
+                .build()
+    }
 
     override fun onCreate() {
         super.onCreate()

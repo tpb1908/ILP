@@ -57,7 +57,7 @@ class MessagesActivity : AppCompatActivity() {
 
         vm.threadIntents.observe(this, Observer<ChatCollection.Thread> {
             val intent = Intent(this@MessagesActivity, ThreadActivity::class.java)
-            intent.putExtra(ThreadActivity.EXTRA_THREAD_ID, it)
+            intent.putExtra(ThreadActivity.EXTRA_THREAD, it)
             startActivity(intent)
         })
 

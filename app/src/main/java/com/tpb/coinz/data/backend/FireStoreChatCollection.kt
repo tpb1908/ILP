@@ -1,17 +1,17 @@
 package com.tpb.coinz.data.backend
 
 import android.util.Log
-import com.firebase.ui.auth.data.model.User
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.*
 import com.tpb.coinz.Result
 import com.tpb.coinz.db.chats
 import com.tpb.coinz.db.threads
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
 
+    private var openThread: ChatCollection.Thread? = null
+    private var listenerRegistration: ListenerRegistration? = null
 
-    override fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (com.tpb.coinz.Result<ChatCollection.Thread>) -> Unit) {
+    override fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (Result<ChatCollection.Thread>) -> Unit) {
         // Create empty thread in threads
         // Then Add thread id to both users
         val collection = store.collection(threads)
@@ -29,7 +29,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
     }
 
-    private fun addThreadToUserChats(threadId: String, creator: UserCollection.User, partner: UserCollection.User, callback: (com.tpb.coinz.Result<ChatCollection.Thread>) -> Unit) {
+    private fun addThreadToUserChats(threadId: String, creator: UserCollection.User, partner: UserCollection.User, callback: (Result<ChatCollection.Thread>) -> Unit) {
         val chats = store.collection(chats)
         val userDoc = chats.document(creator.uid)
         val partnerDoc = chats.document(partner.uid)
@@ -42,17 +42,32 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                     mapOf(threadId to mapOf("partner_uid" to creator.uid, "partner_email" to creator.email)),
                     SetOptions.merge()
             )
-            callback(Result.Value(ChatCollection.Thread(threadId, partner)))
+            callback(Result.Value(ChatCollection.Thread(threadId, creator, partner)))
         }
     }
 
-    override fun openThread(creator: User, partner: User) {
+    private val threadSnapshotListener: EventListener<DocumentSnapshot> = EventListener { snapshot, exception ->
+        if (snapshot?.exists() == true) {
+            snapshot.data?.let {
+                Log.i("FireStoreChatCollection", "Chat data recieved $it")
+            }
+        }
     }
 
-    override fun closeThread(partnerId: String) {
+    override fun openThread(thread: ChatCollection.Thread) {
+        openThread = thread
+        listenerRegistration?.remove()
+        listenerRegistration = store.collection(threads).document(thread.threadId).addSnapshotListener(threadSnapshotListener)
     }
 
-    override fun postMessage(message: String) {
+    override fun closeThread(thread: ChatCollection.Thread) {
+        listenerRegistration?.remove()
+    }
+
+    override fun postMessage(message: ChatCollection.Message) {
+        openThread?.let {
+            store.collection(threads).document(it.threadId)
+        }
     }
 
     override fun getThreads(user: UserCollection.User, callback: (Result<List<ChatCollection.Thread>>) -> Unit) {
@@ -61,7 +76,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                 it.result?.data?.let { data ->
                     val threads = mutableListOf<ChatCollection.Thread>()
                     data.keys.forEach { key ->
-                        threads.add(ChatCollection.Thread(key, UserCollection.User(
+                        threads.add(ChatCollection.Thread(key, user, UserCollection.User(
                                 (data[key] as Map<String, Any>)["partner_uid"] as String,
                                 (data[key] as Map<String, Any>)["partner_email"] as String
                         )))
