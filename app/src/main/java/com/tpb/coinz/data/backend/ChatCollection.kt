@@ -1,7 +1,9 @@
 package com.tpb.coinz.data.backend
 
+import android.os.Parcelable
 import com.firebase.ui.auth.data.model.User
 import com.tpb.coinz.Result
+import kotlinx.android.parcel.Parcelize
 
 interface ChatCollection {
 
@@ -15,5 +17,6 @@ interface ChatCollection {
 
     fun getThreads(user: UserCollection.User, callback: (Result<List<Thread>>) -> Unit)
 
-    data class Thread(val threadId: String, val partner: UserCollection.User)
+    @Parcelize
+    data class Thread(val threadId: String, val partner: UserCollection.User): Parcelable
 }

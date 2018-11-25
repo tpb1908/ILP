@@ -1,6 +1,8 @@
 package com.tpb.coinz.data.backend
 
+import android.os.Parcelable
 import com.tpb.coinz.Result
+import kotlinx.android.parcel.Parcelize
 
 interface UserCollection {
 
@@ -10,6 +12,7 @@ interface UserCollection {
 
     fun retrieveUserFromEmail(email: String, callback: (Result<User>) -> Unit)
 
-    data class User(val uid: String, val email: String)
+    @Parcelize
+    data class User(val uid: String, val email: String): Parcelable
 
 }
