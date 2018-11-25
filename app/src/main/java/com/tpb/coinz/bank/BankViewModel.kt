@@ -10,7 +10,7 @@ import com.tpb.coinz.data.backend.CoinCollection
 import com.tpb.coinz.data.coins.Coin
 import javax.inject.Inject
 
-class BankViewModel(application: Application) : BaseViewModel<BankNavigator>(application) {
+class BankViewModel : BaseViewModel<BankViewModel.BankAction>() {
 
     @Inject
     lateinit var coinCollection: CoinCollection
@@ -18,6 +18,8 @@ class BankViewModel(application: Application) : BaseViewModel<BankNavigator>(app
     val availableCoins = MutableLiveData<Pair<List<Coin>, List<Coin>>>()
 
     private var user: FirebaseUser? = null
+
+    override val actions = MutableLiveData<BankAction>()
 
     override fun bind() {
         user = FirebaseAuth.getInstance().currentUser
@@ -31,5 +33,7 @@ class BankViewModel(application: Application) : BaseViewModel<BankNavigator>(app
             }
         }
     }
+
+    sealed class BankAction {}
 
 }

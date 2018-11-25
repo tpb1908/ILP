@@ -15,7 +15,7 @@ import com.tpb.coinz.R
 import com.tpb.coinz.data.backend.ChatCollection
 import kotlinx.android.synthetic.main.activity_messages.*
 
-class MessagesActivity : AppCompatActivity(), MessagesNavigator {
+class MessagesActivity : AppCompatActivity() {
 
     private lateinit var vm: MessagesViewModel
 
@@ -53,7 +53,6 @@ class MessagesActivity : AppCompatActivity(), MessagesNavigator {
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(MessagesViewModel::class.java)
         (application as App).messagesComponent.inject(vm)
-        vm.setNavigator(this)
         vm.bind()
 
         vm.threadIntents.observe(this, Observer<ChatCollection.Thread> {

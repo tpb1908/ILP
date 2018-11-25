@@ -12,7 +12,7 @@ import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 import kotlinx.android.synthetic.main.activity_bank.*
 
-class BankActivity : AppCompatActivity(), BankNavigator{
+class BankActivity : AppCompatActivity() {
 
     private lateinit var vm: BankViewModel
 

@@ -30,7 +30,7 @@ import java.lang.Exception
 import javax.inject.Inject
 
 
-class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
+class MapActivity : AppCompatActivity(), PermissionsListener {
 
     @Inject
     lateinit var locationProvider: LocationProvider
@@ -64,16 +64,25 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(MapViewModel::class.java)
         (application as App).mapComponent.inject(vm)
-        vm.setNavigator(this)
         vm.bind()
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {
                 vm.mapMarkers(coins.zip(it.addMarkers(coins.map(::coinToMarkerOption))).toMap().toMutableMap())
             }
         })
+        vm.actions.observe(this, Observer {
+            if (it is MapViewModel.MapActions.RemoveMarker) {
+                mapview.getMapAsync { map ->
+                    map.removeMarker(it.marker)
+                }
+            } else if (it is MapViewModel.MapActions.DisplayMessage) {
+                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+            }
+        })
         connection.observe(this, Observer<Boolean> {
 
         })
+
     }
 
     private fun coinToMarkerOption(coin: Coin): MarkerOptions {
@@ -93,7 +102,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         return iconFactory.fromBitmap(bitmap)
     }
 
-    override fun beginLocationTracking() {
+    private fun beginLocationTracking() {
         locationProvider.start()
     }
 
@@ -151,11 +160,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         it.animateCamera(CameraUpdateFactory.newCameraPosition(position))
     }
 
-    override fun removeMarker(marker: Marker) = mapview.getMapAsync {
-        it.removeMarker(marker)
-    }
-
-
     private fun moveToInitialLocation() {
         mapview.getMapAsync {
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
@@ -175,11 +179,9 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
         }
     }
 
-    override fun displayMessage(resId: Int) {
-        Toast.makeText(this, resId, Toast.LENGTH_LONG).show()
-    }
 
-    override fun requestLocationPermission() {
+
+    private fun requestLocationPermission() {
         permissionsManager.requestLocationPermissions(this)
     }
 

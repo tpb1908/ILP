@@ -9,7 +9,7 @@ import com.tpb.coinz.data.backend.ChatCollection
 import com.tpb.coinz.data.backend.UserCollection
 import javax.inject.Inject
 
-class MessagesViewModel(application: Application) : BaseViewModel<MessagesNavigator>(application) {
+class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
 
     @Inject lateinit var chatCollection: ChatCollection
 
@@ -18,6 +18,9 @@ class MessagesViewModel(application: Application) : BaseViewModel<MessagesNaviga
     val threads = MutableLiveData<List<ChatCollection.Thread>>()
 
     val threadIntents = MutableLiveData<ChatCollection.Thread>()
+
+    override val actions = MutableLiveData<MessagesAction>()
+
     override fun bind() {
         chatCollection.getThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<ChatCollection.Thread>>) {
@@ -43,4 +46,6 @@ class MessagesViewModel(application: Application) : BaseViewModel<MessagesNaviga
     fun openChat() {
 
     }
+
+    sealed class MessagesAction {}
 }

@@ -1,14 +1,13 @@
 package com.tpb.coinz.map
 
-import android.app.Application
 import android.location.Location
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.tpb.coinz.App
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.CoinCollection
@@ -23,7 +22,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 
-class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(application), com.tpb.coinz.data.location.LocationListener {
+class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.data.location.LocationListener {
 
     @Inject
     lateinit var coinLoader: CoinLoader
@@ -39,8 +38,11 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
 
     @Inject lateinit var coinCollection: CoinCollection
 
+
     private var map: Map? = null
     private var markers: MutableMap<Coin, Marker> = HashMap()
+
+    override val actions = MutableLiveData<MapActions>()
 
     override fun bind() {
         user = FirebaseAuth.getInstance().currentUser
@@ -91,7 +93,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
     private fun collect(coin: Coin) {
         Log.i("MapViewModel", "Collecting coin $coin")
         if (markers.containsKey(coin)) {
-            navigator.get()?.removeMarker(markers.getValue(coin))
+            actions.postValue(MapActions.RemoveMarker(markers.getValue(coin)))
             markers.remove(coin)
             map?.let {
                 it.remainingCoins.remove(coin)
@@ -108,4 +110,8 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
         user?.let { coinCollection.collectCoin(it.uid, coin) }
     }
 
+    sealed class MapActions {
+        class RemoveMarker(val marker: Marker): MapActions()
+        class DisplayMessage(@StringRes val message: Int): MapActions()
+    }
 }

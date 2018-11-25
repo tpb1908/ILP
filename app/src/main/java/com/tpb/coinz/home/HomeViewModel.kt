@@ -6,8 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import com.tpb.coinz.App
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.CoinCollection
@@ -18,7 +16,7 @@ import dagger.Lazy
 import java.util.*
 import javax.inject.Inject
 
-class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(application) {
+class HomeViewModel: BaseViewModel<HomeViewModel.HomeActions>(){
 
     @Inject
     lateinit var coinLoader: CoinLoader
@@ -33,11 +31,13 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
+    override val actions: MutableLiveData<HomeActions> = MutableLiveData()
+
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
         Log.i(this::class.toString(), "User $fbUser")
         if (fbUser == null) {
-            navigator.get()?.beginLoginFlow()
+            actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
         } else {
             user.postValue(fbUser)
             checkForCurrentMap()
@@ -84,9 +84,11 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
     }
 
     fun userLoginFailed() {
-        navigator.get()?.beginLoginFlow()
+        actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
     }
 
-
+    enum class HomeActions {
+        BEGIN_LOGIN_FLOW
+    }
 
 }

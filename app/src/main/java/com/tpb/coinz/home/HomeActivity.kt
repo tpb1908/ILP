@@ -25,7 +25,7 @@ import com.tpb.coinz.map.MapActivity
 import com.tpb.coinz.messaging.MessagesActivity
 import kotlinx.android.synthetic.main.activity_home.*
 
-class HomeActivity : AppCompatActivity(), HomeNavigator {
+class HomeActivity : AppCompatActivity() {
 
     private val RC_LOGIN = 5534
     private lateinit var vm: HomeViewModel
@@ -65,11 +65,15 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         (application as App).homeComponent.inject(vm)
-        vm.setNavigator(this)
         vm.bind()
 
         vm.user.observe(this, userObserver)
         vm.collectionInfo.observe(this, collectionObserver)
+        vm.actions.observe(this, Observer {
+            when (it) {
+                HomeViewModel.HomeActions.BEGIN_LOGIN_FLOW -> beginLoginFlow()
+            }
+        })
     }
 
     private val userObserver = Observer<FirebaseUser> {
@@ -81,7 +85,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
         map_collection_info.text = getString(R.string.home_coin_collection_info, it.numCollected, it.numRemaining)
     }
 
-    override fun beginLoginFlow() {
+    private fun beginLoginFlow() {
         val providers = listOf(
                 AuthUI.IdpConfig.EmailBuilder().build(),
                 AuthUI.IdpConfig.PhoneBuilder().build(),
