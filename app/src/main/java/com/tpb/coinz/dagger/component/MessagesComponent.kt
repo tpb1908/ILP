@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-@Component(modules = [ConnectivityModule::class, ChatModule::class])
+@Component(modules = [ConnectivityModule::class, ChatModule::class, UserModule::class])
 interface MessagesComponent {
 
 

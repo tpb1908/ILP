@@ -22,6 +22,7 @@ import com.tpb.coinz.BuildConfig
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.R
 import com.tpb.coinz.map.MapActivity
+import com.tpb.coinz.messaging.MessagesActivity
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity(), HomeNavigator {
@@ -37,6 +38,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
 
         initViews(savedInstanceState)
         bindViewModel()
+        startActivity(Intent(this, MessagesActivity::class.java))
     }
 
     private fun initViews(savedInstanceState: Bundle?) {

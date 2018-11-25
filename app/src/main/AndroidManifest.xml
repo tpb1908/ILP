@@ -33,6 +33,7 @@
         </activity>
         <activity android:name=".bank.BankActivity" />
         <activity android:name=".messaging.MessagesActivity" />
+        <activity android:name=".messaging.ThreadActivity" />
     </application>
 
 </manifest>
