@@ -1,5 +1,6 @@
 package com.tpb.coinz.dagger.module
 
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.backend.ChatCollection
 import com.tpb.coinz.data.backend.FireStoreChatCollection
 import dagger.Module
@@ -12,7 +13,7 @@ class ChatModule {
     @Singleton
     @Provides
     fun provideChatCollection(): ChatCollection {
-        return FireStoreChatCollection()
+        return FireStoreChatCollection(FirebaseFirestore.getInstance())
     }
 
 }

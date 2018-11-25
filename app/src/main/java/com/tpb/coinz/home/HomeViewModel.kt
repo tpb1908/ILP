@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.tpb.coinz.App
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
@@ -70,6 +72,14 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
     fun userLoggedIn() {
         fbUser = FirebaseAuth.getInstance().currentUser
         user.postValue(fbUser)
+        fbUser?.let {
+            FirebaseFirestore.getInstance().collection("users").document(it.uid).set(
+                    mapOf("email" to it.email)
+            ).addOnCompleteListener { task ->
+                Log.i("HomeViewModel", "Stored user email ${it.email}")
+            }
+        }
+
         checkForCurrentMap()
     }
 

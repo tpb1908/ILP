@@ -100,6 +100,7 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
                 vm.userLoggedIn()
+
             } else {
                 vm.userLoginFailed()
             }
