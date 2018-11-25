@@ -39,7 +39,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                     SetOptions.merge()
             )
             it.set(partnerDoc,
-                    mapOf(threadId to mapOf("partner_uid" to creator.uid, "partner_email" to partner.email)),
+                    mapOf(threadId to mapOf("partner_uid" to creator.uid, "partner_email" to creator.email)),
                     SetOptions.merge()
             )
             callback(Result.Value(ChatCollection.Thread(threadId, partner)))
