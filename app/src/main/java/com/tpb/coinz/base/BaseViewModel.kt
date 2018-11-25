@@ -13,6 +13,6 @@ abstract class BaseViewModel<N>(application: Application) : AndroidViewModel(app
         this.navigator = WeakReference(navigator)
     }
 
-    abstract fun init()
+    abstract fun bind()
 
 }

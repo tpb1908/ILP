@@ -32,6 +32,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".bank.BankActivity" />
+        <activity android:name=".messaging.MessagesActivity" />
     </application>
 
 </manifest>

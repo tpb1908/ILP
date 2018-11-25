@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.tpb.coinz.Result
 import com.tpb.coinz.db.chats
 import com.tpb.coinz.db.threads
 
@@ -12,7 +13,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     private val user = FirebaseAuth.getInstance().currentUser
 
     //TODO: Add partner email
-    override fun createThread(partnerId: String) {
+    override fun createThread(partnerId: String, callback: (com.tpb.coinz.Result<String>) -> Unit) {
         // Create empty thread in threads
         // Then Add thread id to both users
         val collection = store.collection(threads)
@@ -21,7 +22,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         collection.add(mapOf(threadId to mapOf("created" to System.currentTimeMillis(), "recipient" to partnerId))).addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.i("FireStoreChatCollection", "Created thread $threadId")
-                addThreadToUserChats(threadId, partnerId)
+                addThreadToUserChats(threadId, partnerId, callback)
 
             } else if (it.isCanceled) {
                 Log.e("FireStoreChatCollection", "Cancelled thread creation $threadId")
@@ -29,7 +30,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
     }
 
-    private fun addThreadToUserChats(threadId: String, partnerId: String) {
+    private fun addThreadToUserChats(threadId: String, partnerId: String, callback: (com.tpb.coinz.Result<String>) -> Unit) {
         val userId = user?.uid ?: "user_id_error"
         val chats = store.collection(chats)
         val userDoc = chats.document(userId)
@@ -37,6 +38,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         store.runTransaction {
             it.set(userDoc, mapOf(threadId to partnerId), SetOptions.merge())
             it.set(partnerDoc, mapOf(threadId to userId))
+            callback(Result.Value(threadId))
         }
     }
 

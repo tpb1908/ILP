@@ -10,7 +10,7 @@ class ThreadViewModel(application: Application) : BaseViewModel<ThreadNavigator>
     @Inject
     lateinit var chatCollection: ChatCollection
 
-    override fun init() {
+    override fun bind() {
 
     }
 }

@@ -21,7 +21,6 @@ import com.tpb.coinz.App
 import com.tpb.coinz.BuildConfig
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.R
-import com.tpb.coinz.bank.BankActivity
 import com.tpb.coinz.map.MapActivity
 import kotlinx.android.synthetic.main.activity_home.*
 
@@ -38,7 +37,6 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
 
         initViews(savedInstanceState)
         bindViewModel()
-        startActivity(Intent(this, BankActivity::class.java))
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
@@ -64,8 +62,9 @@ class HomeActivity : AppCompatActivity(), HomeNavigator {
 
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        (application as App).homeComponent.inject(vm)
         vm.setNavigator(this)
-        vm.init()
+        vm.bind()
 
         vm.user.observe(this, userObserver)
         vm.collectionInfo.observe(this, collectionObserver)

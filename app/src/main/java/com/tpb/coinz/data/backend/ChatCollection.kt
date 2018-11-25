@@ -1,8 +1,10 @@
 package com.tpb.coinz.data.backend
 
+import com.tpb.coinz.Result
+
 interface ChatCollection {
 
-    fun createThread(partnerId: String)
+    fun createThread(partnerId: String, callback: (Result<String>) -> Unit)
 
     fun openThread(partnerId: String)
 

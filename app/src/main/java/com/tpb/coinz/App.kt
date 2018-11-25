@@ -31,6 +31,12 @@ class App : Application() {
                 .backendModule(BackendModule())
                 .build()
     }
+    val messagesComponent: MessagesComponent by lazy {
+        DaggerMessagesComponent.builder()
+                .connectivityModule(ConnectivityModule(this))
+                .chatModule(ChatModule())
+                .build()
+    }
 
     override fun onCreate() {
         super.onCreate()

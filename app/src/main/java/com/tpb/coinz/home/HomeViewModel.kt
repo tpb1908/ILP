@@ -33,8 +33,7 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
-    override fun init() {
-        (getApplication() as App).homeComponent.inject(this)
+    override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
         Log.i(this::class.toString(), "User $fbUser")
         if (fbUser == null) {
@@ -72,6 +71,7 @@ class HomeViewModel(application: Application) : BaseViewModel<HomeNavigator>(app
     fun userLoggedIn() {
         fbUser = FirebaseAuth.getInstance().currentUser
         user.postValue(fbUser)
+        //TODO: Clean this up and add proper error handling
         fbUser?.let {
             FirebaseFirestore.getInstance().collection("users").document(it.uid).set(
                     mapOf("email" to it.email)

@@ -19,8 +19,7 @@ class BankViewModel(application: Application) : BaseViewModel<BankNavigator>(app
 
     private var user: FirebaseUser? = null
 
-    override fun init() {
-        (getApplication() as App).bankComponent.inject(this)
+    override fun bind() {
         user = FirebaseAuth.getInstance().currentUser
         loadCollectedCoins()
     }

@@ -63,8 +63,9 @@ class MapActivity : AppCompatActivity(), PermissionsListener, MapNavigator {
 
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(MapViewModel::class.java)
+        (application as App).mapComponent.inject(vm)
         vm.setNavigator(this)
-        vm.init()
+        vm.bind()
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {
                 vm.mapMarkers(coins.zip(it.addMarkers(coins.map(::coinToMarkerOption))).toMap().toMutableMap())

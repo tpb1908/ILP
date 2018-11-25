@@ -42,8 +42,7 @@ class MapViewModel(application: Application) : BaseViewModel<MapNavigator>(appli
     private var map: Map? = null
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
-    override fun init() {
-        (getApplication() as App).mapComponent.inject(this)
+    override fun bind() {
         user = FirebaseAuth.getInstance().currentUser
         mapStore.getLatest {
             if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
