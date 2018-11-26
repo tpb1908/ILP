@@ -10,6 +10,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
     private var openThread: ChatCollection.Thread? = null
     private var listenerRegistration: ListenerRegistration? = null
+    private var messageChangeListener: ((Result<List<ChatCollection.Message>>) -> Unit)? = null
 
     override fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (Result<ChatCollection.Thread>) -> Unit) {
         // Create empty thread in threads
@@ -50,11 +51,12 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         if (snapshot?.exists() == true) {
             snapshot.data?.let {
                 Log.i("FireStoreChatCollection", "Chat data recieved $it")
+                messageChangeListener?.invoke(Result.None)
             }
         }
     }
 
-    override fun openThread(thread: ChatCollection.Thread) {
+    override fun openThread(thread: ChatCollection.Thread, listener: (Result<List<ChatCollection.Message>>) -> Unit) {
         openThread = thread
         listenerRegistration?.remove()
         listenerRegistration = store.collection(threads).document(thread.threadId).addSnapshotListener(threadSnapshotListener)
@@ -64,7 +66,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         listenerRegistration?.remove()
     }
 
-    override fun postMessage(message: ChatCollection.Message) {
+    override fun postMessage(message: ChatCollection.Message, callback: (Result<Boolean>) -> Unit) {
         openThread?.let {
             store.collection(threads).document(it.threadId)
         }

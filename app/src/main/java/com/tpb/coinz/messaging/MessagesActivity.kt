@@ -19,7 +19,7 @@ class MessagesActivity : AppCompatActivity() {
 
     private lateinit var vm: MessagesViewModel
 
-    private val adapter = MessagesRecyclerAdapter()
+    private val adapter = ThreadsRecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

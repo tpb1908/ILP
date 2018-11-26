@@ -8,11 +8,11 @@ interface ChatCollection {
 
     fun createThread(creator: UserCollection.User, partner: UserCollection.User, callback: (Result<Thread>) -> Unit)
 
-    fun openThread(thread: Thread)
+    fun openThread(thread: Thread, listener: (Result<List<Message>>) -> Unit)
 
     fun closeThread(thread: Thread)
 
-    fun postMessage(message: Message)
+    fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit)
 
     fun getThreads(user: UserCollection.User, callback: (Result<List<Thread>>) -> Unit)
 

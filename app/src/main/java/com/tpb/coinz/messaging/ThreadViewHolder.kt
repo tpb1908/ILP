@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.data.backend.ChatCollection
 import kotlinx.android.synthetic.main.viewholder_thread.view.*
 
-class MessagesViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+class ThreadViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     var thread: ChatCollection.Thread? = null
         set(value) {
             field = value
@@ -14,5 +14,6 @@ class MessagesViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
                 view.viewholder_thread_info.text = it.threadId
             }
         }
+
 
 }
