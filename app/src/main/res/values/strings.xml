@@ -18,4 +18,6 @@
     <string name="recycler_section_collected_coins">Collected coinz</string>
     <string name="recycler_section_received_coins">Received coinz</string>
     <string name="extra_camera_position">camera_position</string>
+    <string name="action_send">SEND</string>
+    <string name="hint_enter_message">Enter message</string>
 </resources>

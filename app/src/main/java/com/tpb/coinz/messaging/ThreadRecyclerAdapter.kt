@@ -30,19 +30,18 @@ class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
         notifyItemRangeInserted(currentLength, messages.size-1)
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return if(isCurrentUser(messages[position].sender)) R.layout.viewholder_message_sent else R.layout.viewholder_message_received
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        return MessageViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.viewholder_message, parent, false))
+        return MessageViewHolder(LayoutInflater.from(parent.context).inflate(viewType, parent, false))
     }
 
     override fun getItemCount(): Int = messages.size
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         holder.message = messages[position]
-        if (isCurrentUser(messages[position].sender)) {
-            holder.alignEnd()
-        } else {
-            holder.alignStart()
-        }
 
     }
 }
