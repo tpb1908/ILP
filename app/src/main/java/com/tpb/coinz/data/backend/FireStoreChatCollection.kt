@@ -1,8 +1,10 @@
 package com.tpb.coinz.data.backend
 
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.*
 import com.tpb.coinz.Result
-import com.tpb.coinz.db.chats
 import com.tpb.coinz.db.threads
 import timber.log.Timber
 
@@ -23,12 +25,13 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         collection.document(threadId).set(
                 mapOf(
                         "created" to System.currentTimeMillis(),
+                        "creator" to creator.uid, "creator_email" to creator.email,
                         "recipient" to partner.uid, "recipient_email" to partner.email
                 )
         ).addOnCompleteListener {
             if (it.isSuccessful) {
                 Timber.i("Created thread $threadId")
-                addThreadToUserChats(threadId, creator, partner, callback)
+                callback(Result.Value(ChatCollection.Thread(threadId, creator, partner)))
 
             } else if (it.isCanceled) {
                 Timber.e("Cancelled thread creation $threadId")
@@ -37,35 +40,6 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
     }
 
-    private fun addThreadToUserChats(threadId: String,
-                                     creator: UserCollection.User,
-                                     partner: UserCollection.User,
-                                     callback: (Result<ChatCollection.Thread>) -> Unit) {
-        val chats = store.collection(chats)
-        val userDoc = chats.document(creator.uid)
-        val partnerDoc = chats.document(partner.uid)
-        store.runTransaction {
-            it.set(userDoc,
-                    mapOf(threadId to
-                            mapOf(
-                                    "partner_uid" to partner.uid,
-                                    "partner_email" to partner.email
-                            )
-                    ),
-                    SetOptions.merge()
-            )
-            it.set(partnerDoc,
-                    mapOf(threadId to
-                            mapOf(
-                                    "partner_uid" to creator.uid,
-                                    "partner_email" to creator.email
-                            )
-                    ),
-                    SetOptions.merge()
-            )
-            callback(Result.Value(ChatCollection.Thread(threadId, creator, partner)))
-        }
-    }
 
     private val tsl: EventListener<QuerySnapshot> = EventListener { snapshot, exception ->
         val newMessages = mutableListOf<ChatCollection.Message>()
@@ -105,23 +79,29 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     }
 
     override fun getThreads(user: UserCollection.User, callback: (Result<List<ChatCollection.Thread>>) -> Unit) {
-        store.collection(chats).document(user.uid).get().addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result?.data?.let { data ->
-                    val threads = mutableListOf<ChatCollection.Thread>()
-                    data.keys.forEach { key ->
-                        threads.add(ChatCollection.Thread(key, user, UserCollection.User(
-                                (data[key] as Map<String, Any>)["partner_uid"] as String,
-                                (data[key] as Map<String, Any>)["partner_email"] as String
-                        )))
-                        Timber.i("Thread $key, ")
+        val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid)
+        val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
+        Timber.i("Getting threads for user $user")
+        Tasks.whenAllComplete(creatorQuery.get(), recipientQuery.get()).addOnCompleteListener {
+            val threads = mutableListOf<ChatCollection.Thread>()
+            it.result?.forEach {task ->
+                Timber.i("Merged query task $task, ${task.isSuccessful}, ${task.result}")
+                if (task.isSuccessful && task.result is QuerySnapshot) {
+                    (task.result as QuerySnapshot).documents.forEach {data ->
+                       Timber.i("Thread downloaded $data")
+                        threads.add(ChatCollection.Thread(data.id,
+                                UserCollection.User(
+                                        data["creator"] as String,
+                                        data["creator_email"] as String
+                                ),
+                                UserCollection.User(
+                                        data["recipient"] as String,
+                                        data["recipient_email"] as String
+                                )))
                     }
-                    callback(Result.Value(threads))
                 }
-            } else {
-                Timber.e(it.exception, "Error getting threads ")
-                callback(Result.None)
             }
+            callback(Result.Value(threads))
         }
     }
 
