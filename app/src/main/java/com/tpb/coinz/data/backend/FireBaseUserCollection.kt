@@ -2,6 +2,7 @@ package com.tpb.coinz.data.backend
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.Result
 import com.tpb.coinz.db.users
@@ -45,6 +46,27 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
                 Timber.e(it.exception, "Cannot retrieve user for $email")
                 callback(Result.None)
             }
+        }
+    }
+
+    override fun searchUsersByEmail(partialEmail: String, callback: (Result<List<UserCollection.User>>) -> Unit) {
+        store.collection(users).whereGreaterThan("email", partialEmail).limit(10).get().addOnCompleteListener {
+            if (it.result == null) {
+                callback(Result.None)
+            } else {
+                it.result?.let { result ->
+                    val users = mutableListOf<UserCollection.User>()
+                    result.documents.forEach { ds ->
+                        ds.data?.let {data ->
+                            if (data.containsKey("email") && (data["email"] as String) != getCurrentUser().email) {
+                                users.add(UserCollection.User(ds.id, data["email"] as String))
+                            }
+                        }
+                    }
+                    callback(Result.Value(users))
+                }
+            }
+
         }
     }
 }

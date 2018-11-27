@@ -2,7 +2,10 @@ package com.tpb.coinz.messaging
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +15,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tpb.coinz.App
 import com.tpb.coinz.R
+import com.tpb.coinz.SimpleTextWatcher
 import com.tpb.coinz.data.backend.ChatCollection
 import kotlinx.android.synthetic.main.activity_messages.*
+import timber.log.Timber
 
 class MessagesActivity : AppCompatActivity() {
 
@@ -42,18 +47,31 @@ class MessagesActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private val addChatClick = View.OnClickListener {
+    private val addChatClick = View.OnClickListener { _ ->
         val edit = AutoCompleteTextView(this)
         val lp = LinearLayoutCompat.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT,
                 LinearLayoutCompat.LayoutParams.MATCH_PARENT)
-
         edit.layoutParams = lp
+
+        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line)
+        adapter.setNotifyOnChange(true)
+        edit.setAdapter(adapter)
+        edit.addTextChangedListener(object: SimpleTextWatcher() {
+            override fun onTextChanged(text: String) {
+                vm.searchUsers(text)
+            }
+        })
+        vm.userSearchResults.observe(this, Observer { users ->
+            adapter.clear()
+            adapter.addAll(users.map { it.email })
+        })
         AlertDialog.Builder(this)
                 .setTitle("Email")
                 .setMessage("Enter email")
                 .setView(edit)
                 .setPositiveButton("OK") { _, _ ->
                     vm.createChat(edit.text.toString())
+                    vm.userSearchResults.removeObservers(this)
                 }.show()
     }
 
@@ -62,11 +80,11 @@ class MessagesActivity : AppCompatActivity() {
         (application as App).messagesComponent.inject(vm)
         vm.bind()
 
-        vm.threadIntents.observe(this, Observer<ChatCollection.Thread> {
+        vm.threadIntents.observe(this, Observer {
             openThread(it)
         })
 
-        vm.threads.observe(this, Observer<List<ChatCollection.Thread>> {
+        vm.threads.observe(this, Observer {
             adapter.setThreads(it)
         })
     }

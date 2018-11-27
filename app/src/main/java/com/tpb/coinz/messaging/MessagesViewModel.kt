@@ -20,6 +20,8 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
 
     val threadIntents = MutableLiveData<ChatCollection.Thread>()
 
+    val userSearchResults = MutableLiveData<List<UserCollection.User>>()
+
     override val actions = MutableLiveData<MessagesAction>()
 
     override fun bind() {
@@ -47,6 +49,13 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
     fun openChat() {
 
     }
+
+    fun searchUsers(partialEmail: String) {
+        userCollection.searchUsersByEmail(partialEmail) {
+            if (it is Result.Value) userSearchResults.postValue(it.v)
+        }
+    }
+
 
     sealed class MessagesAction {}
 }

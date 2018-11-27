@@ -12,6 +12,8 @@ interface UserCollection {
 
     fun retrieveUserFromEmail(email: String, callback: (Result<User>) -> Unit)
 
+    fun searchUsersByEmail(partialEmail: String, callback: (Result<List<User>>) -> Unit)
+
     @Parcelize
     data class User(val uid: String, val email: String): Parcelable
 
