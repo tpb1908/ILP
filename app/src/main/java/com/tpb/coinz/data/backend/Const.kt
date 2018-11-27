@@ -1,4 +1,4 @@
-package com.tpb.coinz.db
+package com.tpb.coinz.data.backend
 
 public const val users = "users"
 

@@ -1,7 +1,6 @@
 package com.tpb.coinz.map
 
 import android.location.Location
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -16,7 +15,7 @@ import com.tpb.coinz.data.coins.CoinLoader
 import com.tpb.coinz.data.coins.Map
 import com.tpb.coinz.data.coins.MapStore
 import com.tpb.coinz.data.location.LocationProvider
-import com.tpb.coinz.db.collectionDistance
+import com.tpb.coinz.data.backend.collectionDistance
 import timber.log.Timber
 import java.lang.Exception
 import java.util.*

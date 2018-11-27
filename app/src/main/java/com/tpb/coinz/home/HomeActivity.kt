@@ -21,7 +21,7 @@ import com.tpb.coinz.BuildConfig
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.R
 import com.tpb.coinz.map.MapActivity
-import com.tpb.coinz.messaging.ThreadsActivity
+import com.tpb.coinz.messaging.threads.ThreadsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 

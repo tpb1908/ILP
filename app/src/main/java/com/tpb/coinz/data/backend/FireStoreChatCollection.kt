@@ -1,9 +1,7 @@
 package com.tpb.coinz.data.backend
 
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.*
 import com.tpb.coinz.Result
-import com.tpb.coinz.db.threads
 import timber.log.Timber
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {

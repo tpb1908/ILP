@@ -1,11 +1,8 @@
 package com.tpb.coinz.data.backend
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.Result
-import com.tpb.coinz.db.users
 import timber.log.Timber
 
 class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollection {

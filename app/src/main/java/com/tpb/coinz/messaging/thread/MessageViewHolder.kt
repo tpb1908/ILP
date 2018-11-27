@@ -1,4 +1,4 @@
-package com.tpb.coinz.messaging
+package com.tpb.coinz.messaging.thread
 
 import android.view.View
 import android.widget.TextView

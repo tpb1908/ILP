@@ -1,4 +1,4 @@
-package com.tpb.coinz.messaging
+package com.tpb.coinz.messaging.threads
 
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
