@@ -87,6 +87,11 @@ class MessagesActivity : AppCompatActivity() {
         vm.threads.observe(this, Observer {
             adapter.setThreads(it)
         })
+        vm.actions.observe(this, Observer {
+            if (it is MessagesViewModel.MessagesAction.SetLoadingState) {
+                messages_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
+            }
+        })
     }
 
 }

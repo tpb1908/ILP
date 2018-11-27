@@ -25,20 +25,24 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
     override val actions = MutableLiveData<MessagesAction>()
 
     override fun bind() {
+        actions.postValue(MessagesAction.SetLoadingState(true))
         chatCollection.getThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<ChatCollection.Thread>>) {
-                Timber.i("Rerieved threads ${it.v}")
+                Timber.i("Retrieved threads ${it.v}")
                 threads.postValue(it.v)
+                actions.postValue(MessagesAction.SetLoadingState(false))
             }
         }
     }
 
     fun createChat(userEmail: String) {
+        actions.postValue(MessagesAction.SetLoadingState(true))
         userCollection.retrieveUserFromEmail(userEmail) { user ->
             if (user is Result.Value<UserCollection.User>) {
                 chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
                     if (it is Result.Value<ChatCollection.Thread>) {
                         threads.postValue(threads.value?.plus(it.v))
+                        actions.postValue(MessagesAction.SetLoadingState(false))
                         threadIntents.postValue(it.v)
                     }
                 }
@@ -57,5 +61,7 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
     }
 
 
-    sealed class MessagesAction {}
+    sealed class MessagesAction {
+        class SetLoadingState(val loading: Boolean): MessagesAction()
+    }
 }

@@ -1,6 +1,7 @@
 package com.tpb.coinz.messaging
 
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
@@ -46,6 +47,12 @@ class ThreadActivity : AppCompatActivity() {
         vm = ViewModelProviders.of(this).get(ThreadViewModel::class.java)
         (application as App).threadComponent.inject(vm)
         vm.bind()
+        vm.actions.observe(this, Observer {
+            when (it) {
+                ThreadViewModel.ThreadAction.DISPLAY_LOADING -> {thread_loading_bar.visibility = View.GONE}
+                ThreadViewModel.ThreadAction.HIDE_LOADING -> {thread_loading_bar.visibility = View.VISIBLE}
+            }
+        })
         vm.messages.observe(this, Observer {
             adapter.setMessages(it)
             thread_messages_recycler.smoothScrollToPosition(adapter.itemCount)

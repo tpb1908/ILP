@@ -54,5 +54,7 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         //TODO: Close thread collection
     }
 
-    sealed class ThreadAction {}
+    enum class ThreadAction {
+        DISPLAY_LOADING, HIDE_LOADING
+    }
 }
