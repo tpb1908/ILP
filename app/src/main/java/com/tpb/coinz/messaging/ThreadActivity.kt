@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_thread.*
 
 class ThreadActivity : AppCompatActivity() {
 
-    lateinit var vm: ThreadViewModel
+    private lateinit var vm: ThreadViewModel
 
     private val adapter = ThreadRecyclerAdapter()
 
@@ -21,12 +21,12 @@ class ThreadActivity : AppCompatActivity() {
         setContentView(R.layout.activity_thread)
         initViews()
         bindViewModel()
-//        if (intent.hasExtra(EXTRA_THREAD)) {
-//            vm.openThread(intent.getParcelableExtra(EXTRA_THREAD))
-//        } else {
-//            Toast.makeText(this, "Cannot open thread without extra $EXTRA_THREAD", Toast.LENGTH_LONG).show()
-//            finish()
-//        }
+        if (intent.hasExtra(EXTRA_THREAD)) {
+            vm.openThread(intent.getParcelableExtra(EXTRA_THREAD))
+        } else {
+            Toast.makeText(this, "Cannot open thread without extra $EXTRA_THREAD", Toast.LENGTH_LONG).show()
+            finish()
+        }
     }
 
     private fun initViews() {
@@ -35,6 +35,7 @@ class ThreadActivity : AppCompatActivity() {
         }
         thread_messages_recycler.layoutManager = LinearLayoutManager(this)
         thread_messages_recycler.adapter = adapter
+
     }
 
     private fun bindViewModel() {
@@ -44,6 +45,7 @@ class ThreadActivity : AppCompatActivity() {
         vm.messages.observe(this, Observer {
             adapter.setMessages(it)
         })
+        adapter.isCurrentUser = vm.isCurrentUser
     }
 
     companion object {

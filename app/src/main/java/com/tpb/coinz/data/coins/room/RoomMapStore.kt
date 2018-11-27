@@ -8,6 +8,7 @@ import com.tpb.coinz.data.coins.MapStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 class RoomMapStore(database: Database): MapStore {
@@ -65,7 +66,7 @@ class RoomMapStore(database: Database): MapStore {
             if (map == null) {
                 callback(Result.None)
             } else {
-                Log.i("RoomMapStore", "Loaded map $map")
+                Timber.i("Loaded map $map")
                 map.apply { callback(Result.Value(this.map)) }
             }
 

@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.Result
 import com.tpb.coinz.db.users
+import timber.log.Timber
 
 class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollection {
 
@@ -28,20 +29,20 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
     override fun retrieveUserFromEmail(email: String, callback: (Result<UserCollection.User>) -> Unit) {
         store.collection(users).whereEqualTo("email", email).get().addOnCompleteListener {
             if (it.isSuccessful) {
-                Log.i("FireBaseUserCollection", "Retrieved user for $email")
+                Timber.i("Retrieved user for $email")
                 it.result?.documents?.let {documents ->
                     if (documents.isNotEmpty()) {
                         val doc = documents.first()
-                        Log.i("FireBaseUserCollection", "Retrieved user document $doc")
+                        Timber.i("Retrieved user document $doc")
                         callback(Result.Value(UserCollection.User(doc.id,
                                 doc.getString("email") ?: "")))
                     } else {
-                        Log.i("FireBaseUserCollection", "No matching users for $email")
+                        Timber.e("No matching user for $email")
                         callback(Result.None)
                     }
                 }
             } else {
-                Log.e("FireBaseUserCollection", "Cannot retrieve user for $email", it.exception)
+                Timber.e(it.exception, "Cannot retrieve user for $email")
                 callback(Result.None)
             }
         }

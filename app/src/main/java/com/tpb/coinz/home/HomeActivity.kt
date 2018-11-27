@@ -25,6 +25,7 @@ import com.tpb.coinz.map.MapActivity
 import com.tpb.coinz.messaging.MessagesActivity
 import com.tpb.coinz.messaging.ThreadActivity
 import kotlinx.android.synthetic.main.activity_home.*
+import timber.log.Timber
 
 class HomeActivity : AppCompatActivity() {
 
@@ -39,7 +40,7 @@ class HomeActivity : AppCompatActivity() {
 
         initViews(savedInstanceState)
         bindViewModel()
-        startActivity(Intent(this, ThreadActivity::class.java))
+        startActivity(Intent(this, MessagesActivity::class.java))
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
@@ -78,7 +79,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val userObserver = Observer<FirebaseUser> {
-        Log.i("UserObserver", "User updated $it")
+        Timber.i("User updated $it")
         user_email.text = it.email
     }
 

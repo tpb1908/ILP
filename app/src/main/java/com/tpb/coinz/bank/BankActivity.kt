@@ -11,6 +11,7 @@ import com.tpb.coinz.App
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 import kotlinx.android.synthetic.main.activity_bank.*
+import timber.log.Timber
 
 class BankActivity : AppCompatActivity() {
 
@@ -31,7 +32,7 @@ class BankActivity : AppCompatActivity() {
         vm = ViewModelProviders.of(this).get(BankViewModel::class.java)
         (application as App).bankComponent.inject(vm)
         vm.availableCoins.observe(this, Observer<Pair<List<Coin>, List<Coin>>> {
-            Log.i("BankActivity", "Available coins changed $it")
+            Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)
         })
         vm.bind()

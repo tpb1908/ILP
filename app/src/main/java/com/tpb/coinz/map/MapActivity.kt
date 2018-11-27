@@ -26,6 +26,7 @@ import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
+import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -121,7 +122,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                 lifecycle.addObserver(locationLayer)
                 locationProvider.addListener(object: com.tpb.coinz.data.location.LocationListener {
                     override fun locationUpdate(location: Location) {
-                        Log.i("MapActivityLocation", "Forcing location update to  " + location)
+                        Timber.i("Forcing location update to $location")
                         locationLayer.forceLocationUpdate(location)
                     }
 
@@ -191,11 +192,11 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-        Log.i(MapActivity::class.java.name, "Permissions to explain $permissionsToExplain")
+        Timber.i("Permissions to explain $permissionsToExplain")
     }
 
     override fun onPermissionResult(granted: Boolean) {
-        Log.i(MapActivity::class.java.name, "Permission result $granted")
+        Timber.i("Permission result $granted")
         initLocationSystem()
     }
 

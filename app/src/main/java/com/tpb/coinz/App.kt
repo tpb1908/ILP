@@ -5,6 +5,7 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.google.firebase.FirebaseApp
 import com.tpb.coinz.dagger.component.*
 import com.tpb.coinz.dagger.module.*
+import timber.log.Timber
 
 
 class App : Application() {
@@ -50,8 +51,9 @@ class App : Application() {
     }
 
     private fun init() {
-        val fbApp = FirebaseApp.initializeApp(this)!!
+        FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
+        Timber.plant(Timber.DebugTree())
     }
 
 }

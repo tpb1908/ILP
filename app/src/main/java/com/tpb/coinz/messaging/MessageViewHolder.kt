@@ -1,6 +1,5 @@
 package com.tpb.coinz.messaging
 
-import android.graphics.drawable.ShapeDrawable
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R

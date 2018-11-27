@@ -11,3 +11,5 @@ public sealed class Result<out T> {
     data class Value<T>(val v: T) : Result<T>()
 }
 
+public fun<T> Collection<T>.startsWith(other: Collection<T>): Boolean = this.zip(other).all { it.first?.equals(it.second) ?: false }
+

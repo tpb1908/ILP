@@ -7,6 +7,7 @@ import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.ChatCollection
 import com.tpb.coinz.data.backend.UserCollection
+import timber.log.Timber
 import javax.inject.Inject
 
 class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
@@ -24,7 +25,7 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
     override fun bind() {
         chatCollection.getThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<ChatCollection.Thread>>) {
-                Log.i("MessagesViewModel", "Retrieved threads ${it.v}")
+                Timber.i("Rerieved threads ${it.v}")
                 threads.postValue(it.v)
             }
         }

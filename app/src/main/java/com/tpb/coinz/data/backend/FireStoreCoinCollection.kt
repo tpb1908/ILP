@@ -5,7 +5,7 @@ import com.google.firebase.firestore.*
 import com.tpb.coinz.data.coins.Coin
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
-
+import timber.log.Timber
 
 
 class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollection {
@@ -16,7 +16,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     private val total = "total"
 
     override fun collectCoin(id: String, coin: Coin) {
-        Log.i("FireStore", "Collecting ${coin.toMap()} for $id")
+        Timber.i("Collecting ${coin.toMap()} for $id")
         store.collection(collected).document(id).update(coin.toMap())
     }
 
@@ -30,18 +30,18 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
             // Set with merge will create document if it doesn't exist
             //it.update(userScore, total, score)
         }.addOnSuccessListener {
-            Log.i("FireStore", "Successfully updated scoreboard for $id")
+            Timber.i("Successfully updated scoreboard for $id")
         }.addOnFailureListener {
-            Log.e("FireStore", "Failed to update scoreboard for $id", it)
+            Timber.e(it, "Failed to update scoreboard for $id")
         }
     }
 
     override fun getCollectedCoins(id: String, listener: (List<Coin>) -> Unit) {
-        Log.i("FireStoreCoinCollection", "Loading collected coins for $id")
+        Timber.i("Loading collected coins for $id")
         store.collection(collected).document(id).addSnapshotListener { d, e ->
             d?.data?.let { data ->
                 data.keys.forEach { key ->
-                    Log.i("FireStoreCoinCollection", "Coin $key map ${data[key]}")
+                    Timber.i("Coin $key map ${data[key]}")
                     //coins.add(Coin.fromMap(key, it[key] as MutableMap<String, Any>))
                 }
                 //TODO: Error handling

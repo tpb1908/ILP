@@ -19,5 +19,5 @@ interface ChatCollection {
     @Parcelize
     data class Thread(val threadId: String, val creator: UserCollection.User, val partner: UserCollection.User): Parcelable
 
-    data class Message(val message: String)
+    data class Message(val timestamp: Long, val sender: UserCollection.User, val message: String)
 }

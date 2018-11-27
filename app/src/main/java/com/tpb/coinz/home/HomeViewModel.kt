@@ -13,6 +13,7 @@ import com.tpb.coinz.data.coins.CoinLoader
 import com.tpb.coinz.data.coins.Map
 import com.tpb.coinz.data.coins.MapStore
 import dagger.Lazy
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class HomeViewModel: BaseViewModel<HomeViewModel.HomeActions>(){
 
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
-        Log.i(this::class.toString(), "User $fbUser")
+        Timber.i("User $fbUser")
         if (fbUser == null) {
             actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
         } else {
@@ -76,7 +77,7 @@ class HomeViewModel: BaseViewModel<HomeViewModel.HomeActions>(){
             FirebaseFirestore.getInstance().collection("users").document(it.uid).set(
                     mapOf("email" to it.email)
             ).addOnCompleteListener { task ->
-                Log.i("HomeViewModel", "Stored user email ${it.email}")
+                Timber.i("Stored user email ${it.email}")
             }
         }
 

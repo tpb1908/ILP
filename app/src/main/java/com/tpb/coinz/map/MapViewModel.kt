@@ -17,6 +17,7 @@ import com.tpb.coinz.data.coins.Map
 import com.tpb.coinz.data.coins.MapStore
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.db.collectionDistance
+import timber.log.Timber
 import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
@@ -49,10 +50,10 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
         mapStore.getLatest {
             if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
                 map = it.v
-                Log.i("MapViewModel", "Coins loaded from room")
+                Timber.i("Coins loaded from room")
                 coins.postValue(it.v.remainingCoins)
             } else {
-                Log.i("MapViewModel", "Loading remainingCoins")
+                Timber.i("Loading coins from network")
                 coinLoader.loadCoins(Calendar.getInstance(), mapLoadCallback)
             }
         }
@@ -91,7 +92,7 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
     }
 
     private fun collect(coin: Coin) {
-        Log.i("MapViewModel", "Collecting coin $coin")
+        Timber.i("Collecting coin $coin")
         if (markers.containsKey(coin)) {
             actions.postValue(MapActions.RemoveMarker(markers.getValue(coin)))
             markers.remove(coin)
@@ -104,7 +105,7 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
                 //TODO: Notification of all remainingCoins collected
             }
         } else {
-            Log.e("MapViewModel", "No marker for $coin")
+            Timber.e("No marker for $coin")
         }
         //TODO: Cleanup. Error if user null
         user?.let { coinCollection.collectCoin(it.uid, coin) }

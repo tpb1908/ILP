@@ -16,6 +16,8 @@ class ThreadsRecyclerAdapter : RecyclerView.Adapter<ThreadViewHolder>() {
         notifyDataSetChanged()
     }
 
+    var onClick: (ChatCollection.Thread) -> Unit = {}
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.viewholder_thread, parent, false))
     }
@@ -24,5 +26,6 @@ class ThreadsRecyclerAdapter : RecyclerView.Adapter<ThreadViewHolder>() {
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) {
         holder.thread = threads[position]
+        holder.itemView.setOnClickListener { onClick(threads[position]) }
     }
 }

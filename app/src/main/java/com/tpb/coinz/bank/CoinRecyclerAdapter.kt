@@ -32,7 +32,6 @@ class CoinRecyclerAdapter: RecyclerView.Adapter<SelectableViewHolder>() {
 
     var onClick: (Coin) -> Unit =  {}
 
-
     private fun select(vh: CoinViewHolder, position: Int) {
         val item = getStateForPosition(position)
         if (position <= sentCoins.size) { // received coin

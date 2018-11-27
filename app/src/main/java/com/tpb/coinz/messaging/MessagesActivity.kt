@@ -33,6 +33,13 @@ class MessagesActivity : AppCompatActivity() {
         fab_add_chat.setOnClickListener(addChatClick)
         messages_recycler.adapter = adapter
         messages_recycler.layoutManager = LinearLayoutManager(this)
+        adapter.onClick = this::openThread
+    }
+
+    private fun openThread(thread: ChatCollection.Thread) {
+        val intent = Intent(this@MessagesActivity, ThreadActivity::class.java)
+        intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
+        startActivity(intent)
     }
 
     private val addChatClick = View.OnClickListener {
@@ -56,9 +63,7 @@ class MessagesActivity : AppCompatActivity() {
         vm.bind()
 
         vm.threadIntents.observe(this, Observer<ChatCollection.Thread> {
-            val intent = Intent(this@MessagesActivity, ThreadActivity::class.java)
-            intent.putExtra(ThreadActivity.EXTRA_THREAD, it)
-            startActivity(intent)
+            openThread(it)
         })
 
         vm.threads.observe(this, Observer<List<ChatCollection.Thread>> {
