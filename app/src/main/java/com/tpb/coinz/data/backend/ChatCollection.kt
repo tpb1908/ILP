@@ -14,7 +14,9 @@ interface ChatCollection {
 
     fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit)
 
-    fun getThreads(user: UserCollection.User, callback: (Result<List<Thread>>) -> Unit)
+    fun openThreads(user: UserCollection.User, callback: (Result<List<Thread>>) -> Unit)
+
+    fun closeThreads()
 
     @Parcelize
     data class Thread(val threadId: String, val creator: UserCollection.User, val partner: UserCollection.User): Parcelable

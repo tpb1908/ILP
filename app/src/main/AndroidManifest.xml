@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".bank.BankActivity" />
-        <activity android:name=".messaging.MessagesActivity" />
+        <activity android:name=".messaging.ThreadsActivity" />
         <activity android:name=".messaging.ThreadActivity" />
     </application>
 

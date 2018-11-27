@@ -3,7 +3,6 @@ package com.tpb.coinz.home
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
@@ -22,8 +21,7 @@ import com.tpb.coinz.BuildConfig
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.R
 import com.tpb.coinz.map.MapActivity
-import com.tpb.coinz.messaging.MessagesActivity
-import com.tpb.coinz.messaging.ThreadActivity
+import com.tpb.coinz.messaging.ThreadsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 
@@ -40,7 +38,7 @@ class HomeActivity : AppCompatActivity() {
 
         initViews(savedInstanceState)
         bindViewModel()
-        startActivity(Intent(this, MessagesActivity::class.java))
+        startActivity(Intent(this, ThreadsActivity::class.java))
     }
 
     private fun initViews(savedInstanceState: Bundle?) {

@@ -1,7 +1,5 @@
 package com.tpb.coinz.messaging
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
@@ -10,7 +8,7 @@ import com.tpb.coinz.data.backend.UserCollection
 import timber.log.Timber
 import javax.inject.Inject
 
-class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
+class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     @Inject lateinit var chatCollection: ChatCollection
 
@@ -22,27 +20,27 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
 
     val userSearchResults = MutableLiveData<List<UserCollection.User>>()
 
-    override val actions = MutableLiveData<MessagesAction>()
+    override val actions = MutableLiveData<ThreadsAction>()
 
     override fun bind() {
-        actions.postValue(MessagesAction.SetLoadingState(true))
-        chatCollection.getThreads(userCollection.getCurrentUser()) {
+        actions.postValue(ThreadsAction.SetLoadingState(true))
+        chatCollection.openThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<ChatCollection.Thread>>) {
                 Timber.i("Retrieved threads ${it.v}")
-                threads.postValue(it.v)
-                actions.postValue(MessagesAction.SetLoadingState(false))
+                threads.postValue(it.v + (threads.value ?: emptyList()))
+                actions.postValue(ThreadsAction.SetLoadingState(false))
             }
         }
     }
 
     fun createChat(userEmail: String) {
-        actions.postValue(MessagesAction.SetLoadingState(true))
+        actions.postValue(ThreadsAction.SetLoadingState(true))
         userCollection.retrieveUserFromEmail(userEmail) { user ->
             if (user is Result.Value<UserCollection.User>) {
                 chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
                     if (it is Result.Value<ChatCollection.Thread>) {
-                        threads.postValue(threads.value?.plus(it.v))
-                        actions.postValue(MessagesAction.SetLoadingState(false))
+                        threads.postValue((threads.value?: emptyList()) + it.v)
+                        actions.postValue(ThreadsAction.SetLoadingState(false))
                         threadIntents.postValue(it.v)
                     }
                 }
@@ -61,7 +59,7 @@ class MessagesViewModel : BaseViewModel<MessagesViewModel.MessagesAction>() {
     }
 
 
-    sealed class MessagesAction {
-        class SetLoadingState(val loading: Boolean): MessagesAction()
+    sealed class ThreadsAction {
+        class SetLoadingState(val loading: Boolean): ThreadsAction()
     }
 }

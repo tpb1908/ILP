@@ -1,6 +1,5 @@
 package com.tpb.coinz.messaging
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
@@ -23,7 +22,6 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
     val messages = MutableLiveData<List<ChatCollection.Message>>()
 
     val isCurrentUser: (UserCollection.User) -> Boolean = {
-        Timber.i("Checking if $it equals ${userCollection.getCurrentUser()}. ${userCollection.getCurrentUser() == it}")
         userCollection.getCurrentUser() == it }
 
     override fun bind() {
@@ -45,13 +43,15 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
     private fun messageUpdate(change: Result<List<ChatCollection.Message>>) {
         if (change is Result.Value) {
+            actions.postValue(ThreadAction.DISPLAY_LOADING)
             messages.postValue((messages.value ?: emptyList()) + change.v)
+            actions.postValue(ThreadAction.HIDE_LOADING)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        //TODO: Close thread collection
+        thread?.let { chatCollection.closeThread(it) }
     }
 
     enum class ThreadAction {

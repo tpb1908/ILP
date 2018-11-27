@@ -1,8 +1,8 @@
 package com.tpb.coinz.dagger.component
 
 import com.tpb.coinz.dagger.module.*
-import com.tpb.coinz.messaging.MessagesActivity
-import com.tpb.coinz.messaging.MessagesViewModel
+import com.tpb.coinz.messaging.ThreadsActivity
+import com.tpb.coinz.messaging.ThreadsViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -12,8 +12,8 @@ import javax.inject.Singleton
 interface MessagesComponent {
 
 
-    fun inject(activity: MessagesActivity)
+    fun inject(activity: ThreadsActivity)
 
-    fun inject(viewModel: MessagesViewModel)
+    fun inject(viewModel: ThreadsViewModel)
 
 }

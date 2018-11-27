@@ -2,8 +2,6 @@ package com.tpb.coinz.messaging
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -20,9 +18,9 @@ import com.tpb.coinz.data.backend.ChatCollection
 import kotlinx.android.synthetic.main.activity_messages.*
 import timber.log.Timber
 
-class MessagesActivity : AppCompatActivity() {
+class ThreadsActivity : AppCompatActivity() {
 
-    private lateinit var vm: MessagesViewModel
+    private lateinit var vm: ThreadsViewModel
 
     private val adapter = ThreadsRecyclerAdapter()
 
@@ -42,7 +40,7 @@ class MessagesActivity : AppCompatActivity() {
     }
 
     private fun openThread(thread: ChatCollection.Thread) {
-        val intent = Intent(this@MessagesActivity, ThreadActivity::class.java)
+        val intent = Intent(this@ThreadsActivity, ThreadActivity::class.java)
         intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
         startActivity(intent)
     }
@@ -76,7 +74,7 @@ class MessagesActivity : AppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        vm = ViewModelProviders.of(this).get(MessagesViewModel::class.java)
+        vm = ViewModelProviders.of(this).get(ThreadsViewModel::class.java)
         (application as App).messagesComponent.inject(vm)
         vm.bind()
 
@@ -85,10 +83,11 @@ class MessagesActivity : AppCompatActivity() {
         })
 
         vm.threads.observe(this, Observer {
+            Timber.i("Threads observed $it")
             adapter.setThreads(it)
         })
         vm.actions.observe(this, Observer {
-            if (it is MessagesViewModel.MessagesAction.SetLoadingState) {
+            if (it is ThreadsViewModel.ThreadsAction.SetLoadingState) {
                 messages_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
             }
         })

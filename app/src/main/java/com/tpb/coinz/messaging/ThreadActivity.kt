@@ -2,8 +2,6 @@ package com.tpb.coinz.messaging
 
 import android.os.Bundle
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -49,8 +47,8 @@ class ThreadActivity : AppCompatActivity() {
         vm.bind()
         vm.actions.observe(this, Observer {
             when (it) {
-                ThreadViewModel.ThreadAction.DISPLAY_LOADING -> {thread_loading_bar.visibility = View.GONE}
-                ThreadViewModel.ThreadAction.HIDE_LOADING -> {thread_loading_bar.visibility = View.VISIBLE}
+                ThreadViewModel.ThreadAction.DISPLAY_LOADING -> {thread_loading_bar.visibility = View.VISIBLE}
+                ThreadViewModel.ThreadAction.HIDE_LOADING -> {thread_loading_bar.visibility = View.GONE}
             }
         })
         vm.messages.observe(this, Observer {
