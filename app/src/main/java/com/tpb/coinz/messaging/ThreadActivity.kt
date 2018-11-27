@@ -44,6 +44,7 @@ class ThreadActivity : AppCompatActivity() {
         vm.bind()
         vm.messages.observe(this, Observer {
             adapter.setMessages(it)
+            thread_messages_recycler.smoothScrollToPosition(adapter.itemCount)
         })
         adapter.isCurrentUser = vm.isCurrentUser
     }
