@@ -20,4 +20,6 @@
     <string name="extra_camera_position">camera_position</string>
     <string name="action_send">SEND</string>
     <string name="hint_enter_message">Enter message</string>
+    <string name="dialog_chat_creation_title">Email</string>
+    <string name="hint_chat_creation_email">Email of recipient</string>
 </resources>

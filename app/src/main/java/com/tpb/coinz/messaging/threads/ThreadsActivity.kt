@@ -91,11 +91,11 @@ class ThreadsActivity : AppCompatActivity() {
             adapter.clear()
             adapter.addAll(users.map { it.email })
         })
+        edit.setHint(R.string.hint_chat_creation_email)
         AlertDialog.Builder(this)
-                .setTitle("Email")
-                .setMessage("Enter email")
+                .setTitle(R.string.dialog_chat_creation_title)
                 .setView(container)
-                .setPositiveButton("OK") { _, _ ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     vm.createChat(edit.text.toString())
                     vm.userSearchResults.removeObservers(this)
                 }.show()
