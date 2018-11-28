@@ -153,16 +153,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                     .strokeColor(Color.RED)
                     .fillColor(Color.TRANSPARENT))
         }
-        mapview.getMapAsync {
-            val markerOptions = MarkerOptions()
-            markerOptions.position = LatLng(55.9456215,-3.1631175)
-            markerOptions.title = "5"
-            markerOptions.snippet = "PENY"
-            val bitmap = Utils.loadAndTintBitMap(this@MapActivity, R.drawable.ic_location_white_24dp, Color.BLUE)
-
-            markerOptions.icon = IconFactory.getInstance(this@MapActivity).fromBitmap(bitmap)
-            it.addMarker(markerOptions)
-        }
     }
 
 
