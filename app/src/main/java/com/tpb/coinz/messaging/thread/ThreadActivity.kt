@@ -33,8 +33,12 @@ class ThreadActivity : AppCompatActivity() {
 
     private fun initViews() {
         thread_message_send.setOnClickListener {
-            vm.postMessage(thread_message_input.text.toString())
-            thread_message_input.text = null
+            if(thread_message_input.text.isNullOrEmpty()) {
+                Toast.makeText(this, R.string.error_empty_message, Toast.LENGTH_SHORT).show()
+            } else {
+                vm.postMessage(thread_message_input.text.toString())
+                thread_message_input.text = null
+            }
         }
         thread_messages_recycler.layoutManager = LinearLayoutManager(this)
         thread_messages_recycler.adapter = adapter
