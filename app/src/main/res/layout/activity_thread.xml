@@ -38,6 +38,13 @@
         android:minHeight="48dp"
         android:orientation="horizontal">
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/thread_add_coin"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_coins"/>
+
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/thread_message_input"
             android:layout_width="0dp"

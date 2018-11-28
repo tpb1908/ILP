@@ -6,6 +6,7 @@ import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.ChatCollection
 import com.tpb.coinz.data.backend.CoinCollection
 import com.tpb.coinz.data.backend.UserCollection
+import com.tpb.coinz.data.coins.Coin
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -43,11 +44,17 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         }
     }
 
+    fun loadCoinsForTransfer() {
+        coinCollection.getCollectedCoins(userCollection.getCurrentUser()) {
+            actions.postValue(ThreadAction.ShowCoinsDialog(it))
+        }
+    }
+
     private fun messageUpdate(change: Result<List<ChatCollection.Message>>) {
         if (change is Result.Value) {
-            actions.postValue(ThreadAction.DISPLAY_LOADING)
+            actions.postValue(ThreadAction.SetLoadingState(true))
             messages.postValue((messages.value ?: emptyList()) + change.v)
-            actions.postValue(ThreadAction.HIDE_LOADING)
+            actions.postValue(ThreadAction.SetLoadingState(false))
         }
     }
 
@@ -56,7 +63,8 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         thread?.let { chatCollection.closeThread(it) }
     }
 
-    enum class ThreadAction {
-        DISPLAY_LOADING, HIDE_LOADING
+    sealed class ThreadAction {
+        class SetLoadingState(val isLoading: Boolean) : ThreadAction()
+        class ShowCoinsDialog(val coins: List<Coin>) : ThreadAction()
     }
 }

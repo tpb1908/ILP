@@ -36,8 +36,7 @@ import javax.inject.Inject
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
 
-    @Inject
-    lateinit var locationProvider: LocationProvider
+    @Inject lateinit var locationProvider: LocationProvider
 
     @Inject lateinit var connection: ConnectionLiveData
 
@@ -153,12 +152,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                     .strokeColor(Color.RED)
                     .fillColor(Color.TRANSPARENT))
         }
-    }
-
-
-
-    private fun requestLocationPermission() {
-        permissionsManager.requestLocationPermissions(this)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

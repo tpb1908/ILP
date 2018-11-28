@@ -13,6 +13,7 @@ import com.tpb.coinz.data.coins.Map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -38,14 +39,14 @@ class CoinDownloader : CoinLoader {
     private fun loadCoinsFromUrl(date: Calendar) {
         try {
             val datePath = convertToDatePath(date)
-            val urlString = "http://homepages.inf.ed.ac.uk/stg/coinz/$datePath/coinzmap.geojson"
+            val urlString = "https://homepages.inf.ed.ac.uk/stg/coinz/$datePath/coinzmap.geojson"
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
             val map = convert(json)
             listeners.forEach {it(map)}
             listeners.clear()
         } catch (ioe: IOException) {
-            Log.e("CoinDownloader", "IOE $ioe")
+            Timber.e(ioe, "CoinDownloader exception")
         }
     }
 

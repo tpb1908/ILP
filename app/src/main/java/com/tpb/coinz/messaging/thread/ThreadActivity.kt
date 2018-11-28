@@ -1,15 +1,23 @@
 package com.tpb.coinz.messaging.thread
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.SimpleAdapter
 import android.widget.Toast
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tpb.coinz.App
 import com.tpb.coinz.R
+import com.tpb.coinz.data.coins.Coin
+import com.tpb.coinz.data.coins.Currency
 import kotlinx.android.synthetic.main.activity_thread.*
+import kotlinx.android.synthetic.main.dialog_coin_selection.*
+import timber.log.Timber
 
 class ThreadActivity : AppCompatActivity() {
 
@@ -40,6 +48,10 @@ class ThreadActivity : AppCompatActivity() {
                 thread_message_input.text = null
             }
         }
+        thread_add_coin.setOnClickListener {
+            vm.loadCoinsForTransfer()
+        }
+
         thread_messages_recycler.layoutManager = LinearLayoutManager(this)
         thread_messages_recycler.adapter = adapter
 
@@ -51,8 +63,12 @@ class ThreadActivity : AppCompatActivity() {
         vm.bind()
         vm.actions.observe(this, Observer {
             when (it) {
-                ThreadViewModel.ThreadAction.DISPLAY_LOADING -> {thread_loading_bar.visibility = View.VISIBLE}
-                ThreadViewModel.ThreadAction.HIDE_LOADING -> {thread_loading_bar.visibility = View.GONE}
+                is ThreadViewModel.ThreadAction.SetLoadingState -> {
+                    thread_loading_bar.visibility = if (it.isLoading) View.VISIBLE else View.GONE
+                }
+                is ThreadViewModel.ThreadAction.ShowCoinsDialog -> {
+                    showCoinsDialog(it.coins)
+                }
             }
         })
         vm.messages.observe(this, Observer {
@@ -60,6 +76,29 @@ class ThreadActivity : AppCompatActivity() {
             thread_messages_recycler.smoothScrollToPosition(adapter.itemCount)
         })
         adapter.isCurrentUser = vm.isCurrentUser
+    }
+
+    private fun showCoinsDialog(coins: List<Coin>) {
+        Timber.i("Received collected coins $coins")
+        CoinSelectionDialog(coins, this, R.style.CoinDialog).show()
+    }
+
+    private class CoinSelectionDialog(val coins: List<Coin>, context: Context, @StyleRes style: Int) : AppCompatDialog(context, style) {
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.dialog_coin_selection)
+            setTitle("Select coin to send")
+            val adapter = SimpleAdapter(context, coins.map {
+                mapOf("img" to Currency.getImageId(it.currency), "value" to "${it.currency} | ${it.value}")
+            },
+                    R.layout.listitem_dialog_coin, arrayOf("img", "value"),
+                    intArrayOf(R.id.listitem_coin_image, R.id.listitem_coin_info))
+            dialog_coin_list.adapter = adapter
+            dialog_coin_list.setOnItemClickListener { adapterView, view, i, l ->
+
+            }
+        }
     }
 
     companion object {

@@ -3,8 +3,6 @@ package com.tpb.coinz.map
 import android.location.Location
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.R
@@ -113,7 +111,7 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
             Timber.e("No marker for $coin")
         }
         //TODO: Cleanup. Error if user null
-        coinCollection.collectCoin(userCollection.getCurrentUser().uid, coin)
+        coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
     }
 
     sealed class MapActions {

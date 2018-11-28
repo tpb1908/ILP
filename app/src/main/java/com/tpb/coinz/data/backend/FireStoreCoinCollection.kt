@@ -1,10 +1,9 @@
 package com.tpb.coinz.data.backend
 
-import android.util.Log
 import com.google.firebase.firestore.*
 import com.tpb.coinz.data.coins.Coin
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestoreException
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.data.coins.Currency
 import timber.log.Timber
 
 
@@ -14,10 +13,14 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     private val scoreboard = "scoreboard"
     private val scoreboardAll = "all"
     private val total = "total"
+    private val coins = "coins"
 
-    override fun collectCoin(id: String, coin: Coin) {
-        Timber.i("Collecting ${coin.toMap()} for $id")
-        store.collection(collected).document(id).update(coin.toMap())
+    private inline fun coins(user: UserCollection.User) = store.collection(collected).document(user.uid).collection(coins)
+
+    override fun collectCoin(user: UserCollection.User, coin: Coin) {
+        Timber.i("Collecting ${toMap(coin)} for $user")
+
+        coins(user).add(toMap(coin))
     }
 
     private fun updateScoreboard(id: String, coin: Coin) {
@@ -36,18 +39,57 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    override fun getCollectedCoins(id: String, listener: (List<Coin>) -> Unit) {
-        Timber.i("Loading collected coins for $id")
-        store.collection(collected).document(id).addSnapshotListener { d, e ->
-            d?.data?.let { data ->
-                data.keys.forEach { key ->
-                    Timber.i("Coin $key map ${data[key]}")
-                    //coins.add(Coin.fromMap(key, it[key] as MutableMap<String, Any>))
+    override fun getCollectedCoins(user: UserCollection.User, listener: (List<Coin>) -> Unit) {
+        Timber.i("Loading collected coins for $user")
+        coins(user).get().addOnCompleteListener { qs ->
+            if (qs.isSuccessful) {
+                val coins = mutableListOf<Coin>()
+                qs.result?.documents?.forEach { ds ->
+                    ds.data?.let { coins.add(fromMap(it)) }
                 }
-                //TODO: Error handling
-                listener(data.keys.map { Coin.fromMap(it, data[it] as MutableMap<String, Any>) })
+                Timber.i("Collected coins $coins")
+                listener(coins)
+            } else {
+                Timber.e(qs.exception, "Query unsuccessful")
             }
         }
+    }
+
+    override fun transferCoin(from: UserCollection.User, to: UserCollection.User, coin: Coin) {
+        coins(from).whereEqualTo("id", coin.id).get().addOnCompleteListener {
+            if (it.result?.documents?.isEmpty() == false) {
+                it.result?.documents?.first()?.let { ds ->
+                    ds.data?.apply {
+                        this["received"] = true
+                        coins(to).add(this)
+                    }
+                    ds.reference.delete()
+                }
+            } else {
+                //TODO Coin doesn't exist error
+            }
+        }
+    }
+
+    private fun toMap(coin: Coin): HashMap<String, Any> {
+        return hashMapOf(
+                "id" to coin.id,
+                "value" to coin.value,
+                "currency" to coin.currency.name,
+                "markerSymbol" to coin.markerSymbol,
+                "markerColor" to coin.markerColor,
+                "latitude" to coin.location.latitude,
+                "longitude" to coin.location.longitude,
+                "banked" to coin.banked,
+                "received" to coin.received)
+
+    }
+
+    private fun fromMap(map: MutableMap<String, Any>): Coin {
+        return Coin(map["id"] as String, map["value"] as Double, Currency.fromString(map["currency"] as String),
+                (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
+                LatLng(map["latitude"] as Double, map["longitude"] as Double),
+                        map["banked"] as Boolean, map["received"] as Boolean)
     }
 
 }

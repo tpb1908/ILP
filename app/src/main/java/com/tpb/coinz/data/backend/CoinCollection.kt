@@ -1,15 +1,13 @@
 package com.tpb.coinz.data.backend
 
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
 import com.tpb.coinz.data.coins.Coin
 
 interface CoinCollection {
 
-    fun collectCoin(id: String, coin: Coin)
+    fun collectCoin(user: UserCollection.User, coin: Coin)
 
-    fun getCollectedCoins(id: String, listener: (List<Coin>) -> Unit)
+    fun getCollectedCoins(user: UserCollection.User, listener: (List<Coin>) -> Unit)
 
-
+    fun transferCoin(from: UserCollection.User, to: UserCollection.User, coin: Coin)
 
 }

@@ -12,20 +12,12 @@ class CoinViewHolder(val view: View): SelectableViewHolder(view) {
         set(value) {
             field = value
             value?.let {
-                view.viewholder_coin_icon.setImageResource(getImageId(it.currency))
+                view.viewholder_coin_icon.setImageResource(Currency.getImageId(it.currency))
                 view.viewholder_coin_value.text = it.value.toString()
             }
         }
 
-    @DrawableRes
-    private fun getImageId(currency: Currency): Int {
-        return when (currency) {
-            Currency.QUID -> R.drawable.ic_quid
-            Currency.DOLR -> R.drawable.ic_dolr
-            Currency.PENY -> R.drawable.ic_peny
-            Currency.SHIL -> R.drawable.ic_shil
-        }
-    }
+
 
     private val originalBackground = view.viewholder_coin_card.cardBackgroundColor
 

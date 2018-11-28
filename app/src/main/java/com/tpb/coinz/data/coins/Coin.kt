@@ -1,30 +1,18 @@
 package com.tpb.coinz.data.coins
 
 import android.util.Log
+import androidx.annotation.DrawableRes
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.R
 
-data class Coin(val id: String, val value: Double, val currency: Currency, val markerSymbol: Int, val markerColor: Int, val location: LatLng) {
-
-    fun toMap(): HashMap<String, Any> {
-        return hashMapOf(id to hashMapOf(
-                "value" to value,
-                "currency" to currency.name,
-                "markerSymbol" to markerSymbol,
-                "markerColor" to markerColor,
-                "latitude" to location.latitude,
-                "longitude" to location.longitude))
-
-    }
-
-    companion object {
-        fun fromMap(id: String, map: MutableMap<String, Any>): Coin {
-            return Coin(id, map["value"] as Double, Currency.fromString(map["currency"] as String),
-                    (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
-                    LatLng(map["latitude"] as Double, map["longitude"] as Double))
-        }
-    }
-
-}
+data class Coin(val id: String,
+                val value: Double,
+                val currency: Currency,
+                val markerSymbol: Int,
+                val markerColor: Int,
+                val location: LatLng,
+                val banked: Boolean = false,
+                val received: Boolean = false)
 
 enum class Currency {
     PENY, DOLR, SHIL, QUID;
@@ -36,6 +24,15 @@ enum class Currency {
             } catch (e: IllegalArgumentException) {
                 Log.e("Currency", "Invalid currency name $name")
                 PENY
+            }
+        }
+        @DrawableRes
+        fun getImageId(currency: Currency): Int {
+            return when (currency) {
+                Currency.QUID -> R.drawable.ic_quid
+                Currency.DOLR -> R.drawable.ic_dolr
+                Currency.PENY -> R.drawable.ic_peny
+                Currency.SHIL -> R.drawable.ic_shil
             }
         }
     }
