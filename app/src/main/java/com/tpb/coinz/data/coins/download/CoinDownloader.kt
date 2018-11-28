@@ -2,7 +2,6 @@ package com.tpb.coinz.data.coins.download
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -21,7 +20,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class CoinDownloader : CoinLoader {
 
@@ -72,7 +70,7 @@ class CoinDownloader : CoinLoader {
         return conn.inputStream
     }
 
-    fun convert(obj: JsonObject): Map {
+    private fun convert(obj: JsonObject): Map {
 
         val ratesObj = obj.getAsJsonObject("rates")
         val rates = ratesObj.entrySet().map {

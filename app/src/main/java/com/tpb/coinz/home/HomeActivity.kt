@@ -27,7 +27,7 @@ import timber.log.Timber
 
 class HomeActivity : AppCompatActivity() {
 
-    private val RC_LOGIN = 5534
+    private val rcLogin = 5534
     private lateinit var vm: HomeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +81,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val collectionObserver = Observer<MapInfo> {
-        map_collection_info.text = getString(R.string.home_coin_collection_info, it.numCollected, it.numRemaining)
+        map_collection_info.text =
+                resources.getQuantityString(R.plurals.home_coin_collection_info, it.numCollected, it.numCollected, it.numRemaining)
     }
 
     private fun beginLoginFlow() {
@@ -95,12 +96,12 @@ class HomeActivity : AppCompatActivity() {
                         .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
                         .setAvailableProviders(providers)
                         .build(),
-                RC_LOGIN)
+                rcLogin)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_LOGIN) {
+        if (requestCode == rcLogin) {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
                 vm.userLoggedIn()

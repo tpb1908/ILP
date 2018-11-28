@@ -1,7 +1,6 @@
 package com.tpb.coinz.bank
 
 import android.view.View
-import androidx.annotation.DrawableRes
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.Currency

@@ -1,36 +1,32 @@
 package com.tpb.coinz.map
 
-import android.graphics.*
-import android.location.Location
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
-import com.tpb.coinz.*
+import com.tpb.coinz.App
+import com.tpb.coinz.LocationUtils
+import com.tpb.coinz.R
+import com.tpb.coinz.asCameraUpdate
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coins.Coin
-import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
 import timber.log.Timber
-import java.lang.Exception
 import javax.inject.Inject
 
 

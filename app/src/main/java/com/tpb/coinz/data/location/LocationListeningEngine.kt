@@ -1,10 +1,9 @@
 package com.tpb.coinz.data.location
 
+import android.annotation.SuppressLint
 import android.location.Location
 import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import timber.log.Timber
-import java.lang.Exception
 
 class LocationListeningEngine(private val locationProvider: LocationProvider) : LocationEngine(), LocationListener {
 
@@ -27,6 +26,7 @@ class LocationListeningEngine(private val locationProvider: LocationProvider) : 
 
     override fun isConnected(): Boolean = connected
 
+    @SuppressLint("MissingPermission")
     override fun getLastLocation(): Location? = locationProvider.lastLocationUpdate()
 
 

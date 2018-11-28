@@ -8,7 +8,7 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 
 
-public class ConnectionLiveData(val context: Context) : LiveData<Boolean>() {
+class ConnectionLiveData(val context: Context) : LiveData<Boolean>() {
 
     override fun onActive() {
         super.onActive()

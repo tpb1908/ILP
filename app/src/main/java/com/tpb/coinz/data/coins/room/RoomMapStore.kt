@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.coins.room
 
-import android.util.Log
 import androidx.room.*
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coins.Map
@@ -17,7 +16,7 @@ class RoomMapStore(database: Database): MapStore {
 
     @androidx.room.Database(entities = [RoomMap::class], version = 2)
     @TypeConverters(MapTypeConverter::class)
-    public abstract class Database: RoomDatabase() {
+    abstract class Database: RoomDatabase() {
 
         abstract fun mapDao(): MapDao
 

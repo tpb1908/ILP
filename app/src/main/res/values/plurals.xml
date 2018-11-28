@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="home_coin_collection_info">
+        <item quantity="zero">%1$d coinz collected. %2$d remaining</item>
+        <item quantity="one">%1$d coin collected. %2$d remaining</item>
+        <item quantity="other">%1$d coinz collected. %2$d remaining</item>
+    </plurals>
+
+</resources>

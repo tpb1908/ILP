@@ -1,7 +1,5 @@
 package com.tpb.coinz.home
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

@@ -67,7 +67,7 @@ class ThreadsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private val addChatClick = View.OnClickListener { _ ->
+    private val addChatClick = View.OnClickListener {
         val edit = AutoCompleteTextView(this)
         val container = FrameLayout(this)
         val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -86,7 +86,7 @@ class ThreadsActivity : AppCompatActivity() {
         })
         vm.userSearchResults.observe(this, Observer { users ->
             adapter.clear()
-            adapter.addAll(users.map { it.email })
+            adapter.addAll(users.map { user -> user.email })
         })
         edit.setHint(R.string.hint_chat_creation_email)
         AlertDialog.Builder(this)

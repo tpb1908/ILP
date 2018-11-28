@@ -1,5 +1,5 @@
-<resources>
-    <string name="app_name">Coinz</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" tools:ignore="PrivateResource">Coinz</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -15,7 +15,7 @@
     </string>
 
     <string name="error_empty_message">Can\'t send empty message</string>
-    <string name="home_coin_collection_info">%1$d coinz collected. %2$d remaining</string>
+
     <string name="recycler_section_collected_coins">Collected coinz</string>
     <string name="recycler_section_received_coins">Received coinz</string>
     <string name="extra_camera_position">camera_position</string>
@@ -24,4 +24,6 @@
     <string name="dialog_chat_creation_title">Email</string>
     <string name="hint_chat_creation_email">Email of recipient</string>
     <string name="message_all_coins_collected">All coins collected</string>
+
+    <string name="content_coin_icon">Icon for coin type</string>
 </resources>

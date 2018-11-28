@@ -1,9 +1,9 @@
 package com.tpb.coinz.data.coins
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.R
+import timber.log.Timber
 
 data class Coin(val id: String,
                 val value: Double,
@@ -22,7 +22,7 @@ enum class Currency {
             return try {
                 valueOf(name)
             } catch (e: IllegalArgumentException) {
-                Log.e("Currency", "Invalid currency name $name")
+                Timber.e("Invalid currency name $name")
                 PENY
             }
         }

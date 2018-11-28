@@ -5,9 +5,9 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class SelectableViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    public abstract fun select()
+    abstract fun select()
 
-    public abstract fun deselect()
+    abstract fun deselect()
 
 
 }

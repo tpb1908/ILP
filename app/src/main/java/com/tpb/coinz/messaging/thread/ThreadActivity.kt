@@ -1,6 +1,5 @@
 package com.tpb.coinz.messaging.thread
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -101,6 +100,7 @@ class ThreadActivity : AppCompatActivity() {
             dialog_coin_list.adapter = adapter
             dialog_coin_list.setOnItemClickListener { adapterView, view, i, l ->
                 dismiss()
+                //TODO: Confirm selection
                 selectionListener(coins[i])
             }
         }

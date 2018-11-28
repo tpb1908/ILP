@@ -10,7 +10,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules= arrayOf(LoaderModule::class, LocationModule::class, BackendModule::class, StoreModule::class))
+@Component(modules= [LoaderModule::class, LocationModule::class, BackendModule::class, StoreModule::class])
 interface HomeComponent {
 
 

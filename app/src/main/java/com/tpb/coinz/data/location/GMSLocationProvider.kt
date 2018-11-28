@@ -3,7 +3,6 @@ package com.tpb.coinz.data.location
 import android.content.Context
 import android.location.Location
 import android.os.Looper
-import android.util.Log
 import com.google.android.gms.location.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

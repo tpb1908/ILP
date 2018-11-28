@@ -8,7 +8,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_margin="5dip" />
+        android:layout_margin="5dip"
+        android:contentDescription="@string/content_coin_icon"/>
 
     <TextView
         android:id="@+id/listitem_coin_info"

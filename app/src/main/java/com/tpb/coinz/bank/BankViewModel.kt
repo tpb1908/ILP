@@ -32,6 +32,6 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>() {
 //        }
     }
 
-    sealed class BankAction {}
+    sealed class BankAction
 
 }
