@@ -52,7 +52,9 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
     }
 
     fun loadCoinsForTransfer() {
+        actions.postValue(ThreadAction.SetLoadingState(true))
         coinCollection.getCollectedCoins(userCollection.getCurrentUser()) {
+            actions.postValue(ThreadAction.SetLoadingState(false))
             actions.postValue(ThreadAction.ShowCoinsDialog(it))
         }
     }

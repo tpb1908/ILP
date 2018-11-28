@@ -1,5 +1,6 @@
 package com.tpb.coinz.messaging.thread
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -49,6 +50,7 @@ class ThreadActivity : AppCompatActivity() {
             }
         }
         thread_add_coin.setOnClickListener {
+
             vm.loadCoinsForTransfer()
         }
 
@@ -67,6 +69,7 @@ class ThreadActivity : AppCompatActivity() {
                     thread_loading_bar.visibility = if (it.isLoading) View.VISIBLE else View.GONE
                 }
                 is ThreadViewModel.ThreadAction.ShowCoinsDialog -> {
+
                     showCoinsDialog(it.coins)
                 }
             }
