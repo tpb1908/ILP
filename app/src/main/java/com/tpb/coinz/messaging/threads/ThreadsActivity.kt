@@ -2,8 +2,6 @@ package com.tpb.coinz.messaging.threads
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -11,7 +9,6 @@ import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,7 +29,7 @@ class ThreadsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messages)
-        (application as App).messagesComponent.inject(this)
+        (application as App).threadsComponent.inject(this)
         initViews()
         bindViewModel()
     }
@@ -46,7 +43,7 @@ class ThreadsActivity : AppCompatActivity() {
 
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(ThreadsViewModel::class.java)
-        (application as App).messagesComponent.inject(vm)
+        (application as App).threadsComponent.inject(vm)
         vm.bind()
 
         vm.threadIntents.observe(this, Observer {

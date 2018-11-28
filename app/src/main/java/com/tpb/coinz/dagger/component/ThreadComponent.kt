@@ -1,5 +1,6 @@
 package com.tpb.coinz.dagger.component
 
+import com.tpb.coinz.dagger.module.BackendModule
 import com.tpb.coinz.dagger.module.ChatModule
 import com.tpb.coinz.dagger.module.ConnectivityModule
 import com.tpb.coinz.dagger.module.UserModule
@@ -8,7 +9,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ConnectivityModule::class, ChatModule::class, UserModule::class])
+@Component(modules = [ConnectivityModule::class, ChatModule::class, UserModule::class, BackendModule::class])
 interface ThreadComponent {
 
     fun inject(viewModel: ThreadViewModel)

@@ -4,16 +4,18 @@ import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.ChatCollection
+import com.tpb.coinz.data.backend.CoinCollection
 import com.tpb.coinz.data.backend.UserCollection
 import timber.log.Timber
 import javax.inject.Inject
 
 class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
-    @Inject
-    lateinit var chatCollection: ChatCollection
+    @Inject lateinit var chatCollection: ChatCollection
 
     @Inject lateinit var userCollection: UserCollection
+
+    @Inject lateinit var coinCollection: CoinCollection
 
     override val actions = MutableLiveData<ThreadAction>()
 

@@ -8,4 +8,4 @@ public const val chats = "chats"
 
 public const val threads = "threads"
 
-public const val collectionDistance = 50
+public const val collectionDistance = 25

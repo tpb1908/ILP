@@ -33,7 +33,6 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        (application as App).homeComponent.inject(this)
         home_minimap.onCreate(savedInstanceState)
 
         initViews(savedInstanceState)

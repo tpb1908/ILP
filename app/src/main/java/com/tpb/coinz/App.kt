@@ -32,8 +32,8 @@ class App : Application() {
                 .backendModule(BackendModule())
                 .build()
     }
-    val messagesComponent: MessagesComponent by lazy {
-        DaggerMessagesComponent.builder()
+    val threadsComponent: ThreadsComponent by lazy {
+        DaggerThreadsComponent.builder()
                 .connectivityModule(ConnectivityModule(this))
                 .chatModule(ChatModule())
                 .build()

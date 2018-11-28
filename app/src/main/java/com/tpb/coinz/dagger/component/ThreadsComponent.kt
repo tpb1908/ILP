@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [ConnectivityModule::class, ChatModule::class, UserModule::class])
-interface MessagesComponent {
+interface ThreadsComponent {
 
 
     fun inject(activity: ThreadsActivity)
