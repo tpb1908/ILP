@@ -1,5 +1,6 @@
 package com.tpb.coinz.messaging.threads
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
@@ -14,7 +15,23 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     @Inject lateinit var userCollection: UserCollection
 
-    val threads = MutableLiveData<List<ChatCollection.Thread>>()
+    val threads = MediatorLiveData<List<ChatCollection.Thread>>()
+    private val createdThreads = MutableLiveData<List<ChatCollection.Thread>>()
+
+    private val receivedThreads = MutableLiveData<List<ChatCollection.Thread>>()
+
+    init {
+        var lastCreatedThreads = listOf<ChatCollection.Thread>()
+        var lastReceivedThreads = listOf<ChatCollection.Thread>()
+        threads.addSource(createdThreads) {
+            lastCreatedThreads = it
+            threads.postValue(lastCreatedThreads + lastReceivedThreads)
+        }
+        threads.addSource(receivedThreads) {
+            lastReceivedThreads = it
+            threads.postValue(lastCreatedThreads + lastReceivedThreads)
+        }
+    }
 
     val threadIntents = MutableLiveData<ChatCollection.Thread>()
 
@@ -24,10 +41,17 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     override fun bind() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
+
         chatCollection.openThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<ChatCollection.Thread>>) {
-                Timber.i("Retrieved threads ${it.v}")
-                threads.postValue(it.v + (threads.value ?: emptyList()))
+                if (it.v.isNotEmpty()) {
+                    Timber.i("Retrieved threads ${it.v}")
+                    if (it.v.first().creator == userCollection.getCurrentUser()) {
+                        createdThreads.postValue(it.v)
+                    } else {
+                        receivedThreads.postValue(it.v)
+                    }
+                }
                 actions.postValue(ThreadsAction.SetLoadingState(false))
             }
         }

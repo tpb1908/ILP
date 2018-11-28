@@ -12,6 +12,8 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     private var threadsListener: ((Result<List<ChatCollection.Thread>>) -> Unit)? = null
     private var threadsListenerRegistration: Pair<ListenerRegistration, ListenerRegistration>? = null
 
+    private inline fun messages(thread: ChatCollection.Thread) = store.collection(threads).document(thread.threadId).collection("messages")
+
     override fun createThread(creator: UserCollection.User,
                               partner: UserCollection.User,
                               callback: (Result<ChatCollection.Thread>) -> Unit) {
@@ -60,6 +62,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
     private val threadsSnapshotListener: EventListener<QuerySnapshot> = EventListener { snapshot, exception ->
         val threads = mutableListOf<ChatCollection.Thread>()
+        //TODO: How do we merge the two sources of the threads?
         snapshot?.documentChanges?.forEach { change ->
             if (change.type == DocumentChange.Type.ADDED) {
                 val doc = change.document
@@ -86,7 +89,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         openThread = thread
         newMessageListener = listener
         messageListenerRegistration?.remove()
-        messageListenerRegistration = store.collection(threads).document(thread.threadId).collection("messages").addSnapshotListener(threadSnapshotListener)
+        messageListenerRegistration = messages(thread).addSnapshotListener(threadSnapshotListener)
     }
 
     override fun closeThread(thread: ChatCollection.Thread) {
@@ -96,7 +99,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     override fun postMessage(message: ChatCollection.Message, callback: (Result<Boolean>) -> Unit) {
         openThread?.let {
             //TODO: Error handling
-            store.collection(threads).document(it.threadId).collection("messages").add(message)
+            messages(it).add(message)
         }
     }
 
