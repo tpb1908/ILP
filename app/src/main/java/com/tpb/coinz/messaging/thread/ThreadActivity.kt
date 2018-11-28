@@ -80,10 +80,10 @@ class ThreadActivity : AppCompatActivity() {
 
     private fun showCoinsDialog(coins: List<Coin>) {
         Timber.i("Received collected coins $coins")
-        CoinSelectionDialog(coins, this, R.style.CoinDialog).show()
+        CoinSelectionDialog(coins, this, R.style.CoinDialog, vm::transferCoin).show()
     }
 
-    private class CoinSelectionDialog(val coins: List<Coin>, context: Context, @StyleRes style: Int) : AppCompatDialog(context, style) {
+    private class CoinSelectionDialog(val coins: List<Coin>, context: Context, @StyleRes style: Int, val selectionListener: (Coin) -> Unit) : AppCompatDialog(context, style) {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -96,7 +96,8 @@ class ThreadActivity : AppCompatActivity() {
                     intArrayOf(R.id.listitem_coin_image, R.id.listitem_coin_info))
             dialog_coin_list.adapter = adapter
             dialog_coin_list.setOnItemClickListener { adapterView, view, i, l ->
-
+                dismiss()
+                selectionListener(coins[i])
             }
         }
     }

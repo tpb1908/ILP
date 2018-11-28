@@ -15,7 +15,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     private val total = "total"
     private val coins = "coins"
 
-    private inline fun coins(user: UserCollection.User) = store.collection(collected).document(user.uid).collection(coins)
+    private inline fun coins(user: UserCollection.User): CollectionReference = store.collection(collected).document(user.uid).collection(coins)
 
     override fun collectCoin(user: UserCollection.User, coin: Coin) {
         Timber.i("Collecting ${toMap(coin)} for $user")
@@ -57,15 +57,23 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
 
     override fun transferCoin(from: UserCollection.User, to: UserCollection.User, coin: Coin) {
         coins(from).whereEqualTo("id", coin.id).get().addOnCompleteListener {
+            Timber.i("Transferring coin $coin from $from to $to")
             if (it.result?.documents?.isEmpty() == false) {
                 it.result?.documents?.first()?.let { ds ->
                     ds.data?.apply {
-                        this["received"] = true
-                        coins(to).add(this)
+                        coins(to).add(toMap(coin.copy(received = true))).addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Timber.i("Transferred coin. Deleting original")
+                                ds.reference.delete()
+                            } else {
+                                Timber.e(it.exception, "Couldn't transfer coin")
+                            }
+                        }
                     }
-                    ds.reference.delete()
+
                 }
             } else {
+                Timber.e("Coin to send doesn't exist ${it.result}, ${it.result?.documents}")
                 //TODO Coin doesn't exist error
             }
         }

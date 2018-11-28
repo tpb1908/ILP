@@ -44,6 +44,13 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         }
     }
 
+    fun transferCoin(coin: Coin) {
+        Timber.i("Transferring $coin in thread $thread")
+        thread?.let {
+            coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin)
+        }
+    }
+
     fun loadCoinsForTransfer() {
         coinCollection.getCollectedCoins(userCollection.getCurrentUser()) {
             actions.postValue(ThreadAction.ShowCoinsDialog(it))
