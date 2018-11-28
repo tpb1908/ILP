@@ -83,6 +83,7 @@ class ThreadActivity : AppCompatActivity() {
 
     private fun showCoinsDialog(coins: List<Coin>) {
         Timber.i("Received collected coins $coins")
+        thread_loading_bar.visibility = View.GONE
         CoinSelectionDialog(coins, this, R.style.CoinDialog, vm::transferCoin).show()
     }
 
@@ -103,6 +104,8 @@ class ThreadActivity : AppCompatActivity() {
                 selectionListener(coins[i])
             }
         }
+
+
     }
 
     companion object {
