@@ -5,6 +5,7 @@ import android.location.Location
 import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.*
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback() {
@@ -25,6 +26,7 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
         super.onLocationResult(lr)
         lr?.apply {
             this@GMSLocationProvider.lastLocation = lastLocation
+            Timber.i("Location update $lastLocation")
             listeners.forEach {
                 it.locationUpdate(lastLocation)
             }
@@ -48,7 +50,7 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
                 if (it.isSuccessful) lastLocation = it.result
             }
         } catch (se: SecurityException) {
-            Log.e(LocationListener::class.java.name, "Missing permission", se)
+            Timber.e(se, "Missing location permission")
         }
     }
 

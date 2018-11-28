@@ -7,7 +7,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [LoaderModule::class, LocationModule::class, StoreModule::class, ConnectivityModule::class, BackendModule::class])
+@Component(modules = [LoaderModule::class, LocationModule::class, StoreModule::class, ConnectivityModule::class, BackendModule::class, UserModule::class])
 interface MapComponent {
 
 

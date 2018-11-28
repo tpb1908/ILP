@@ -23,4 +23,5 @@
     <string name="hint_enter_message">Enter message</string>
     <string name="dialog_chat_creation_title">Email</string>
     <string name="hint_chat_creation_email">Email of recipient</string>
+    <string name="message_all_coins_collected">All coins collected</string>
 </resources>

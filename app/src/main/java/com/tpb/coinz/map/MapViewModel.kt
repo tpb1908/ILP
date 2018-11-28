@@ -7,9 +7,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.R
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.CoinCollection
+import com.tpb.coinz.data.backend.UserCollection
 import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.CoinLoader
 import com.tpb.coinz.data.coins.Map
@@ -34,10 +36,10 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
     @Inject
     lateinit var locationProvider: LocationProvider
 
-    private var user: FirebaseUser? = null
 
     @Inject lateinit var coinCollection: CoinCollection
 
+    @Inject lateinit var userCollection: UserCollection
 
     private var map: Map? = null
     private var markers: MutableMap<Coin, Marker> = HashMap()
@@ -45,7 +47,6 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
     override val actions = MutableLiveData<MapActions>()
 
     override fun bind() {
-        user = FirebaseAuth.getInstance().currentUser
         mapStore.getLatest {
             if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
                 map = it.v
@@ -57,6 +58,11 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
             }
         }
         locationProvider.addListener(this)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        locationProvider.removeListener(this)
     }
 
     private val mapLoadCallback = { m: Map? ->
@@ -101,13 +107,13 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), com.tpb.coinz.dat
                 mapStore.update(it)
             }
             if (markers.isEmpty()) {
-                //TODO: Notification of all remainingCoins collected
+                actions.postValue(MapActions.DisplayMessage(R.string.message_all_coins_collected))
             }
         } else {
             Timber.e("No marker for $coin")
         }
         //TODO: Cleanup. Error if user null
-        user?.let { coinCollection.collectCoin(it.uid, coin) }
+        coinCollection.collectCoin(userCollection.getCurrentUser().uid, coin)
     }
 
     sealed class MapActions {

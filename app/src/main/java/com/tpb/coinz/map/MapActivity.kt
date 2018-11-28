@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -24,6 +25,8 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.tpb.coinz.*
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coins.Coin
+import com.tpb.coinz.data.location.LocationListener
+import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
 import timber.log.Timber
@@ -103,10 +106,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         return iconFactory.fromBitmap(bitmap)
     }
 
-    private fun beginLocationTracking() {
-        locationProvider.start()
-    }
-
     private fun initLocationSystem() {
         locationProvider.start()
         permissionsManager = PermissionsManager(this)
@@ -116,25 +115,11 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
 
             mapview.getMapAsync {
-                locationLayer = LocationLayerPlugin(mapview, it, LocationEngineProvider(applicationContext).obtainBestLocationEngineAvailable())
+                val engine = LocationListeningEngine(locationProvider)
+                locationLayer = LocationLayerPlugin(mapview, it, engine)
                 locationLayer.renderMode = RenderMode.COMPASS
-
+                engine.activate()
                 lifecycle.addObserver(locationLayer)
-                locationProvider.addListener(object: com.tpb.coinz.data.location.LocationListener {
-                    override fun locationUpdate(location: Location) {
-                        Timber.i("Forcing location update to $location")
-                        locationLayer.forceLocationUpdate(location)
-                    }
-
-                    override fun locationAvailable() {
-                    }
-
-                    override fun locationUnavailable() {
-                    }
-
-                    override fun locationUpdateError(exception: Exception) {
-                    }
-                })
             }
 
         } else {
