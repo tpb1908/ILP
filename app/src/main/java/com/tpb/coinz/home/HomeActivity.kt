@@ -134,6 +134,11 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+    
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Timber.i("Permissions to explain $permissionsToExplain")
     }
@@ -141,5 +146,42 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     override fun onPermissionResult(granted: Boolean) {
         Timber.i("Permission result $granted")
         initLocationSystem()
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        home_minimap.onResume()
+        locationProvider.start()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        home_minimap.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        home_minimap.onStop()
+        locationProvider.stop()
+    }
+
+    public override fun onPause() {
+        super.onPause()
+        home_minimap.onPause()
+    }
+
+    public override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        home_minimap.onSaveInstanceState(outState)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        home_minimap.onLowMemory()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        home_minimap.onDestroy()
     }
 }
