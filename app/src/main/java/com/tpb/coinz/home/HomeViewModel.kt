@@ -45,6 +45,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
         } else {
             user.postValue(fbUser)
             coinCollector.addCollectionListener(this)
+            coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
         }
 
@@ -54,20 +55,19 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
         collected.forEach { coin ->
             if (markers.containsKey(coin)) {
                 Timber.i("Removing marker for $coin")
-                //actions.postValue(MapViewModel.MapAction.RemoveMarker(markers.getValue(coin)))
+                actions.postValue(HomeAction.RemoveMarker(markers.getValue(coin)))
                 markers.remove(coin)
-
             } else {
                 Timber.e("No marker for $coin")
             }
             //TODO: Probably not the best way to do this
-            collectionInfo.postValue(MapInfo(markers.size, 50-markers.size))
-            coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
+            collectionInfo.postValue(MapInfo(50-markers.size, markers.size))
         }
     }
 
     override fun mapLoaded(map: Map) {
         coins.postValue(map.remainingCoins)
+        collectionInfo.postValue(MapInfo(map.collectedCoins.size, map.remainingCoins.size))
     }
 
     fun mapMarkers(markers: MutableMap<Coin, Marker>) {

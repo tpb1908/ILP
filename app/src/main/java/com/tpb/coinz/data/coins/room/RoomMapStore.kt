@@ -14,6 +14,7 @@ class RoomMapStore(database: Database) : MapStore {
 
     private val dao: MapDao = database.mapDao()
 
+    //TODO: Rewrite the store
     @androidx.room.Database(entities = [RoomMap::class], version = 2)
     @TypeConverters(MapTypeConverter::class)
     abstract class Database : RoomDatabase() {
@@ -48,6 +49,11 @@ class RoomMapStore(database: Database) : MapStore {
     override fun update(map: Map) {
         GlobalScope.launch(Dispatchers.IO) {
             dao.update(RoomMap(map))
+            getLatest {
+                if (it is Result.Value) {
+                    Timber.i("CoinCollector Latest map ${it.v.remainingCoins.size}")
+                }
+            }
         }
     }
 

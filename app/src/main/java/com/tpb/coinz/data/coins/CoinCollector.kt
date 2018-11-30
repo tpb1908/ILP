@@ -3,6 +3,8 @@ package com.tpb.coinz.data.coins
 import android.location.Location
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.Result
+import com.tpb.coinz.data.backend.CoinCollection
+import com.tpb.coinz.data.backend.UserCollection
 import com.tpb.coinz.data.backend.collectionDistance
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationProvider
@@ -15,13 +17,16 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
 
     private val listeners: MutableSet<CoinCollectorListener> = hashSetOf()
 
+    private var coinCollection: CoinCollection? = null
+    private var user: UserCollection.User? = null
+
     fun loadMap() {
         lp.addListener(this)
         mapStore.getLatest { result ->
             if (result is Result.Value<Map> && result.v.isValidForDay(Calendar.getInstance())) {
                 map = result.v
                 listeners.forEach { it.mapLoaded(result.v) }
-                Timber.i("Coins loaded from room. Remaining coins: ${result.v.remainingCoins}")
+                Timber.i("Coins loaded from room. Remaining coins: ${result.v.remainingCoins.size}")
             } else {
                 Timber.i("Loading coins from network")
                 coinLoader.loadCoins(Calendar.getInstance()) { m ->
@@ -35,6 +40,10 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
         }
     }
 
+    fun setCoinCollection(coinCollection: CoinCollection, user: UserCollection.User) {
+        this.coinCollection = coinCollection
+        this.user = user
+    }
 
     fun addCollectionListener(listener: CoinCollectorListener) = listeners.add(listener)
 
@@ -57,13 +66,16 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
 
 
     private fun collect(collectable: List<Coin>) {
-        Timber.i("Collecting ${collectable.size} coins")
         if (collectable.isNotEmpty()) {
             Timber.i("Collecting coins $collectable from map ${map?.collectedCoins?.size}")
             map?.let {
+                Timber.i("Map prior to update ${it.remainingCoins.size}")
                 it.remainingCoins.removeAll(collectable)
                 it.collectedCoins.addAll(collectable)
                 mapStore.update(it)
+            }
+            user?.let { user ->
+                collectable.forEach { coinCollection?.collectCoin(user, it) }
             }
             listeners.forEach { it.coinsCollected(collectable) }
         }

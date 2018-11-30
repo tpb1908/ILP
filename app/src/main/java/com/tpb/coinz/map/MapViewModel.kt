@@ -32,6 +32,7 @@ class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.Coin
 
 
     override fun bind() {
+        coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         coinCollector.addCollectionListener(this)
         coinCollector.loadMap()
     }
@@ -55,7 +56,6 @@ class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.Coin
             } else {
                 Timber.e("No marker for $coin")
             }
-            coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
         }
     }
 
