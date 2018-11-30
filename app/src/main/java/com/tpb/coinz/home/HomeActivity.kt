@@ -2,6 +2,7 @@ package com.tpb.coinz.home
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
@@ -13,6 +14,10 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseUser
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.mapboxsdk.annotations.Icon
+import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
@@ -20,17 +25,21 @@ import com.tpb.coinz.App
 import com.tpb.coinz.BuildConfig
 import com.tpb.coinz.LocationUtils
 import com.tpb.coinz.R
+import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.map.MapActivity
+import com.tpb.coinz.map.Utils
 import com.tpb.coinz.messaging.threads.ThreadsActivity
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.activity_map.*
 import timber.log.Timber
 import javax.inject.Inject
 
 class HomeActivity : AppCompatActivity(), PermissionsListener {
 
     private val rcLogin = 5534
+    private val rcMap = 6543
     private lateinit var vm: HomeViewModel
 
     @Inject
@@ -45,7 +54,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
         initViews(savedInstanceState)
         bindViewModel()
-        startActivity(Intent(this, ThreadsActivity::class.java))
+        //startActivity(Intent(this, ThreadsActivity::class.java))
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
@@ -60,7 +69,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                 )
                 val intent = Intent(this, MapActivity::class.java)
                 intent.putExtra(getString(R.string.extra_camera_position), cameraPosition)
-                startActivity(intent, options.toBundle())
+                startActivityForResult(intent, rcMap, options.toBundle())
             }
         }
         initLocationSystem()
@@ -90,11 +99,33 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
         vm.user.observe(this, userObserver)
         vm.collectionInfo.observe(this, collectionObserver)
+        vm.coins.observe(this, Observer<List<Coin>> { coins ->
+            home_minimap.getMapAsync {
+                vm.mapMarkers(coins.zip(it.addMarkers(coins.map(::coinToMarkerOption))).toMap().toMutableMap())
+            }
+        })
         vm.actions.observe(this, Observer {
             when (it) {
                 HomeViewModel.HomeActions.BEGIN_LOGIN_FLOW -> beginLoginFlow()
             }
         })
+    }
+
+    private fun coinToMarkerOption(coin: Coin): MarkerOptions {
+        return MarkerOptions()
+                .position(coin.location)
+                .title(coin.currency.name)
+                .snippet(coin.value.toString())
+                .setIcon(getCoinIcon(coin))
+    }
+
+    /**
+     * Load a marker icon as a tinted [Bitmap] and pass to [IconFactory.fromBitmap] which wraps
+     * it to be displayed on the map
+     */
+    private fun getCoinIcon(coin: Coin): Icon {
+        val bitmap = Utils.loadAndTintBitMap(this, R.drawable.ic_location_white_24dp, coin.markerColor)
+        return IconFactory.getInstance(this).fromBitmap(bitmap)
     }
 
     private val userObserver = Observer<FirebaseUser> {
@@ -130,6 +161,13 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
             } else {
                 vm.userLoginFailed()
+            }
+        } else if (requestCode == rcMap) {
+            if (data?.hasExtra(getString(R.string.extra_camera_position)) == true) {
+                val position = data.getParcelableExtra<CameraPosition>(getString(R.string.extra_camera_position))
+                home_minimap.getMapAsync {
+                    it.cameraPosition = position
+                }
             }
         }
     }

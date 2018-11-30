@@ -1,5 +1,7 @@
 package com.tpb.coinz.map
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
@@ -39,7 +41,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
 
-    private lateinit var iconFactory: IconFactory
 
     private lateinit var vm: MapViewModel
 
@@ -48,7 +49,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         setContentView(R.layout.activity_map)
         (application as App).mapComponent.inject(this)
         mapview.onCreate(savedInstanceState)
-        iconFactory = IconFactory.getInstance(this)
         bindViewModel()
 
         initLocationSystem()
@@ -98,7 +98,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
      */
     private fun getCoinIcon(coin: Coin): Icon {
         val bitmap = Utils.loadAndTintBitMap(this, R.drawable.ic_location_white_24dp, coin.markerColor)
-        return iconFactory.fromBitmap(bitmap)
+        return IconFactory.getInstance(this).fromBitmap(bitmap)
     }
 
     private fun initLocationSystem() {
@@ -162,6 +162,13 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     override fun onPermissionResult(granted: Boolean) {
         Timber.i("Permission result $granted")
         initLocationSystem()
+    }
+
+    override fun onBackPressed() {
+        mapview.getMapAsync {
+            setResult(Activity.RESULT_OK, Intent().putExtra(getString(R.string.extra_camera_position), it.cameraPosition))
+            super.onBackPressed()
+        }
     }
 
     public override fun onResume() {

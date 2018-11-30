@@ -4,27 +4,29 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.mapbox.mapboxsdk.annotations.Marker
+import com.tpb.coinz.R
 import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.CoinCollection
-import com.tpb.coinz.data.coins.CoinLoader
+import com.tpb.coinz.data.coins.*
 import com.tpb.coinz.data.coins.Map
-import com.tpb.coinz.data.coins.MapStore
+import com.tpb.coinz.map.MapViewModel
 import dagger.Lazy
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-class HomeViewModel: BaseViewModel<HomeViewModel.HomeActions>(){
+class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.CoinCollectorListener {
 
-    @Inject
-    lateinit var coinLoader: CoinLoader
+    val coins = MutableLiveData<List<Coin>>()
+
+    private var markers: MutableMap<Coin, Marker> = HashMap()
+
     private var fbUser: FirebaseUser? = null
 
     @Inject
-    lateinit var mapStore: MapStore
-
-    @Inject lateinit var coinCollection: Lazy<CoinCollection>
+    lateinit var coinCollector: CoinCollector
 
     val user = MutableLiveData<FirebaseUser>()
 
@@ -39,23 +41,32 @@ class HomeViewModel: BaseViewModel<HomeViewModel.HomeActions>(){
             actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
         } else {
             user.postValue(fbUser)
-            checkForCurrentMap()
+            coinCollector.addCollectionListener(this)
+            coinCollector.loadMap()
         }
 
     }
 
-    // Check whether we have a valid
-    private fun checkForCurrentMap() {
-        mapStore.getLatest {
-            if (it is Result.Value<Map> && it.v.isValidForDay(Calendar.getInstance())) {
-                postCoinCollectionInfo(it.v)
+    override fun coinsCollected(collected: List<Coin>) {
+        collected.forEach { coin ->
+            if (markers.containsKey(coin)) {
+                Timber.i("Removing marker for $coin")
+                //actions.postValue(MapViewModel.MapActions.RemoveMarker(markers.getValue(coin)))
+                markers.remove(coin)
+
             } else {
-                coinLoader.loadCoins(Calendar.getInstance()) {
-                    map -> map?.apply { mapStore.store(this) }
-                }
-                postEmptyCollectionInfo()
+                Timber.e("No marker for $coin")
             }
+            //TODO coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
         }
+    }
+
+    override fun mapLoaded(map: Map) {
+        coins.postValue(map.remainingCoins)
+    }
+
+    fun mapMarkers(markers: MutableMap<Coin, Marker>) {
+        this.markers = markers
     }
 
     // If we haven't collected any remainingCoins
@@ -79,11 +90,16 @@ class HomeViewModel: BaseViewModel<HomeViewModel.HomeActions>(){
             }
         }
 
-        checkForCurrentMap()
     }
 
     fun userLoginFailed() {
         actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        coinCollector.removeCollectionListener(this)
+        coinCollector.dispose()
     }
 
     enum class HomeActions {

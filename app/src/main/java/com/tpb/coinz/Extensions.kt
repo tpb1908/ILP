@@ -9,6 +9,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 
 fun Location.asCameraUpdate(): CameraUpdate = CameraUpdateFactory.newLatLngZoom(LatLng(this), 15.0)
 
+
+
 sealed class Result<out T> {
     object None: Result<Nothing>()
     data class Value<T>(val v: T) : Result<T>()
