@@ -15,7 +15,6 @@ class App : Application() {
                 .loaderModule(LoaderModule())
                 .locationModule(LocationModule(this))
                 .storeModule(StoreModule(this))
-                .backendModule(BackendModule())
                 .build()
     }
     val mapComponent: MapComponent by lazy {
@@ -29,7 +28,6 @@ class App : Application() {
     val bankComponent: BankComponent by lazy {
         DaggerBankComponent.builder()
                 .connectivityModule(ConnectivityModule(this))
-                .backendModule(BackendModule())
                 .build()
     }
     val threadsComponent: ThreadsComponent by lazy {

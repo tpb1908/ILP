@@ -1,13 +1,8 @@
 package com.tpb.coinz.dagger.module
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.tpb.coinz.data.coins.MapStore
-import com.tpb.coinz.data.coins.room.RoomMapStore
-import com.tpb.coinz.data.coins.room.SharedPrefsMapStore
+import com.tpb.coinz.data.coin.MapStore
+import com.tpb.coinz.data.coin.room.SharedPrefsMapStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

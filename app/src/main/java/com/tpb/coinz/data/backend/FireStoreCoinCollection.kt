@@ -4,22 +4,24 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.tpb.coinz.data.coins.Coin
-import com.tpb.coinz.data.coins.Currency
+import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.coin.Currency
+import com.tpb.coinz.data.users.User
 import timber.log.Timber
 
 
 class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollection {
 
+    private val threads = "threads"
     private val collected = "collected"
     private val scoreboard = "scoreboard"
     private val scoreboardAll = "all"
     private val total = "total"
     private val coins = "coins"
 
-    private inline fun coins(user: UserCollection.User): CollectionReference = store.collection(collected).document(user.uid).collection(coins)
+    private inline fun coins(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(coins)
 
-    override fun collectCoin(user: UserCollection.User, coin: Coin) {
+    override fun collectCoin(user: User, coin: Coin) {
         Timber.i("Collecting ${toMap(coin)} for $user")
 
         coins(user).add(toMap(coin))
@@ -41,7 +43,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    override fun getCollectedCoins(user: UserCollection.User, listener: (List<Coin>) -> Unit) {
+    override fun getCollectedCoins(user: User, listener: (List<Coin>) -> Unit) {
         Timber.i("Loading collected coins for $user")
         coins(user).get().addOnCompleteListener { qs ->
             if (qs.isSuccessful) {
@@ -57,7 +59,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    override fun transferCoin(from: UserCollection.User, to: UserCollection.User, coin: Coin) {
+    override fun transferCoin(from: User, to: User, coin: Coin) {
         coins(from).whereEqualTo("id", coin.id).get().addOnCompleteListener { getTask ->
             Timber.i("Transferring coin $coin from $from to $to")
             if (getTask.result?.documents?.isEmpty() == false) {

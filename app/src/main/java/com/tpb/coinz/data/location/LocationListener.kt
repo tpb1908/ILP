@@ -12,5 +12,17 @@ interface LocationListener {
 
     fun locationUpdateError(exception: Exception)
 
+    interface SimpleLocationListener : LocationListener {
+
+        override fun locationAvailable() {
+
+        }
+
+        override fun locationUnavailable() {
+        }
+
+        override fun locationUpdateError(exception: Exception) {
+        }
+    }
 
 }

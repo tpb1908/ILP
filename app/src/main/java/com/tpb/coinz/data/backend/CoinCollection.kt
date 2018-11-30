@@ -1,13 +1,14 @@
 package com.tpb.coinz.data.backend
 
-import com.tpb.coinz.data.coins.Coin
+import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.users.User
 
 interface CoinCollection {
 
-    fun collectCoin(user: UserCollection.User, coin: Coin)
+    fun collectCoin(user: User, coin: Coin)
 
-    fun getCollectedCoins(user: UserCollection.User, listener: (List<Coin>) -> Unit)
+    fun getCollectedCoins(user: User, listener: (List<Coin>) -> Unit)
 
-    fun transferCoin(from: UserCollection.User, to: UserCollection.User, coin: Coin)
+    fun transferCoin(from: User, to: User, coin: Coin)
 
 }

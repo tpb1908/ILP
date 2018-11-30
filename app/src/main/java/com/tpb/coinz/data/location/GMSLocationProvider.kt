@@ -26,15 +26,13 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
         lr?.apply {
             this@GMSLocationProvider.lastLocation = lastLocation
             Timber.i("Location update $lastLocation")
-            listeners.forEach {
-                it.locationUpdate(lastLocation)
-            }
+            listeners.toList().forEach { it.locationUpdate(lastLocation) }
         }
     }
 
     override fun onLocationAvailability(la: LocationAvailability?) {
         super.onLocationAvailability(la)
-        la?.apply { listeners.forEach { if (isLocationAvailable) it.locationAvailable() else it.locationUnavailable() } }
+        la?.apply { listeners.toList().forEach { if (isLocationAvailable) it.locationAvailable() else it.locationUnavailable() } }
     }
 
     override fun lastLocationUpdate(): Location? = lastLocation
