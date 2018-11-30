@@ -1,9 +1,8 @@
-package com.tpb.coinz.data.coin.room
+package com.tpb.coinz.data.coin.storage
 
 import androidx.room.*
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Map
-import com.tpb.coinz.data.coin.MapStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

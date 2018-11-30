@@ -1,4 +1,4 @@
-package com.tpb.coinz.data.coin.room
+package com.tpb.coinz.data.coin.storage
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

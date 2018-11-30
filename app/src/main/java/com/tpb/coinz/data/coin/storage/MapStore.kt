@@ -1,6 +1,7 @@
-package com.tpb.coinz.data.coin
+package com.tpb.coinz.data.coin.storage
 
 import com.tpb.coinz.Result
+import com.tpb.coinz.data.coin.Map
 import java.util.*
 
 interface MapStore {

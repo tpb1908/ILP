@@ -1,4 +1,4 @@
-package com.tpb.coinz.data.backend
+package com.tpb.coinz.data.coin.collection
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,9 +12,7 @@ import timber.log.Timber
 
 class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollection {
 
-    private val threads = "threads"
     private val collected = "collected"
-    private val scoreboard = "scoreboard"
     private val scoreboardAll = "all"
     private val total = "total"
     private val coins = "coins"
@@ -43,7 +41,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    override fun getCollectedCoins(user: User, listener: (List<Coin>) -> Unit) {
+    override fun getCollectedCoins(user: User, callback: (List<Coin>) -> Unit) {
         Timber.i("Loading collected coins for $user")
         coins(user).get().addOnCompleteListener { qs ->
             if (qs.isSuccessful) {
@@ -52,7 +50,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
                     ds.data?.let { coins.add(fromMap(it)) }
                 }
                 Timber.i("Collected coins $coins")
-                listener(coins)
+                callback(coins)
             } else {
                 Timber.e(qs.exception, "Query unsuccessful")
             }

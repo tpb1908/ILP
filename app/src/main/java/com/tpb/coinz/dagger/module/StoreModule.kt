@@ -1,8 +1,8 @@
 package com.tpb.coinz.dagger.module
 
 import android.content.Context
-import com.tpb.coinz.data.coin.MapStore
-import com.tpb.coinz.data.coin.room.SharedPrefsMapStore
+import com.tpb.coinz.data.coin.storage.MapStore
+import com.tpb.coinz.data.coin.storage.SharedPrefsMapStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

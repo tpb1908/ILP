@@ -1,4 +1,4 @@
-package com.tpb.coinz.data.coin.room
+package com.tpb.coinz.data.coin.storage
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

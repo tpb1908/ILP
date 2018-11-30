@@ -3,15 +3,17 @@ package com.tpb.coinz.data.coin
 import android.location.Location
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.Result
-import com.tpb.coinz.data.backend.CoinCollection
-import com.tpb.coinz.data.backend.collectionDistance
+import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.coin.collection.collectionDistance
+import com.tpb.coinz.data.coin.loading.MapLoader
+import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.data.users.User
 import timber.log.Timber
 import java.util.*
 
-class CoinCollector(private val lp: LocationProvider, private val coinLoader: CoinLoader, private val mapStore: MapStore) : LocationListener {
+class CoinCollector(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore) : LocationListener {
 
     private var map: Map? = null
 
@@ -35,7 +37,7 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
 
     private fun loadFromNetwork() {
         Timber.i("Loading coins from network")
-        coinLoader.loadCoins(Calendar.getInstance()) { m ->
+        mapLoader.loadCoins(Calendar.getInstance()) { m ->
             m?.let {
                 map = it
                 mapStore.store(it)

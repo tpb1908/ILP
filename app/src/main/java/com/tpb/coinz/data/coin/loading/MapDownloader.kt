@@ -1,4 +1,4 @@
-package com.tpb.coinz.data.coin.download
+package com.tpb.coinz.data.coin.loading
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -6,7 +6,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.CoinLoader
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Map
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +20,7 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CoinDownloader : CoinLoader {
+class MapDownloader : MapLoader {
 
     private var listeners: ArrayList<(Map?) -> Unit> = arrayListOf()
 
@@ -44,7 +43,7 @@ class CoinDownloader : CoinLoader {
             listeners.forEach { it(map) }
             listeners.clear()
         } catch (ioe: IOException) {
-            Timber.e(ioe, "CoinDownloader exception")
+            Timber.e(ioe, "MapDownloader exception")
         }
     }
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
-import com.tpb.coinz.data.backend.CoinCollection
+import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.users.User

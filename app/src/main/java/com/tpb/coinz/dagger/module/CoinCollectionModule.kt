@@ -1,11 +1,11 @@
 package com.tpb.coinz.dagger.module
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tpb.coinz.data.backend.CoinCollection
-import com.tpb.coinz.data.backend.FireStoreCoinCollection
+import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.coin.collection.FireStoreCoinCollection
 import com.tpb.coinz.data.coin.CoinCollector
-import com.tpb.coinz.data.coin.CoinLoader
-import com.tpb.coinz.data.coin.MapStore
+import com.tpb.coinz.data.coin.loading.MapLoader
+import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.location.LocationProvider
 import dagger.Module
 import dagger.Provides
@@ -16,8 +16,8 @@ class CoinCollectionModule {
 
     @Singleton
     @Provides
-    fun provideCoinCollector(locationProvider: LocationProvider, coinLoader: CoinLoader, mapStore: MapStore): CoinCollector {
-        return CoinCollector(locationProvider, coinLoader, mapStore)
+    fun provideCoinCollector(locationProvider: LocationProvider, mapLoader: MapLoader, mapStore: MapStore): CoinCollector {
+        return CoinCollector(locationProvider, mapLoader, mapStore)
     }
 
     @Singleton
