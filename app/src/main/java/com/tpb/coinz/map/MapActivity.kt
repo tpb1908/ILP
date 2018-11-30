@@ -70,11 +70,11 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             }
         })
         vm.actions.observe(this, Observer {
-            if (it is MapViewModel.MapActions.RemoveMarker) {
+            if (it is MapViewModel.MapAction.RemoveMarker) {
                 mapview.getMapAsync { map ->
                     map.removeMarker(it.marker)
                 }
-            } else if (it is MapViewModel.MapActions.DisplayMessage) {
+            } else if (it is MapViewModel.MapAction.DisplayMessage) {
                 Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
             }
         })
@@ -112,6 +112,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             mapview.getMapAsync {
                 val engine = LocationListeningEngine(locationProvider)
                 locationLayer = LocationLayerPlugin(mapview, it, engine)
+                locationLayer.isLocationLayerEnabled = true
+
                 locationLayer.renderMode = RenderMode.COMPASS
                 engine.activate()
                 lifecycle.addObserver(locationLayer)

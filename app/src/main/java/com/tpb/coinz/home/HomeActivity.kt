@@ -101,10 +101,15 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             home_minimap.getMapAsync {
                 vm.mapMarkers(coins.zip(it.addMarkers(coins.map(::coinToMarkerOption))).toMap().toMutableMap())
             }
+
         })
         vm.actions.observe(this, Observer {
-            when (it) {
-                HomeViewModel.HomeActions.BEGIN_LOGIN_FLOW -> beginLoginFlow()
+            if (it is HomeViewModel.HomeAction.BeginLoginFlow) {
+                beginLoginFlow()
+            } else if (it is HomeViewModel.HomeAction.RemoveMarker) {
+                home_minimap.getMapAsync { map ->
+                    map.removeMarker(it.marker)
+                }
             }
         })
     }

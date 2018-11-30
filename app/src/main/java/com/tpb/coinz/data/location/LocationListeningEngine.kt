@@ -3,12 +3,14 @@ package com.tpb.coinz.data.location
 import android.annotation.SuppressLint
 import android.location.Location
 import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineListener
 import timber.log.Timber
 
 class LocationListeningEngine(private val locationProvider: LocationProvider) : LocationEngine(), LocationListener {
 
     private var connected = false
     override fun activate() {
+        locationProvider.removeListener(this)
         locationProvider.addListener(this)
     }
 
@@ -36,6 +38,9 @@ class LocationListeningEngine(private val locationProvider: LocationProvider) : 
 
     override fun locationUpdate(location: Location) {
         Timber.i("LocationEngine impl location update $location")
+        this.locationListeners.forEach {
+            it.onLocationChanged(location)
+        }
     }
 
     override fun locationAvailable() {

@@ -15,7 +15,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.CoinCollectorListener {
+class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
@@ -35,13 +35,13 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
-    override val actions: MutableLiveData<HomeActions> = MutableLiveData()
+    override val actions: MutableLiveData<HomeAction> = MutableLiveData()
 
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
         Timber.i("User $fbUser")
         if (fbUser == null) {
-            actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
+            actions.postValue(HomeAction.BeginLoginFlow)
         } else {
             user.postValue(fbUser)
             coinCollector.addCollectionListener(this)
@@ -54,12 +54,14 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.
         collected.forEach { coin ->
             if (markers.containsKey(coin)) {
                 Timber.i("Removing marker for $coin")
-                //actions.postValue(MapViewModel.MapActions.RemoveMarker(markers.getValue(coin)))
+                //actions.postValue(MapViewModel.MapAction.RemoveMarker(markers.getValue(coin)))
                 markers.remove(coin)
 
             } else {
                 Timber.e("No marker for $coin")
             }
+            //TODO: Probably not the best way to do this
+            collectionInfo.postValue(MapInfo(markers.size, 50-markers.size))
             coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
         }
     }
@@ -72,14 +74,6 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.
         this.markers = markers
     }
 
-    // If we haven't collected any remainingCoins
-    private fun postEmptyCollectionInfo() {
-        collectionInfo.postValue(MapInfo(0, 50))
-    }
-
-    private fun postCoinCollectionInfo(map: Map) {
-        collectionInfo.postValue(MapInfo(map.collectedCoins.size, map.remainingCoins.size))
-    }
 
     fun userLoggedIn() {
         fbUser = FirebaseAuth.getInstance().currentUser
@@ -96,7 +90,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.
     }
 
     fun userLoginFailed() {
-        actions.postValue(HomeActions.BEGIN_LOGIN_FLOW)
+        actions.postValue(HomeAction.BeginLoginFlow)
     }
 
     override fun onCleared() {
@@ -105,8 +99,10 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.
         coinCollector.dispose()
     }
 
-    enum class HomeActions {
-        BEGIN_LOGIN_FLOW
+    sealed class HomeAction {
+        object BeginLoginFlow : HomeAction()
+        data class RemoveMarker(val marker: Marker) : HomeAction()
     }
+
 
 }

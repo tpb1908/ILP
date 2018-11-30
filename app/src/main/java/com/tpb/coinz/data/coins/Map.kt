@@ -1,6 +1,7 @@
 package com.tpb.coinz.data.coins
 
 import java.util.*
+import kotlin.collections.Map
 
 data class Map(val dateGenerated: Calendar, val rates: Map<Currency, Double>, val remainingCoins: MutableList<Coin>, val collectedCoins: MutableList<Coin> = mutableListOf()) {
 

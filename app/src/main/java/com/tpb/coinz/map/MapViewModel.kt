@@ -13,7 +13,7 @@ import com.tpb.coinz.data.coins.Map
 import timber.log.Timber
 import javax.inject.Inject
 
-class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), CoinCollector.CoinCollectorListener {
+class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
 
@@ -25,7 +25,7 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), CoinCollector.Coi
 
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
-    override val actions = MutableLiveData<MapActions>()
+    override val actions = MutableLiveData<MapAction>()
 
     @Inject
     lateinit var coinCollector: CoinCollector
@@ -46,11 +46,11 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), CoinCollector.Coi
         collected.forEach { coin ->
             if (markers.containsKey(coin)) {
                 Timber.i("Removing marker for $coin")
-                actions.postValue(MapActions.RemoveMarker(markers.getValue(coin)))
+                actions.postValue(MapAction.RemoveMarker(markers.getValue(coin)))
                 markers.remove(coin)
 
                 if (markers.isEmpty()) {
-                    actions.postValue(MapActions.DisplayMessage(R.string.message_all_coins_collected))
+                    actions.postValue(MapAction.DisplayMessage(R.string.message_all_coins_collected))
                 }
             } else {
                 Timber.e("No marker for $coin")
@@ -69,8 +69,8 @@ class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), CoinCollector.Coi
     }
 
 
-    sealed class MapActions {
-        class RemoveMarker(val marker: Marker) : MapActions()
-        class DisplayMessage(@StringRes val message: Int) : MapActions()
+    sealed class MapAction {
+        class RemoveMarker(val marker: Marker) : MapAction()
+        class DisplayMessage(@StringRes val message: Int) : MapAction()
     }
 }

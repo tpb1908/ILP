@@ -9,13 +9,14 @@ import com.tpb.coinz.data.location.LocationProvider
 import timber.log.Timber
 import java.util.*
 
-class CoinCollector(var lp: LocationProvider, private val coinLoader: CoinLoader, private val mapStore: MapStore) : LocationListener {
+class CoinCollector(private val lp: LocationProvider, private val coinLoader: CoinLoader, private val mapStore: MapStore) : LocationListener {
 
     private var map: Map? = null
 
     private val listeners: MutableSet<CoinCollectorListener> = hashSetOf()
 
     fun loadMap() {
+        lp.addListener(this)
         mapStore.getLatest { result ->
             if (result is Result.Value<Map> && result.v.isValidForDay(Calendar.getInstance())) {
                 map = result.v
@@ -56,6 +57,7 @@ class CoinCollector(var lp: LocationProvider, private val coinLoader: CoinLoader
 
 
     private fun collect(collectable: List<Coin>) {
+        Timber.i("Collecting ${collectable.size} coins")
         if (collectable.isNotEmpty()) {
             Timber.i("Collecting coins $collectable from map ${map?.collectedCoins?.size}")
             map?.let {
