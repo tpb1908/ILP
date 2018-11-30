@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.backend.ChatCollection
 
-class MessageViewHolder(val view: View): RecyclerView.ViewHolder(view) {
+class MessageViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     var message: ChatCollection.Message? = null
         set(value) {
             field = value

@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
-class RoomMapStore(database: Database): MapStore {
+class RoomMapStore(database: Database) : MapStore {
 
     private val dao: MapDao = database.mapDao()
 
     @androidx.room.Database(entities = [RoomMap::class], version = 2)
     @TypeConverters(MapTypeConverter::class)
-    abstract class Database: RoomDatabase() {
+    abstract class Database : RoomDatabase() {
 
         abstract fun mapDao(): MapDao
 
@@ -41,7 +41,7 @@ class RoomMapStore(database: Database): MapStore {
 
     override fun store(map: Map) {
         GlobalScope.launch(Dispatchers.IO) {
-            dao.insert(RoomMap(map=map))
+            dao.insert(RoomMap(map = map))
         }
     }
 

@@ -19,7 +19,7 @@ interface ChatCollection {
     fun closeThreads()
 
     @Parcelize
-    data class Thread(val threadId: String, val creator: UserCollection.User, val partner: UserCollection.User): Parcelable {
+    data class Thread(val threadId: String, val creator: UserCollection.User, val partner: UserCollection.User) : Parcelable {
 
         fun otherUser(user: UserCollection.User): UserCollection.User = if (user == creator) partner else creator
 

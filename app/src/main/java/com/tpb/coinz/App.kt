@@ -1,8 +1,8 @@
 package com.tpb.coinz
 
 import android.app.Application
-import com.mapbox.mapboxsdk.Mapbox
 import com.google.firebase.FirebaseApp
+import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.dagger.component.*
 import com.tpb.coinz.dagger.module.*
 import timber.log.Timber

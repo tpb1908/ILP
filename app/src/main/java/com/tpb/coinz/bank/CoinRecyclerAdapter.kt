@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coins.Coin
 
-class CoinRecyclerAdapter: RecyclerView.Adapter<SelectableViewHolder>() {
+class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
     private var userCoins: List<SelectableItem> = emptyList()
     private var sentCoins: List<SelectableItem> = emptyList()
@@ -30,15 +30,15 @@ class CoinRecyclerAdapter: RecyclerView.Adapter<SelectableViewHolder>() {
         numStillBankable = stillBankable
     }
 
-    var onClick: (Coin) -> Unit =  {}
+    var onClick: (Coin) -> Unit = {}
 
     private fun select(vh: CoinViewHolder, position: Int) {
         val item = getStateForPosition(position)
         if (position <= sentCoins.size) { // received coin
             if (item.selected) vh.deselect() else vh.select()
             item.selected = !item.selected
-        } else if(!item.selected) {
-            if (numCollectedCoinsSelected < numStillBankable ) {
+        } else if (!item.selected) {
+            if (numCollectedCoinsSelected < numStillBankable) {
                 vh.select()
                 item.selected = true
                 numCollectedCoinsSelected++

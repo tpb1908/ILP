@@ -28,7 +28,7 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
         store.collection(users).whereEqualTo("email", email).get().addOnCompleteListener {
             if (it.isSuccessful) {
                 Timber.i("Retrieved user for $email")
-                it.result?.documents?.let {documents ->
+                it.result?.documents?.let { documents ->
                     if (documents.isNotEmpty()) {
                         val doc = documents.first()
                         Timber.i("Retrieved user document $doc")
@@ -54,7 +54,7 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
                 it.result?.let { result ->
                     val users = mutableListOf<UserCollection.User>()
                     result.documents.forEach { ds ->
-                        ds.data?.let {data ->
+                        ds.data?.let { data ->
                             if (data.containsKey("email") && (data["email"] as String) != getCurrentUser().email) {
                                 users.add(UserCollection.User(ds.id, data["email"] as String))
                             }

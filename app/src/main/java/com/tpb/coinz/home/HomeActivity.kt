@@ -30,9 +30,7 @@ import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.map.MapActivity
 import com.tpb.coinz.map.Utils
-import com.tpb.coinz.messaging.threads.ThreadsActivity
 import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.activity_map.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -61,7 +59,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         home_minimap.onCreate(savedInstanceState)
         home_minimap.getMapAsync {
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
-            it.addOnMapClickListener {latLng ->
+            it.addOnMapClickListener { latLng ->
                 val cameraPosition = it.cameraPosition
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
                         home_minimap,
@@ -176,7 +174,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-    
+
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Timber.i("Permissions to explain $permissionsToExplain")
     }

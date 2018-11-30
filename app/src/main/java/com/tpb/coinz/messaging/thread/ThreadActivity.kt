@@ -41,7 +41,7 @@ class ThreadActivity : AppCompatActivity() {
 
     private fun initViews() {
         thread_message_send.setOnClickListener {
-            if(thread_message_input.text.isNullOrEmpty()) {
+            if (thread_message_input.text.isNullOrEmpty()) {
                 Toast.makeText(this, R.string.error_empty_message, Toast.LENGTH_SHORT).show()
             } else {
                 vm.postMessage(thread_message_input.text.toString())

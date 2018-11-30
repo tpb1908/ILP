@@ -21,7 +21,7 @@ class ConnectionLiveData(val context: Context) : LiveData<Boolean>() {
         context.unregisterReceiver(receiver)
     }
 
-    private val receiver = object: BroadcastReceiver() {
+    private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(c: Context, i: Intent) {
             if ("android.net.conn.CONNECTIVITY_CHANGE" == i.action) {

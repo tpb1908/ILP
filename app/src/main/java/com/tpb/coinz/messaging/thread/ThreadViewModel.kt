@@ -25,7 +25,8 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
     val messages = MutableLiveData<List<ChatCollection.Message>>()
 
     val isCurrentUser: (UserCollection.User) -> Boolean = {
-        userCollection.getCurrentUser() == it }
+        userCollection.getCurrentUser() == it
+    }
 
     override fun bind() {
     }

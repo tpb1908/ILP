@@ -1,8 +1,10 @@
 package com.tpb.coinz.data.backend
 
-import com.google.firebase.firestore.*
-import com.tpb.coinz.data.coins.Coin
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.Currency
 import timber.log.Timber
 
@@ -61,7 +63,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
             if (getTask.result?.documents?.isEmpty() == false) {
                 getTask.result?.documents?.first()?.let { ds ->
                     ds.data?.apply {
-                        coins(to).add(toMap(coin.copy(received = true))).addOnCompleteListener {addTask ->
+                        coins(to).add(toMap(coin.copy(received = true))).addOnCompleteListener { addTask ->
                             if (addTask.isSuccessful) {
                                 Timber.i("Transferred coin. Deleting original")
                                 ds.reference.delete()
@@ -97,7 +99,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         return Coin(map["id"] as String, map["value"] as Double, Currency.fromString(map["currency"] as String),
                 (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
                 LatLng(map["latitude"] as Double, map["longitude"] as Double),
-                        map["banked"] as Boolean, map["received"] as Boolean)
+                map["banked"] as Boolean, map["received"] as Boolean)
     }
 
 }

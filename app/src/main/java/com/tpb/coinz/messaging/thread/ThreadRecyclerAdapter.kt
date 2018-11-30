@@ -11,7 +11,7 @@ class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
 
     private val messages = mutableListOf<ChatCollection.Message>()
 
-    var isCurrentUser: (UserCollection.User) -> Boolean = {false}
+    var isCurrentUser: (UserCollection.User) -> Boolean = { false }
 
     fun setMessages(newMessages: List<ChatCollection.Message>) {
         messages.clear()
@@ -21,17 +21,17 @@ class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
 
     fun addMessage(message: ChatCollection.Message) {
         messages.add(message)
-        notifyItemInserted(messages.size-1)
+        notifyItemInserted(messages.size - 1)
     }
 
     fun addMessages(newMessages: List<ChatCollection.Message>) {
         val currentLength = messages.size
         messages.addAll(newMessages)
-        notifyItemRangeInserted(currentLength, messages.size-1)
+        notifyItemRangeInserted(currentLength, messages.size - 1)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(isCurrentUser(messages[position].sender)) R.layout.viewholder_message_sent else R.layout.viewholder_message_received
+        return if (isCurrentUser(messages[position].sender)) R.layout.viewholder_message_sent else R.layout.viewholder_message_received
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {

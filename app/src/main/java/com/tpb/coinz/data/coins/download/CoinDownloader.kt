@@ -41,7 +41,7 @@ class CoinDownloader : CoinLoader {
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
             val map = convert(json)
-            listeners.forEach {it(map)}
+            listeners.forEach { it(map) }
             listeners.clear()
         } catch (ioe: IOException) {
             Timber.e(ioe, "CoinDownloader exception")

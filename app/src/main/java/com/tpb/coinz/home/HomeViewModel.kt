@@ -5,14 +5,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.annotations.Marker
-import com.tpb.coinz.R
-import com.tpb.coinz.Result
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.CoinCollection
-import com.tpb.coinz.data.coins.*
+import com.tpb.coinz.data.backend.UserCollection
+import com.tpb.coinz.data.coins.Coin
+import com.tpb.coinz.data.coins.CoinCollector
 import com.tpb.coinz.data.coins.Map
-import com.tpb.coinz.map.MapViewModel
-import dagger.Lazy
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -20,13 +18,18 @@ import javax.inject.Inject
 class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
-
     private var markers: MutableMap<Coin, Marker> = HashMap()
+
+    @Inject
+    lateinit var coinCollection: CoinCollection
 
     private var fbUser: FirebaseUser? = null
 
     @Inject
     lateinit var coinCollector: CoinCollector
+
+    @Inject
+    lateinit var userCollection: UserCollection
 
     val user = MutableLiveData<FirebaseUser>()
 
@@ -57,7 +60,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeActions>(), CoinCollector.
             } else {
                 Timber.e("No marker for $coin")
             }
-            //TODO coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
+            coinCollection.collectCoin(userCollection.getCurrentUser(), coin)
         }
     }
 

@@ -17,12 +17,11 @@ class StoreModule(val context: Context) {
     @Singleton
     fun provideMapStore(): MapStore {
         return RoomMapStore(
-                Room.databaseBuilder(context, RoomMapStore.Database::class.java, "db").
-                        addMigrations(object: Migration(1, 2) {
-                            override fun migrate(database: SupportSQLiteDatabase) {
-                                //Nothing to do
-                            }
-                        }).build()
+                Room.databaseBuilder(context, RoomMapStore.Database::class.java, "db").addMigrations(object : Migration(1, 2) {
+                    override fun migrate(database: SupportSQLiteDatabase) {
+                        //Nothing to do
+                    }
+                }).build()
         )
     }
 

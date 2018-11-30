@@ -6,7 +6,7 @@ import com.tpb.coinz.data.coins.Coin
 import com.tpb.coinz.data.coins.Currency
 import kotlinx.android.synthetic.main.viewholder_coin.view.*
 
-class CoinViewHolder(val view: View): SelectableViewHolder(view) {
+class CoinViewHolder(val view: View) : SelectableViewHolder(view) {
     var coin: Coin? = null
         set(value) {
             field = value
@@ -15,7 +15,6 @@ class CoinViewHolder(val view: View): SelectableViewHolder(view) {
                 view.viewholder_coin_value.text = it.value.toString()
             }
         }
-
 
 
     private val originalBackground = view.viewholder_coin_card.cardBackgroundColor

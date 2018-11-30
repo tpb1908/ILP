@@ -7,11 +7,11 @@ import com.tpb.coinz.R
 import com.tpb.coinz.base.BaseViewModel
 import com.tpb.coinz.data.backend.CoinCollection
 import com.tpb.coinz.data.backend.UserCollection
-import com.tpb.coinz.data.coins.*
+import com.tpb.coinz.data.coins.Coin
+import com.tpb.coinz.data.coins.CoinCollector
 import com.tpb.coinz.data.coins.Map
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 class MapViewModel : BaseViewModel<MapViewModel.MapActions>(), CoinCollector.CoinCollectorListener {
 

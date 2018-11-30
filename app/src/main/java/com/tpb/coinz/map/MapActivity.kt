@@ -123,21 +123,20 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     }
 
 
-
     private val coinLocationOnClick: View.OnClickListener = View.OnClickListener {
         moveToInitialLocation()
     }
 
     private val myLocationOnClick: View.OnClickListener = View.OnClickListener {
         //TODO: First click for location, second for zoom
-        mapview.getMapAsync {map ->
+        mapview.getMapAsync { map ->
             locationProvider.lastLocationUpdate()?.apply {
                 map.animateCamera(this.asCameraUpdate())
             }
         }
     }
 
-    private fun setCameraPosition(position: CameraPosition)  = mapview.getMapAsync {
+    private fun setCameraPosition(position: CameraPosition) = mapview.getMapAsync {
         it.animateCamera(CameraUpdateFactory.newCameraPosition(position))
     }
 

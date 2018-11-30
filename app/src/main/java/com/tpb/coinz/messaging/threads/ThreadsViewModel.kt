@@ -63,7 +63,7 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
             if (user is Result.Value<UserCollection.User>) {
                 chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
                     if (it is Result.Value<ChatCollection.Thread>) {
-                        threads.postValue((threads.value?: emptyList()) + it.v)
+                        threads.postValue((threads.value ?: emptyList()) + it.v)
                         actions.postValue(ThreadsAction.SetLoadingState(false))
                         threadIntents.postValue(it.v)
                     }
@@ -84,6 +84,6 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
 
     sealed class ThreadsAction {
-        class SetLoadingState(val loading: Boolean): ThreadsAction()
+        class SetLoadingState(val loading: Boolean) : ThreadsAction()
     }
 }

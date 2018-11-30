@@ -26,6 +26,7 @@ enum class Currency {
                 PENY
             }
         }
+
         @DrawableRes
         fun getImageId(currency: Currency): Int {
             return when (currency) {

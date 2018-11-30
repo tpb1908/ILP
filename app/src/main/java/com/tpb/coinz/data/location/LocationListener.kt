@@ -1,7 +1,6 @@
 package com.tpb.coinz.data.location
 
 import android.location.Location
-import java.lang.Exception
 
 interface LocationListener {
 
@@ -12,7 +11,6 @@ interface LocationListener {
     fun locationUnavailable()
 
     fun locationUpdateError(exception: Exception)
-
 
 
 }

@@ -79,7 +79,7 @@ class ThreadsActivity : AppCompatActivity() {
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line)
         adapter.setNotifyOnChange(true)
         edit.setAdapter(adapter)
-        edit.addTextChangedListener(object: SimpleTextWatcher() {
+        edit.addTextChangedListener(object : SimpleTextWatcher() {
             override fun onTextChanged(text: String) {
                 vm.searchUsers(text)
             }
