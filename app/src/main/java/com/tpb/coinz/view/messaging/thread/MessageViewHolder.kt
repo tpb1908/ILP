@@ -4,10 +4,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
-import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Message
 
 class MessageViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-    var message: ChatCollection.Message? = null
+    var message: Message? = null
         set(value) {
             field = value
             value?.let {

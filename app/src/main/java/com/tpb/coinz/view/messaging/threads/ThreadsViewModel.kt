@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import timber.log.Timber
@@ -16,14 +17,14 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     @Inject lateinit var userCollection: UserCollection
 
-    val threads = MediatorLiveData<List<ChatCollection.Thread>>()
-    private val createdThreads = MutableLiveData<List<ChatCollection.Thread>>()
+    val threads = MediatorLiveData<List<Thread>>()
+    private val createdThreads = MutableLiveData<List<Thread>>()
 
-    private val receivedThreads = MutableLiveData<List<ChatCollection.Thread>>()
+    private val receivedThreads = MutableLiveData<List<Thread>>()
 
     init {
-        var lastCreatedThreads = listOf<ChatCollection.Thread>()
-        var lastReceivedThreads = listOf<ChatCollection.Thread>()
+        var lastCreatedThreads = listOf<Thread>()
+        var lastReceivedThreads = listOf<Thread>()
         threads.addSource(createdThreads) {
             lastCreatedThreads = it
             threads.postValue(lastCreatedThreads + lastReceivedThreads)
@@ -34,7 +35,7 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
         }
     }
 
-    val threadIntents = MutableLiveData<ChatCollection.Thread>()
+    val threadIntents = MutableLiveData<Thread>()
 
     val userSearchResults = MutableLiveData<List<User>>()
 
@@ -44,7 +45,7 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
 
         chatCollection.openThreads(userCollection.getCurrentUser()) {
-            if (it is Result.Value<List<ChatCollection.Thread>>) {
+            if (it is Result.Value<List<Thread>>) {
                 if (it.v.isNotEmpty()) {
                     Timber.i("Retrieved threads ${it.v}")
                     if (it.v.first().creator == userCollection.getCurrentUser()) {
@@ -63,7 +64,7 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
         userCollection.retrieveUserFromEmail(userEmail) { user ->
             if (user is Result.Value<User>) {
                 chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
-                    if (it is Result.Value<ChatCollection.Thread>) {
+                    if (it is Result.Value<Thread>) {
                         threads.postValue((threads.value ?: emptyList()) + it.v)
                         actions.postValue(ThreadsAction.SetLoadingState(false))
                         threadIntents.postValue(it.v)

@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tpb.coinz.App
 import com.tpb.coinz.R
 import com.tpb.coinz.SimpleTextWatcher
-import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import kotlinx.android.synthetic.main.activity_messages.*
 import timber.log.Timber
@@ -61,7 +61,7 @@ class ThreadsActivity : AppCompatActivity() {
         })
     }
 
-    private fun openThread(thread: ChatCollection.Thread) {
+    private fun openThread(thread: Thread) {
         val intent = Intent(this@ThreadsActivity, ThreadActivity::class.java)
         intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
         startActivity(intent)

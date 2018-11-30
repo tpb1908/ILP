@@ -4,6 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Message
+import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
@@ -21,9 +23,9 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
     override val actions = MutableLiveData<ThreadAction>()
 
-    private var thread: ChatCollection.Thread? = null
+    private var thread: Thread? = null
 
-    val messages = MutableLiveData<List<ChatCollection.Message>>()
+    val messages = MutableLiveData<List<Message>>()
 
     val isCurrentUser: (User) -> Boolean = {
         userCollection.getCurrentUser() == it
@@ -32,14 +34,14 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
     override fun bind() {
     }
 
-    fun openThread(thread: ChatCollection.Thread) {
+    fun openThread(thread: Thread) {
         this.thread = thread
         chatCollection.openThread(thread, this::messageUpdate)
     }
 
     fun postMessage(message: String) {
         Timber.i("Posting message $message")
-        chatCollection.postMessage(ChatCollection.Message(System.currentTimeMillis(), userCollection.getCurrentUser(), message)) {
+        chatCollection.postMessage(Message(System.currentTimeMillis(), userCollection.getCurrentUser(), message)) {
             if (it is Result.Value) {
 
             }
@@ -61,7 +63,7 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         }
     }
 
-    private fun messageUpdate(change: Result<List<ChatCollection.Message>>) {
+    private fun messageUpdate(change: Result<List<Message>>) {
         if (change is Result.Value) {
             actions.postValue(ThreadAction.SetLoadingState(true))
             messages.postValue((messages.value ?: emptyList()) + change.v)

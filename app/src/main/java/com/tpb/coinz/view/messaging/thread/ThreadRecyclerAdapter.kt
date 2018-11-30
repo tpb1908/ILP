@@ -4,27 +4,27 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
-import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.users.User
 
 class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
 
-    private val messages = mutableListOf<ChatCollection.Message>()
+    private val messages = mutableListOf<Message>()
 
     var isCurrentUser: (User) -> Boolean = { false }
 
-    fun setMessages(newMessages: List<ChatCollection.Message>) {
+    fun setMessages(newMessages: List<Message>) {
         messages.clear()
         messages.addAll(newMessages)
         notifyDataSetChanged()
     }
 
-    fun addMessage(message: ChatCollection.Message) {
+    fun addMessage(message: Message) {
         messages.add(message)
         notifyItemInserted(messages.size - 1)
     }
 
-    fun addMessages(newMessages: List<ChatCollection.Message>) {
+    fun addMessages(newMessages: List<Message>) {
         val currentLength = messages.size
         messages.addAll(newMessages)
         notifyItemRangeInserted(currentLength, messages.size - 1)

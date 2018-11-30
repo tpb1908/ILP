@@ -2,11 +2,11 @@ package com.tpb.coinz.view.messaging.threads
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Thread
 import kotlinx.android.synthetic.main.viewholder_thread.view.*
 
 class ThreadViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-    var thread: ChatCollection.Thread? = null
+    var thread: Thread? = null
         set(value) {
             field = value
             value?.let {

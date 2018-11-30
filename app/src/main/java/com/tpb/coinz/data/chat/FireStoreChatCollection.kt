@@ -7,19 +7,19 @@ import timber.log.Timber
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
 
-    private var openThread: ChatCollection.Thread? = null
+    private var openThread: Thread? = null
     private var messageListenerRegistration: ListenerRegistration? = null
-    private var newMessageListener: ((Result<List<ChatCollection.Message>>) -> Unit)? = null
-    private var threadsListener: ((Result<List<ChatCollection.Thread>>) -> Unit)? = null
+    private var newMessageListener: ((Result<List<Message>>) -> Unit)? = null
+    private var threadsListener: ((Result<List<Thread>>) -> Unit)? = null
     private var threadsListenerRegistration: Pair<ListenerRegistration, ListenerRegistration>? = null
 
     private val threads = "threads"
 
-    private inline fun messages(thread: ChatCollection.Thread) = store.collection(threads).document(thread.threadId).collection("messages")
+    private inline fun messages(thread: Thread) = store.collection(threads).document(thread.threadId).collection("messages")
 
     override fun createThread(creator: User,
                               partner: User,
-                              callback: (Result<ChatCollection.Thread>) -> Unit) {
+                              callback: (Result<Thread>) -> Unit) {
         // Create empty thread in threads
         // Then Add thread id to both users
         val collection = store.collection(threads)
@@ -34,7 +34,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         ).addOnCompleteListener {
             if (it.isSuccessful) {
                 Timber.i("Created thread $threadId")
-                callback(Result.Value(ChatCollection.Thread(threadId, creator, partner)))
+                callback(Result.Value(Thread(threadId, creator, partner)))
 
             } else if (it.isCanceled) {
                 Timber.e("Cancelled thread creation $threadId")
@@ -45,11 +45,11 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
 
     private val threadSnapshotListener: EventListener<QuerySnapshot> = EventListener { snapshot, exception ->
-        val newMessages = mutableListOf<ChatCollection.Message>()
+        val newMessages = mutableListOf<Message>()
         snapshot?.documentChanges?.forEach {
             Timber.i("Document change ${it.document}")
             val doc = it.document
-            newMessages.add(ChatCollection.Message(
+            newMessages.add(Message(
                     doc["timestamp"] as Long,
                     User(
                             (doc["sender"] as Map<String, Any>)["uid"] as String,
@@ -64,13 +64,13 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     }
 
     private val threadsSnapshotListener: EventListener<QuerySnapshot> = EventListener { snapshot, exception ->
-        val threads = mutableListOf<ChatCollection.Thread>()
+        val threads = mutableListOf<Thread>()
         //TODO: How do we merge the two sources of the threads?
         snapshot?.documentChanges?.forEach { change ->
             if (change.type == DocumentChange.Type.ADDED) {
                 val doc = change.document
                 Timber.i("Thread downloaded $doc")
-                threads.add(ChatCollection.Thread(doc.id,
+                threads.add(Thread(doc.id,
                         User(
                                 doc["creator"] as String,
                                 doc["creator_email"] as String
@@ -88,25 +88,25 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         threadsListener?.invoke(Result.Value(threads))
     }
 
-    override fun openThread(thread: ChatCollection.Thread, listener: (Result<List<ChatCollection.Message>>) -> Unit) {
+    override fun openThread(thread: Thread, listener: (Result<List<Message>>) -> Unit) {
         openThread = thread
         newMessageListener = listener
         messageListenerRegistration?.remove()
         messageListenerRegistration = messages(thread).addSnapshotListener(threadSnapshotListener)
     }
 
-    override fun closeThread(thread: ChatCollection.Thread) {
+    override fun closeThread(thread: Thread) {
         messageListenerRegistration?.remove()
     }
 
-    override fun postMessage(message: ChatCollection.Message, callback: (Result<Boolean>) -> Unit) {
+    override fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit) {
         openThread?.let {
             //TODO: Error handling
             messages(it).add(message)
         }
     }
 
-    override fun openThreads(user: User, callback: (Result<List<ChatCollection.Thread>>) -> Unit) {
+    override fun openThreads(user: User, callback: (Result<List<Thread>>) -> Unit) {
         val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid)
         val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
         threadsListener = callback
