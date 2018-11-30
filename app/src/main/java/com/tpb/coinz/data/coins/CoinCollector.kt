@@ -28,14 +28,18 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
                 listeners.forEach { it.mapLoaded(result.v) }
                 Timber.i("Coins loaded from room. Remaining coins: ${result.v.remainingCoins.size}")
             } else {
-                Timber.i("Loading coins from network")
-                coinLoader.loadCoins(Calendar.getInstance()) { m ->
-                    m?.let {
-                        map = it
-                        mapStore.store(it)
-                        listeners.forEach { l -> l.mapLoaded(it) }
-                    }
-                }
+                loadFromNetwork()
+            }
+        }
+    }
+
+    private fun loadFromNetwork() {
+        Timber.i("Loading coins from network")
+        coinLoader.loadCoins(Calendar.getInstance()) { m ->
+            m?.let {
+                map = it
+                mapStore.store(it)
+                listeners.forEach { l -> l.mapLoaded(it) }
             }
         }
     }
@@ -56,8 +60,15 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
 
 
     override fun locationUpdate(location: Location) {
-        map?.let { map ->
-            collect(map.remainingCoins.filter { collectable(it, location) })
+        map?.let { m ->
+            if (m.isValidForDay(Calendar.getInstance())) {
+                collect(m.remainingCoins.filter { collectable(it, location) })
+            } else {
+                map = null
+                listeners.forEach { it.notifyReloading() }
+                loadFromNetwork()
+
+            }
         }
     }
 
@@ -96,6 +107,8 @@ class CoinCollector(private val lp: LocationProvider, private val coinLoader: Co
         fun coinsCollected(collected: List<Coin>)
 
         fun mapLoaded(map: Map)
+
+        fun notifyReloading()
 
     }
 

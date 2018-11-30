@@ -70,12 +70,14 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             }
         })
         vm.actions.observe(this, Observer {
-            if (it is MapViewModel.MapAction.RemoveMarker) {
-                mapview.getMapAsync { map ->
+            when (it) {
+                is MapViewModel.MapAction.RemoveMarker -> mapview.getMapAsync { map ->
                     map.removeMarker(it.marker)
                 }
-            } else if (it is MapViewModel.MapAction.DisplayMessage) {
-                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                is MapViewModel.MapAction.DisplayMessage -> Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                is MapViewModel.MapAction.ClearMarkers -> mapview.getMapAsync { map ->
+                    map.markers.forEach { map.removeMarker(it) }
+                }
             }
         })
         connection.observe(this, Observer<Boolean> {

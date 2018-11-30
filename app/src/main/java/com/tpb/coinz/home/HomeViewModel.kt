@@ -70,6 +70,12 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
         collectionInfo.postValue(MapInfo(map.collectedCoins.size, map.remainingCoins.size))
     }
 
+    override fun notifyReloading() {
+        actions.postValue(HomeAction.ClearMarkers)
+        coins.postValue(emptyList())
+        markers.clear()
+    }
+
     fun mapMarkers(markers: MutableMap<Coin, Marker>) {
         this.markers = markers
     }
@@ -101,6 +107,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
 
     sealed class HomeAction {
         object BeginLoginFlow : HomeAction()
+        object ClearMarkers : HomeAction()
         data class RemoveMarker(val marker: Marker) : HomeAction()
     }
 

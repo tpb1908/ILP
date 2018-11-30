@@ -63,6 +63,11 @@ class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.Coin
         coins.postValue(map.remainingCoins)
     }
 
+    override fun notifyReloading() {
+        actions.postValue(MapAction.ClearMarkers)
+        coins.postValue(emptyList())
+        markers.clear()
+    }
 
     fun mapMarkers(markers: MutableMap<Coin, Marker>) {
         this.markers = markers
@@ -72,5 +77,6 @@ class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.Coin
     sealed class MapAction {
         class RemoveMarker(val marker: Marker) : MapAction()
         class DisplayMessage(@StringRes val message: Int) : MapAction()
+        object ClearMarkers : MapAction()
     }
 }

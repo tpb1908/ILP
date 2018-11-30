@@ -104,11 +104,13 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
         })
         vm.actions.observe(this, Observer {
-            if (it is HomeViewModel.HomeAction.BeginLoginFlow) {
-                beginLoginFlow()
-            } else if (it is HomeViewModel.HomeAction.RemoveMarker) {
-                home_minimap.getMapAsync { map ->
+            when (it) {
+                is HomeViewModel.HomeAction.BeginLoginFlow -> beginLoginFlow()
+                is HomeViewModel.HomeAction.RemoveMarker -> home_minimap.getMapAsync { map ->
                     map.removeMarker(it.marker)
+                }
+                is HomeViewModel.HomeAction.ClearMarkers -> home_minimap.getMapAsync { map ->
+                    map.markers.forEach { map.removeMarker(it) }
                 }
             }
         })
