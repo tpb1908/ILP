@@ -12,14 +12,12 @@ class App : Application() {
 
     val homeComponent: HomeComponent by lazy {
         DaggerHomeComponent.builder()
-                .loaderModule(LoaderModule())
                 .locationModule(LocationModule(this))
                 .storeModule(StoreModule(this))
                 .build()
     }
     val mapComponent: MapComponent by lazy {
         DaggerMapComponent.builder()
-                .loaderModule(LoaderModule())
                 .locationModule(LocationModule(this))
                 .storeModule(StoreModule(this))
                 .connectivityModule(ConnectivityModule(this))
@@ -28,18 +26,17 @@ class App : Application() {
     val bankComponent: BankComponent by lazy {
         DaggerBankComponent.builder()
                 .connectivityModule(ConnectivityModule(this))
+                .coinBankModule(CoinBankModule(this))
                 .build()
     }
     val threadsComponent: ThreadsComponent by lazy {
         DaggerThreadsComponent.builder()
                 .connectivityModule(ConnectivityModule(this))
-                .chatModule(ChatModule())
                 .build()
     }
     val threadComponent: ThreadComponent by lazy {
         DaggerThreadComponent.builder()
                 .connectivityModule(ConnectivityModule(this))
-                .chatModule(ChatModule())
                 .build()
     }
 

@@ -5,14 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
+import timber.log.Timber
 
 class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
     private var userCoins: List<SelectableItem> = emptyList()
     private var sentCoins: List<SelectableItem> = emptyList()
-    var isSelectionEnabled = true
     private var numStillBankable = 0
     private var numCollectedCoinsSelected = 0
+    var isSelectionEnabled = true
+    var selectionListener: SelectionListener? = null
 
     data class SelectableItem(var selected: Boolean, val coin: Coin)
 
@@ -34,21 +36,30 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
     private fun select(vh: CoinViewHolder, position: Int) {
         val item = getStateForPosition(position)
+        Timber.i("Selecting ViewHolder at position $position")
         if (position <= sentCoins.size) { // received coin
-            if (item.selected) vh.deselect() else vh.select()
+            if (item.selected) {
+                vh.deselect()
+                selectionListener?.deselected(item.coin)
+            } else {
+                vh.select()
+                selectionListener?.selected(item.coin)
+            }
             item.selected = !item.selected
         } else if (!item.selected) {
             if (numCollectedCoinsSelected < numStillBankable) {
                 vh.select()
                 item.selected = true
                 numCollectedCoinsSelected++
+                selectionListener?.selected(item.coin)
             } else {
-                //TODO: Error should be handled in BankActivity
+                selectionListener?.selectionFull()
             }
         } else {
             vh.deselect()
             item.selected = false
             numCollectedCoinsSelected--
+            selectionListener?.deselected(item.coin)
         }
     }
 
@@ -97,4 +108,14 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
         }
 
     }
+
+    interface SelectionListener {
+
+        fun selected(coin: Coin)
+
+        fun deselected(coin: Coin)
+
+        fun selectionFull()
+    }
+
 }

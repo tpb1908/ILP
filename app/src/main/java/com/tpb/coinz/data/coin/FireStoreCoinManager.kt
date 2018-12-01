@@ -5,12 +5,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.data.users.User
 
-abstract class FireStoreCoin(protected val store: FirebaseFirestore) {
+abstract class FireStoreCoinManager(protected val store: FirebaseFirestore) {
 
     protected val collected = "collected"
     protected val coins = "coins"
+    protected val banked = "banked"
 
     protected inline fun coins(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(coins)
+    protected inline fun banked(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(banked)
 
     protected fun toMap(coin: Coin): HashMap<String, Any> {
         return hashMapOf(

@@ -4,16 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
-import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.base.BaseViewModel
 import javax.inject.Inject
 
-class BankViewModel : BaseViewModel<BankViewModel.BankAction>() {
+class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), CoinRecyclerAdapter.SelectionListener {
 
     @Inject lateinit var coinBank: CoinBank
-
-    @Inject lateinit var coinCollection: CoinCollection
 
     @Inject lateinit var userCollection: UserCollection
 
@@ -25,10 +22,10 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>() {
     override val actions = MutableLiveData<BankAction>()
 
     override fun bind() {
-        loadCollectedCoins()
+        loadBankableCoins()
     }
 
-    private fun loadCollectedCoins() {
+    private fun loadBankableCoins() {
         actions.postValue(BankAction.SetLoadingState(true))
         coinBank.getBankableCoins(userCollection.getCurrentUser()) {
             if (it is Result.Value) {
@@ -38,7 +35,18 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>() {
             }
             actions.postValue(BankAction.SetLoadingState(false))
         }
+        numStillBankable.postValue(coinBank.getNumBankable())
 
+    }
+
+    override fun selected(coin: Coin) {
+
+    }
+
+    override fun deselected(coin: Coin) {
+    }
+
+    override fun selectionFull() {
     }
 
     sealed class BankAction {

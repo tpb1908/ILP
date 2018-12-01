@@ -35,6 +35,7 @@ class BankActivity : AppCompatActivity() {
             adapter.loadItems(it.first, it.second)
         })
         vm.numStillBankable.observe(this, Observer {
+            Timber.i("Number bankable $it")
             adapter.setNumStillBankable(it)
         })
         vm.actions.observe(this, Observer {
@@ -42,6 +43,7 @@ class BankActivity : AppCompatActivity() {
                 bank_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
             }
         })
+        adapter.selectionListener = vm
         vm.bind()
     }
 

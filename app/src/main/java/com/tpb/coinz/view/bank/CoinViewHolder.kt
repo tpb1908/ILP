@@ -5,6 +5,7 @@ import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import kotlinx.android.synthetic.main.viewholder_coin.view.*
+import timber.log.Timber
 
 class CoinViewHolder(val view: View) : SelectableViewHolder(view) {
     var coin: Coin? = null

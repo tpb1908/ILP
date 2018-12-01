@@ -1,18 +1,14 @@
 package com.tpb.coinz.data.coin.collection
 
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.Currency
-import com.tpb.coinz.data.coin.FireStoreCoin
+import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.users.User
 import timber.log.Timber
 
 
-class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoin(store), CoinCollection {
+class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(store), CoinCollection {
 
 
 
