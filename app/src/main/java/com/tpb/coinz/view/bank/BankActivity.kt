@@ -30,9 +30,12 @@ class BankActivity : AppCompatActivity() {
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(BankViewModel::class.java)
         (application as App).bankComponent.inject(vm)
-        vm.availableCoins.observe(this, Observer<Pair<List<Coin>, List<Coin>>> {
+        vm.availableCoins.observe(this, Observer {
             Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)
+        })
+        vm.numStillBankable.observe(this, Observer {
+            adapter.setNumStillBankable(it)
         })
         vm.bind()
     }
@@ -43,7 +46,6 @@ class BankActivity : AppCompatActivity() {
         adapter.onClick = {
             Toast.makeText(this, "${it.currency} clicked", Toast.LENGTH_LONG).show()
         }
-        adapter.setNumStillBankable(10)
     }
 
 }

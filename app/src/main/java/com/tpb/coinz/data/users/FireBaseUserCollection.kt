@@ -66,7 +66,6 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
                     callback(Result.Value(users))
                 }
             }
-
         }
     }
 }

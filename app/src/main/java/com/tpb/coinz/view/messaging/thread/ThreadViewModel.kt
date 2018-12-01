@@ -59,7 +59,11 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         actions.postValue(ThreadAction.SetLoadingState(true))
         coinCollection.getCollectedCoins(userCollection.getCurrentUser()) {
             actions.postValue(ThreadAction.SetLoadingState(false))
-            actions.postValue(ThreadAction.ShowCoinsDialog(it))
+            if (it is Result.Value) {
+                actions.postValue(ThreadAction.ShowCoinsDialog(it.v))
+            } else {
+                //TODO: Error display
+            }
         }
     }
 

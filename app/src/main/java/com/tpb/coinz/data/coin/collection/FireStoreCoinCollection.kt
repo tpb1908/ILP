@@ -4,6 +4,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.users.User
@@ -41,7 +42,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    override fun getCollectedCoins(user: User, callback: (List<Coin>) -> Unit) {
+    override fun getCollectedCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
         Timber.i("Loading collected coins for $user")
         coins(user).get().addOnCompleteListener { qs ->
             if (qs.isSuccessful) {
@@ -51,9 +52,26 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
                     ds.data?.let { coins.add(fromMap(it)) }
                 }
                 Timber.i("Collected coins $coins")
-                callback(coins)
+                callback(Result.Value(coins))
             } else {
                 Timber.e(qs.exception, "Query unsuccessful")
+                callback(Result.None)
+            }
+        }
+    }
+
+    override fun getBankableCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
+        coins(user).whereEqualTo("banked", false).get().addOnCompleteListener { qs ->
+            if (qs.isSuccessful) {
+                val coins = mutableListOf<Coin>()
+                qs.result?.documents?.forEach { ds ->
+                    ds.data?.let { coins.add(fromMap(it)) }
+                }
+                Timber.i("Bankable coins $coins")
+                callback(Result.Value(coins))
+            } else {
+                Timber.e(qs.exception, "Query unsuccessful")
+                callback(Result.None)
             }
         }
     }
