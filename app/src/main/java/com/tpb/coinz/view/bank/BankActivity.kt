@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tpb.coinz.App
 import com.tpb.coinz.R
-import com.tpb.coinz.data.coin.Coin
 import kotlinx.android.synthetic.main.activity_bank.*
 import timber.log.Timber
 
@@ -31,7 +30,7 @@ class BankActivity : AppCompatActivity() {
     private fun bindViewModel() {
         vm = ViewModelProviders.of(this).get(BankViewModel::class.java)
         (application as App).bankComponent.inject(vm)
-        vm.availableCoins.observe(this, Observer {
+        vm.bankableCoins.observe(this, Observer {
             Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)
         })

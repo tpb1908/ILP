@@ -7,18 +7,14 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
+import com.tpb.coinz.data.coin.FireStoreCoin
 import com.tpb.coinz.data.users.User
 import timber.log.Timber
 
 
-class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollection {
+class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoin(store), CoinCollection {
 
-    private val collected = "collected"
-    private val scoreboardAll = "all"
-    private val total = "total"
-    private val coins = "coins"
 
-    private inline fun coins(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(coins)
 
     override fun collectCoin(user: User, coin: Coin) {
         Timber.i("Collecting ${toMap(coin)} for $user")
@@ -26,21 +22,6 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         coins(user).add(toMap(coin))
     }
 
-    private fun updateScoreboard(id: String, coin: Coin) {
-        val userScore = store.collection(scoreboardAll).document(id)
-        store.runTransaction {
-            val snapshot = it.get(userScore)
-            var score = snapshot.getDouble(total) ?: 0.0
-            score += coin.value
-            it.set(userScore, mapOf(total to score), SetOptions.merge())
-            // Set with merge will create document if it doesn't exist
-            //it.update(userScore, total, score)
-        }.addOnSuccessListener {
-            Timber.i("Successfully updated scoreboard for $id")
-        }.addOnFailureListener {
-            Timber.e(it, "Failed to update scoreboard for $id")
-        }
-    }
 
     override fun getCollectedCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
         Timber.i("Loading collected coins for $user")
@@ -60,22 +41,6 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    override fun getBankableCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
-        //TODO: Realtime?
-        coins(user).whereEqualTo("banked", false).get().addOnCompleteListener { qs ->
-            if (qs.isSuccessful) {
-                val coins = mutableListOf<Coin>()
-                qs.result?.documents?.forEach { ds ->
-                    ds.data?.let { coins.add(fromMap(it)) }
-                }
-                Timber.i("Bankable coins $coins")
-                callback(Result.Value(coins))
-            } else {
-                Timber.e(qs.exception, "Query unsuccessful")
-                callback(Result.None)
-            }
-        }
-    }
 
     override fun transferCoin(from: User, to: User, coin: Coin) {
         // Unfortunately there is no way to move a document in one operation
@@ -108,25 +73,5 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         }
     }
 
-    private fun toMap(coin: Coin): HashMap<String, Any> {
-        return hashMapOf(
-                "id" to coin.id,
-                "value" to coin.value,
-                "currency" to coin.currency.name,
-                "markerSymbol" to coin.markerSymbol,
-                "markerColor" to coin.markerColor,
-                "latitude" to coin.location.latitude,
-                "longitude" to coin.location.longitude,
-                "banked" to coin.banked,
-                "received" to coin.received)
-
-    }
-
-    private fun fromMap(map: MutableMap<String, Any>): Coin {
-        return Coin(map["id"] as String, map["value"] as Double, Currency.fromString(map["currency"] as String),
-                (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
-                LatLng(map["latitude"] as Double, map["longitude"] as Double),
-                map["banked"] as Boolean, map["received"] as Boolean)
-    }
 
 }

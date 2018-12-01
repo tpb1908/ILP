@@ -4,6 +4,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.FireStoreCoinCollection
 import com.tpb.coinz.data.coin.CoinCollector
+import com.tpb.coinz.data.coin.bank.CoinBank
+import com.tpb.coinz.data.coin.bank.FireStoreCoinBank
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.location.LocationProvider
@@ -24,6 +26,12 @@ class CoinCollectionModule {
     @Provides
     fun provideCoinCollection(): CoinCollection {
         return FireStoreCoinCollection(FirebaseFirestore.getInstance())
+    }
+
+    @Singleton
+    @Provides
+    fun provideCoinBank(): CoinBank {
+        return FireStoreCoinBank(FirebaseFirestore.getInstance())
     }
 
 }

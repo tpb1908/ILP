@@ -20,7 +20,6 @@ interface CoinCollection {
      */
     fun getCollectedCoins(user: User, callback: (Result<List<Coin>>) -> Unit)
 
-    fun getBankableCoins(user: User, callback: (Result<List<Coin>>) -> Unit)
 
     /**
      * Transfer [coin] from [User] [from] to [User] [to]
