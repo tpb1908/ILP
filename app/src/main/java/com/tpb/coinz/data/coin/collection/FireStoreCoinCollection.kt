@@ -61,6 +61,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     }
 
     override fun getBankableCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
+        //TODO: Realtime?
         coins(user).whereEqualTo("banked", false).get().addOnCompleteListener { qs ->
             if (qs.isSuccessful) {
                 val coins = mutableListOf<Coin>()

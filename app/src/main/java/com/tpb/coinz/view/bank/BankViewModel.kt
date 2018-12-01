@@ -27,16 +27,20 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>() {
     }
 
     private fun loadCollectedCoins() {
+        actions.postValue(BankAction.SetLoadingState(true))
         coinCollection.getBankableCoins(userCollection.getCurrentUser()) {
             if (it is Result.Value) {
                 availableCoins.postValue(it.v.partition { it.received })
             } else {
                 //TODO error handling
             }
+            actions.postValue(BankAction.SetLoadingState(false))
         }
 
     }
 
-    sealed class BankAction
+    sealed class BankAction {
+        data class SetLoadingState(val loading: Boolean) : BankAction()
+    }
 
 }

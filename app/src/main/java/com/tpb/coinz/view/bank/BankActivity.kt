@@ -1,6 +1,7 @@
 package com.tpb.coinz.view.bank
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -36,6 +37,11 @@ class BankActivity : AppCompatActivity() {
         })
         vm.numStillBankable.observe(this, Observer {
             adapter.setNumStillBankable(it)
+        })
+        vm.actions.observe(this, Observer {
+            if (it is BankViewModel.BankAction.SetLoadingState) {
+                bank_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
+            }
         })
         vm.bind()
     }
