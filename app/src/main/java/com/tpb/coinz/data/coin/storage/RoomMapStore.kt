@@ -56,14 +56,6 @@ class RoomMapStore(database: Database) : MapStore {
         }
     }
 
-    override fun getLastStoreDate(callback: (Calendar) -> Unit) {
-        getLatest {
-            if (it is Result.Value<Map>) {
-                callback(it.v.dateGenerated)
-            }
-        }
-    }
-
     override fun getLatest(callback: (Result<Map>) -> Unit) {
         GlobalScope.launch(Dispatchers.IO) {
             val map = dao.getMostRecent()

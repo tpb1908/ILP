@@ -21,7 +21,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
 
     override fun collectCoin(user: User, coin: Coin) {
         Timber.i("Collecting ${toMap(coin)} for $user")
-
+        //TODO: Check result and callback
         coins(user).add(toMap(coin))
     }
 
@@ -46,6 +46,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
         coins(user).get().addOnCompleteListener { qs ->
             if (qs.isSuccessful) {
                 val coins = mutableListOf<Coin>()
+                //TODO: Query for banked or not banked coins
                 qs.result?.documents?.forEach { ds ->
                     ds.data?.let { coins.add(fromMap(it)) }
                 }
@@ -58,9 +59,13 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
     }
 
     override fun transferCoin(from: User, to: User, coin: Coin) {
+        // Unfortunately there is no way to move a document in one operation
+        // Instead we load the coin, changed received to true, write the coin to the receiver, and then remove the original
+
         coins(from).whereEqualTo("id", coin.id).get().addOnCompleteListener { getTask ->
             Timber.i("Transferring coin $coin from $from to $to")
             if (getTask.result?.documents?.isEmpty() == false) {
+                // If there's more than one result, something has gone horribly wrong
                 getTask.result?.documents?.first()?.let { ds ->
                     ds.data?.apply {
                         coins(to).add(toMap(coin.copy(received = true))).addOnCompleteListener { addTask ->
@@ -68,6 +73,7 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
                                 Timber.i("Transferred coin. Deleting original")
                                 ds.reference.delete()
                             } else {
+                                //TODO: Error callback
                                 Timber.e(addTask.exception, "Couldn't transfer coin")
                             }
                         }
@@ -75,6 +81,8 @@ class FireStoreCoinCollection(private val store: FirebaseFirestore) : CoinCollec
 
                 }
             } else {
+                // In theory this can only happen if the user opens the send dialog on one device, then on another device,
+                // and then attempts to send the same coin from both
                 Timber.e("Coin to send doesn't exist ${getTask.result}, ${getTask.result?.documents}")
                 //TODO Coin doesn't exist error
             }

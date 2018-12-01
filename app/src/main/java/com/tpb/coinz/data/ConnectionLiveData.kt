@@ -7,7 +7,11 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 
-
+/**
+ * [LiveData] which listens for [Intents][Intent] notifying of connectivity changes
+ * Emits a boolean, whether the device is connected to a network
+ * Registers and unregisters receiver with lifecycle changes
+ */
 class ConnectionLiveData(val context: Context) : LiveData<Boolean>() {
 
     override fun onActive() {

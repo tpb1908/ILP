@@ -20,12 +20,10 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     override fun createThread(creator: User,
                               partner: User,
                               callback: (Result<Thread>) -> Unit) {
-        // Create empty thread in threads
-        // Then Add thread id to both users
-        val collection = store.collection(threads)
         val threadId = "${creator.uid}|${partner.uid}"
         Timber.i("Creating thread for $threadId")
-        collection.document(threadId).set(
+        // Create thread document
+        store.collection(threads).document(threadId).set(
                 mapOf(
                         "created" to System.currentTimeMillis(),
                         "creator" to creator.uid, "creator_email" to creator.email,
@@ -36,14 +34,14 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                 Timber.i("Created thread $threadId")
                 callback(Result.Value(Thread(threadId, creator, partner)))
 
-            } else if (it.isCanceled) {
-                Timber.e("Cancelled thread creation $threadId")
+            } else  {
+                Timber.e(it.exception, "Failed thread creation $threadId")
                 callback(Result.None)
             }
         }
     }
 
-
+    // Listener for the thread we are watching
     private val threadSnapshotListener: EventListener<QuerySnapshot> = EventListener { snapshot, exception ->
         val newMessages = mutableListOf<Message>()
         snapshot?.documentChanges?.forEach {
@@ -80,7 +78,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                                 doc["recipient_email"] as String
                         )))
             } else {
-                //TODO: For the moment, this should never happen
+                //TODO: For the moment, this should never happen, as we have not way to delete threads
                 Timber.e("Document changed $change")
             }
         }
@@ -106,10 +104,10 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
     }
 
-    override fun openThreads(user: User, callback: (Result<List<Thread>>) -> Unit) {
+    override fun openThreads(user: User, listener: (Result<List<Thread>>) -> Unit) {
         val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid)
         val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
-        threadsListener = callback
+        threadsListener = listener
         threadsListenerRegistration = Pair(
                 creatorQuery.addSnapshotListener(threadsSnapshotListener),
                 recipientQuery.addSnapshotListener(threadsSnapshotListener)
@@ -117,6 +115,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
         Timber.i("Getting threads for user $user")
     }
+
 
     override fun closeThreads() {
         threadsListenerRegistration?.first?.remove()

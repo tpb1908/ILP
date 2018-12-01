@@ -22,9 +22,15 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
     private var coinCollection: CoinCollection? = null
     private var user: User? = null
 
+    fun setCoinCollection(coinCollection: CoinCollection, user: User) {
+        this.coinCollection = coinCollection
+        this.user = user
+    }
+
     fun loadMap() {
         lp.addListener(this)
         mapStore.getLatest { result ->
+            // If a map exists, and is valid, we use it
             if (result is Result.Value<Map> && result.v.isValidForDay(Calendar.getInstance())) {
                 map = result.v
                 listeners.forEach { it.mapLoaded(result.v) }
@@ -37,18 +43,13 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
 
     private fun loadFromNetwork() {
         Timber.i("Loading coins from network")
-        mapLoader.loadCoins(Calendar.getInstance()) { m ->
-            m?.let {
-                map = it
-                mapStore.store(it)
-                listeners.forEach { l -> l.mapLoaded(it) }
+        mapLoader.loadCoins(Calendar.getInstance()) { result ->
+            if (result is Result.Value) {
+                map = result.v
+                mapStore.store(result.v)
+                listeners.forEach { it.mapLoaded(result.v) }
             }
         }
-    }
-
-    fun setCoinCollection(coinCollection: CoinCollection, user: User) {
-        this.coinCollection = coinCollection
-        this.user = user
     }
 
     fun addCollectionListener(listener: CoinCollectorListener) = listeners.add(listener)

@@ -5,6 +5,7 @@ import android.graphics.Color
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Map
@@ -15,19 +16,22 @@ import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.net.ssl.HttpsURLConnection
 
+/**
+ * Implementation of [MapLoader] which downloads the map JSON in a coroutine and parses it
+ * Largely the same code as provided in the course slides
+ */
 class MapDownloader : MapLoader {
 
-    private var listeners: ArrayList<(Map?) -> Unit> = arrayListOf()
+    private var listeners: ArrayList<(Result<Map>) -> Unit> = arrayListOf()
 
-    override fun loadCoins(date: Calendar, listener: (Map?) -> Unit) {
+    override fun loadCoins(date: Calendar, listener: (Result<Map>) -> Unit) {
         listeners.add(listener)
-
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) { // launch download on the IO threadpool
             loadCoinsFromUrl(date)
         }
 
@@ -40,10 +44,12 @@ class MapDownloader : MapLoader {
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
             val map = convert(json)
-            listeners.forEach { it(map) }
+            listeners.forEach { it(Result.Value(map)) }
             listeners.clear()
         } catch (ioe: IOException) {
             Timber.e(ioe, "MapDownloader exception")
+            listeners.forEach { it(Result.None) }
+            listeners.clear()
         }
     }
 
@@ -53,12 +59,10 @@ class MapDownloader : MapLoader {
     }
 
 
-    // Given a string representation of a URL, sets up a connection and gets an input stream.
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String): InputStream {
         val url = URL(urlString)
-        val conn = url.openConnection() as HttpURLConnection
-        // Also available: HttpsURLConnection
+        val conn = url.openConnection() as HttpsURLConnection
         with(conn) {
             readTimeout = 10000
             connectTimeout = 15000

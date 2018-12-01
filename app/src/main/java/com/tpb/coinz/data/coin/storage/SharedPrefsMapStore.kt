@@ -6,10 +6,13 @@ import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Map
 import java.util.*
 
+/**
+ * Simple implementation of [MapStore] which stores a single [Map]
+ */
 class SharedPrefsMapStore(private val prefs: SharedPreferences) : MapStore {
 
     private val key = "map"
-    private var latest: Map? = null
+    private var latest: Map? = null // cache of Map
 
     override fun store(map: Map) {
         prefs.edit().putString(key, Gson().toJson(map)).apply()
@@ -21,8 +24,6 @@ class SharedPrefsMapStore(private val prefs: SharedPreferences) : MapStore {
         latest = map
     }
 
-    override fun getLastStoreDate(callback: (Calendar) -> Unit) {
-    }
 
     override fun getLatest(callback: (Result<Map>) -> Unit) {
         if (latest == null) {
@@ -35,6 +36,7 @@ class SharedPrefsMapStore(private val prefs: SharedPreferences) : MapStore {
                 callback(Result.None)
             }
         } else {
+            // Return from cached value if available
             callback(Result.Value(latest!!))
         }
     }

@@ -7,6 +7,9 @@ import com.google.android.gms.location.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+/**
+ * Implementation of [LocationProvider] using Play Services [FusedLocationProviderClient]
+ */
 class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback() {
 
     private val fusedLocationProviderClient = FusedLocationProviderClient(context)
@@ -26,6 +29,7 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
         lr?.apply {
             this@GMSLocationProvider.lastLocation = lastLocation
             Timber.i("Location update $lastLocation")
+            // Copy to separate list as single use listeners may remove themselves while iterating
             listeners.toList().forEach { it.locationUpdate(lastLocation) }
         }
     }
