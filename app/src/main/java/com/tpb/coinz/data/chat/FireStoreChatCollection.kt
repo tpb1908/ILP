@@ -1,6 +1,9 @@
 package com.tpb.coinz.data.chat
 
 import com.google.firebase.firestore.*
+import com.tpb.coinz.CompositeRegistration
+import com.tpb.coinz.FireStoreRegistration
+import com.tpb.coinz.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.users.User
 import timber.log.Timber
@@ -8,10 +11,8 @@ import timber.log.Timber
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
 
     private var openThread: Thread? = null
-    private var messageListenerRegistration: ListenerRegistration? = null
     private var newMessageListener: ((Result<List<Message>>) -> Unit)? = null
     private var threadsListener: ((Result<List<Thread>>) -> Unit)? = null
-    private var threadsListenerRegistration: Pair<ListenerRegistration, ListenerRegistration>? = null
 
     private val threads = "threads"
 
@@ -86,16 +87,12 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         threadsListener?.invoke(Result.Value(threads))
     }
 
-    override fun openThread(thread: Thread, listener: (Result<List<Message>>) -> Unit) {
+    override fun openThread(thread: Thread, listener: (Result<List<Message>>) -> Unit): Registration {
         openThread = thread
         newMessageListener = listener
-        messageListenerRegistration?.remove()
-        messageListenerRegistration = messages(thread).addSnapshotListener(threadSnapshotListener)
+        return FireStoreRegistration(messages(thread).addSnapshotListener(threadSnapshotListener))
     }
 
-    override fun closeThread(thread: Thread) {
-        messageListenerRegistration?.remove()
-    }
 
     override fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit) {
         openThread?.let {
@@ -104,21 +101,16 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
     }
 
-    override fun openThreads(user: User, listener: (Result<List<Thread>>) -> Unit) {
+    override fun openThreads(user: User, listener: (Result<List<Thread>>) -> Unit): Registration {
         val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid)
         val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
         threadsListener = listener
-        threadsListenerRegistration = Pair(
-                creatorQuery.addSnapshotListener(threadsSnapshotListener),
-                recipientQuery.addSnapshotListener(threadsSnapshotListener)
+        Timber.i("Getting threads for user $user")
+        return CompositeRegistration(mutableListOf(
+                FireStoreRegistration(creatorQuery.addSnapshotListener(threadSnapshotListener)),
+                FireStoreRegistration(recipientQuery.addSnapshotListener(threadSnapshotListener)))
         )
 
-        Timber.i("Getting threads for user $user")
-    }
 
-
-    override fun closeThreads() {
-        threadsListenerRegistration?.first?.remove()
-        threadsListenerRegistration?.second?.remove()
     }
 }

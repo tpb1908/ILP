@@ -2,6 +2,7 @@ package com.tpb.coinz.view.messaging.threads
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.tpb.coinz.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
@@ -22,6 +23,14 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     private val receivedThreads = MutableLiveData<List<Thread>>()
 
+    val threadIntents = MutableLiveData<Thread>()
+
+    val userSearchResults = MutableLiveData<List<User>>()
+
+    override val actions = MutableLiveData<ThreadsAction>()
+
+    private var threadsRegistration: Registration? = null
+
     init {
         var lastCreatedThreads = listOf<Thread>()
         var lastReceivedThreads = listOf<Thread>()
@@ -34,12 +43,6 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
             threads.postValue(lastCreatedThreads + lastReceivedThreads)
         }
     }
-
-    val threadIntents = MutableLiveData<Thread>()
-
-    val userSearchResults = MutableLiveData<List<User>>()
-
-    override val actions = MutableLiveData<ThreadsAction>()
 
     override fun bind() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
@@ -84,6 +87,11 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
         }
     }
 
+
+    override fun onCleared() {
+        super.onCleared()
+        threadsRegistration?.deregister()
+    }
 
     sealed class ThreadsAction {
         class SetLoadingState(val loading: Boolean) : ThreadsAction()

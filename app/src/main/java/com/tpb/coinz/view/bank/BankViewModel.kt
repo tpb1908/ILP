@@ -1,6 +1,8 @@
 package com.tpb.coinz.view.bank
 
 import androidx.lifecycle.MutableLiveData
+import com.tpb.coinz.CompositeRegistration
+import com.tpb.coinz.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
@@ -18,10 +20,17 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
 
     val numStillBankable = MutableLiveData<Int>()
 
+    val numSelected = MutableLiveData<Int>()
+
     override val actions = MutableLiveData<BankAction>()
 
     private var numCollectedCoinsSelected = 0
+        set(value) {
+            field = value
+            numSelected.postValue(value)
+        }
 
+    private val registrations = CompositeRegistration()
 
     override fun bind() {
         if (firstBind) loadBankableCoins()
@@ -33,7 +42,7 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
 
     private fun loadBankableCoins() {
         actions.postValue(BankAction.SetLoadingState(true))
-        coinBank.getBankableCoins(userCollection.getCurrentUser()) {
+        registrations.add(coinBank.getBankableCoins(userCollection.getCurrentUser()) {
             if (it is Result.Value) {
                 collectedCoins.clear()
                 collectedCoins.addAll(it.v.filterNot(Coin::received).map { SelectableItem(false, it) })
@@ -44,7 +53,7 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
                 //TODO error handling
             }
             actions.postValue(BankAction.SetLoadingState(false))
-        }
+        })
         numStillBankable.postValue(coinBank.getNumBankable())
 
     }
@@ -86,6 +95,11 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
 
     fun selectionFull() {
         actions.postValue(BankAction.SelectionFull)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        registrations.deregister()
     }
 
     sealed class BankAction {

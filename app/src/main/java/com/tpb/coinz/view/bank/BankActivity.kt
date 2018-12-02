@@ -45,6 +45,9 @@ class BankActivity : AppCompatActivity() {
             //TODO: Move 25 somewhere else
             bank_coins_text.text = resources.getQuantityString(R.plurals.bank_coins_banked_info, 25-it, 25-it, it)
         })
+        vm.numSelected.observe(this, Observer {
+            //TODO: Display this text somewhere
+        })
         adapter.selectionManager = vm
         vm.bind()
     }

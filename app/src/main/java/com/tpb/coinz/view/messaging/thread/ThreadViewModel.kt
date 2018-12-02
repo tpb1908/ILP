@@ -1,6 +1,7 @@
 package com.tpb.coinz.view.messaging.thread
 
 import androidx.lifecycle.MutableLiveData
+import com.tpb.coinz.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
@@ -31,12 +32,14 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
         userCollection.getCurrentUser() == it
     }
 
+    private var chatRegistration: Registration? = null
+
     override fun bind() {
     }
 
     fun openThread(thread: Thread) {
         this.thread = thread
-        chatCollection.openThread(thread, this::messageUpdate)
+        chatRegistration = chatCollection.openThread(thread, this::messageUpdate)
     }
 
     fun postMessage(message: String) {
@@ -77,7 +80,7 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
     override fun onCleared() {
         super.onCleared()
-        thread?.let { chatCollection.closeThread(it) }
+        chatRegistration?.deregister()
     }
 
     sealed class ThreadAction {

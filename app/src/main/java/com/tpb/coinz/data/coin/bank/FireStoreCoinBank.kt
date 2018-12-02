@@ -1,9 +1,8 @@
 package com.tpb.coinz.data.coin.bank
 
 import android.content.SharedPreferences
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
+import com.tpb.coinz.FireStoreRegistration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
@@ -50,52 +49,51 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
                 // actually want to bank a received coin
                 coins(user).whereEqualTo("id", coin.id).whereEqualTo("received", coin.received).get()
                         .addOnCompleteListener { getTask ->
-                    if (getTask.isSuccessful) {
-                        // The query could return more than one document if the user has been sent the same coin twice
-                        // In this case it doesn't matter which one of the coins we bank
-                        getTask.result?.documents?.first()?.let { ds ->
-                            banked(user).add(coin).addOnCompleteListener { addTask ->
-                                if (addTask.isSuccessful) {
-                                    ds.reference.delete()
-                                    successfullyBanked.add(coin)
-                                    if (!coin.received) numBankable -= 1
-                                } else {
-                                    Timber.e(addTask.exception, "Failed to bank coin $coin")
-                                    //TODO: Error
+                            if (getTask.isSuccessful) {
+                                // The query could return more than one document if the user has been sent the same coin twice
+                                // In this case it doesn't matter which one of the coins we bank
+                                getTask.result?.documents?.first()?.let { ds ->
+                                    banked(user).add(coin).addOnCompleteListener { addTask ->
+                                        if (addTask.isSuccessful) {
+                                            ds.reference.delete()
+                                            successfullyBanked.add(coin)
+                                            if (!coin.received) numBankable -= 1
+                                        } else {
+                                            Timber.e(addTask.exception, "Failed to bank coin $coin")
+                                            //TODO: Error
+                                        }
+                                        successCount++
+                                        if (successCount == coins.size) callback(Result.Value(successfullyBanked))
+                                    }
                                 }
+                            } else {
+                                Timber.e(getTask.exception, "Failed to get coin $coin")
                                 successCount++
                                 if (successCount == coins.size) callback(Result.Value(successfullyBanked))
+                                //TODO: Error
                             }
                         }
-                    } else {
-                        Timber.e(getTask.exception, "Failed to get coin $coin")
-                        successCount++
-                        if (successCount == coins.size) callback(Result.Value(successfullyBanked))
-                        //TODO: Error
-                    }
-                }
             }
         } else {
             callback(Result.None) //TODO: Proper error
         }
     }
 
-    override fun getBankableCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
-        //TODO: Realtime?
-        coins(user).get().addOnCompleteListener { qs ->
-            if (qs.isSuccessful) {
-                val coins = mutableListOf<Coin>()
-                qs.result?.documents?.forEach { ds ->
-                    ds.data?.let { coins.add(fromMap(it)) }
+    override fun getBankableCoins(user: User, listener: (Result<List<Coin>>) -> Unit) =
+            FireStoreRegistration(coins(user).addSnapshotListener { qs, exception ->
+                if (qs != null) {
+                    val coins = mutableListOf<Coin>()
+                    qs.documents.forEach { ds ->
+                        ds.data?.let { coins.add(fromMap(it)) }
+                    }
+                    Timber.i("Bankable coins $coins")
+                    listener(Result.Value(coins))
+                } else {
+                    Timber.e(exception, "Query unsuccessful")
+                    listener(Result.None)
                 }
-                Timber.i("Bankable coins $coins")
-                callback(Result.Value(coins))
-            } else {
-                Timber.e(qs.exception, "Query unsuccessful")
-                callback(Result.None)
-            }
-        }
-    }
+            })
+
 
     private fun checkCurrentDay() {
         val now = Calendar.getInstance()
