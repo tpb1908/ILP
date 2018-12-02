@@ -86,7 +86,10 @@ class ThreadActivity : AppCompatActivity() {
         CoinSelectionDialog(coins, this, R.style.CoinDialog, vm::transferCoin).show()
     }
 
-    private class CoinSelectionDialog(val coins: List<Coin>, context: Context, @StyleRes style: Int, val selectionListener: (Coin) -> Unit) : AppCompatDialog(context, style) {
+    private class CoinSelectionDialog(val coins: List<Coin>,
+                                      context: Context,
+                                      @StyleRes style: Int,
+                                      val selectionListener: (Coin) -> Unit) : AppCompatDialog(context, style) {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)

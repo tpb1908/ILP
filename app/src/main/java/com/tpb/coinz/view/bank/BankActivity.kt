@@ -41,9 +41,11 @@ class BankActivity : AppCompatActivity() {
         vm.actions.observe(this, Observer {
             if (it is BankViewModel.BankAction.SetLoadingState) {
                 bank_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
+            } else if (it is BankViewModel.BankAction.SelectionFull) {
+
             }
         })
-        adapter.selectionListener = vm
+        adapter.selectionManager = vm
         vm.bind()
     }
 
@@ -52,6 +54,13 @@ class BankActivity : AppCompatActivity() {
         available_coins_recycler.layoutManager = LinearLayoutManager(this)
         adapter.onClick = {
             Toast.makeText(this, "${it.currency} clicked", Toast.LENGTH_LONG).show()
+        }
+        bank_coins_button.setOnClickListener {
+            if (adapter.numSelectedCoins() > 0) {
+                vm.bankCoins()
+            } else {
+                Toast.makeText(this, R.string.message_need_to_select_coins, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

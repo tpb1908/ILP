@@ -11,7 +11,9 @@ abstract class BaseViewModel<T> : ViewModel() {
      */
     abstract val actions: MutableLiveData<T>
 
-
-    abstract fun bind()
+    protected var firstBind = true
+    open fun bind() {
+        firstBind = false
+    }
 
 }
