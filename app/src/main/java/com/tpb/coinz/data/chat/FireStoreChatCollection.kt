@@ -107,8 +107,8 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         threadsListener = listener
         Timber.i("Getting threads for user $user")
         return CompositeRegistration(mutableListOf(
-                FireStoreRegistration(creatorQuery.addSnapshotListener(threadSnapshotListener)),
-                FireStoreRegistration(recipientQuery.addSnapshotListener(threadSnapshotListener)))
+                FireStoreRegistration(creatorQuery.addSnapshotListener(threadsSnapshotListener)),
+                FireStoreRegistration(recipientQuery.addSnapshotListener(threadsSnapshotListener)))
         )
 
 
