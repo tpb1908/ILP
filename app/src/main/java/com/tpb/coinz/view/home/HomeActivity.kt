@@ -16,8 +16,7 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.location.LocationListener
@@ -74,11 +73,12 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         permissionsManager = PermissionsManager(this)
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             home_minimap.getMapAsync {
+                val lc = it.locationComponent
+                lc.isLocationComponentEnabled = true
                 val engine = LocationListeningEngine(locationProvider)
-                val locationLayer = LocationLayerPlugin(home_minimap, it, engine)
-                locationLayer.renderMode = RenderMode.COMPASS
                 engine.activate()
-                lifecycle.addObserver(locationLayer)
+                lc.activateLocationComponent(this, engine)
+                lc.renderMode = RenderMode.NORMAL
                 locationProvider.addListener(object: LocationListener.SimpleLocationListener {
                     override fun locationUpdate(location: Location) {
                         home_minimap.getMapAsync { it.animateCamera(location.asCameraUpdate()) }

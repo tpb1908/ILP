@@ -10,6 +10,7 @@ import timber.log.Timber
  */
 class LocationListeningEngine(private val locationProvider: LocationProvider) : LocationEngine(), LocationListener {
 
+
     private var connected = false
     override fun activate() {
         locationProvider.removeListener(this)

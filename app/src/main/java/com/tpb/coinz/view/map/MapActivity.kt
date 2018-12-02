@@ -14,8 +14,7 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coin.Coin
@@ -33,7 +32,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     @Inject lateinit var connection: ConnectionLiveData
 
-    private lateinit var locationLayer: LocationLayerPlugin
     private lateinit var permissionsManager: PermissionsManager
 
 
@@ -92,13 +90,13 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
 
             mapview.getMapAsync {
+                val lc = it.locationComponent
+                lc.isLocationComponentEnabled = true
                 val engine = LocationListeningEngine(locationProvider)
-                locationLayer = LocationLayerPlugin(mapview, it, engine)
-                locationLayer.isLocationLayerEnabled = true
-
-                locationLayer.renderMode = RenderMode.COMPASS
                 engine.activate()
-                lifecycle.addObserver(locationLayer)
+                lc.activateLocationComponent(this, engine)
+                lc.renderMode = RenderMode.NORMAL
+
             }
             locationProvider.addListener(object: LocationListener.SimpleLocationListener {
                 override fun locationUpdate(location: Location) {
