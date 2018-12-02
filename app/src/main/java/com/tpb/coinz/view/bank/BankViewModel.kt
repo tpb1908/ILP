@@ -28,11 +28,18 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
         super.bind()
     }
 
+    private val collectedCoins = mutableListOf<SelectableItem<Coin>>()
+    private val receivedCoins = mutableListOf<SelectableItem<Coin>>()
+
     private fun loadBankableCoins() {
         actions.postValue(BankAction.SetLoadingState(true))
         coinBank.getBankableCoins(userCollection.getCurrentUser()) {
             if (it is Result.Value) {
-                bankableCoins.postValue(it.v.map { SelectableItem(false, it) }.partition { it.item.received })
+                collectedCoins.clear()
+                collectedCoins.addAll(it.v.filterNot(Coin::received).map { SelectableItem(false, it) })
+                receivedCoins.clear()
+                receivedCoins.addAll(it.v.filter(Coin::received).map { SelectableItem(false, it) })
+                bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
             } else {
                 //TODO error handling
             }
@@ -43,21 +50,32 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
     }
 
     fun bankCoins() {
-
+        actions.postValue(BankAction.SetLoadingState(true))
+        val selected = (collectedCoins + receivedCoins).filter { it.selected }.map { it.item }
+        coinBank.bankCoins(userCollection.getCurrentUser(), selected) { result ->
+            if (result is Result.Value) {
+                numStillBankable.postValue(coinBank.getNumBankable())
+                collectedCoins.removeAll(result.v.map { SelectableItem(true, it) })
+                receivedCoins.removeAll(result.v.map { SelectableItem(true, it) })
+                bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
+            }
+            actions.postValue(BankAction.SetLoadingState(false))
+        }
     }
 
     override fun attemptSelect(item: SelectableItem<Coin>): Boolean {
-        if (!item.item.received) {
-            return if (numCollectedCoinsSelected < coinBank.getNumBankable()) {
-                numCollectedCoinsSelected++
-                item.selected = true
-                true
-            } else {
-                false
-            }
+        if (item.item.received) {
+            item.selected = true
+            return true
         }
-        item.selected = true
-        return true
+        val bankable = coinBank.getNumBankable()
+        if (numCollectedCoinsSelected < bankable) {
+            item.selected = true
+            numCollectedCoinsSelected++
+            if (numCollectedCoinsSelected == bankable) selectionFull()
+            return true
+        }
+        return false
     }
 
     override fun deselect(item: SelectableItem<Coin>) {

@@ -9,27 +9,20 @@ import timber.log.Timber
 
 class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
-    private var userCoins: List<SelectableItem<Coin>> = emptyList()
-    private var sentCoins: List<SelectableItem<Coin>> = emptyList()
-    private var numStillBankable = 0
+    private var collectedCoins: List<SelectableItem<Coin>> = emptyList()
+    private var receivedCoins: List<SelectableItem<Coin>> = emptyList()
     var isSelectionEnabled = true
     var selectionManager: SelectionManager<Coin>? = null
 
-    fun loadItems(newUserCoins: List<SelectableItem<Coin>>, newSentCoins: List<SelectableItem<Coin>>) {
-        userCoins = newUserCoins
-        sentCoins = newSentCoins
+    fun loadItems(newCollectedCoins: List<SelectableItem<Coin>>, newReceivedCoins: List<SelectableItem<Coin>>) {
+        collectedCoins = newCollectedCoins
+        receivedCoins = newReceivedCoins
         //TODO: Diff and notify for exact changes
         notifyDataSetChanged()
     }
 
-    fun numSelectedCoins() = userCoins.count(SelectableItem<Coin>::selected) + sentCoins.count(SelectableItem<Coin>::selected)
+    fun numSelectedCoins() = collectedCoins.count(SelectableItem<Coin>::selected) + receivedCoins.count(SelectableItem<Coin>::selected)
 
-    fun getSelectedCoins(): List<Coin> =
-            (userCoins + sentCoins).filter(SelectableItem<Coin>::selected).map(SelectableItem<Coin>::item)
-
-    fun setNumStillBankable(stillBankable: Int) {
-        numStillBankable = stillBankable
-    }
 
     var onClick: (Coin) -> Unit = {}
 
@@ -56,17 +49,17 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
                         R.layout.viewholder_coin, parent, false)
                 )
 
-    override fun getItemCount(): Int = userCoins.size + sentCoins.size + 2
+    override fun getItemCount(): Int = collectedCoins.size + receivedCoins.size + 2
 
     override fun getItemViewType(position: Int): Int {
         // Headers at position 0 and position after sent coins
-        return if (position == 0 || position == Math.max(1, sentCoins.size)) 1 else 0
+        return if (position == 0 || position == 1 + receivedCoins.size) 1 else 0
     }
 
-    private fun getStateForPosition(position: Int): SelectableItem<Coin> = if (position > sentCoins.size) {
-        userCoins[position - sentCoins.size - 2]
+    private fun getStateForPosition(position: Int): SelectableItem<Coin> = if (position > receivedCoins.size) {
+        collectedCoins[position - receivedCoins.size - 2]
     } else {
-        sentCoins[position - 1]
+        receivedCoins[position - 1]
     }
 
     override fun onBindViewHolder(holder: SelectableViewHolder, position: Int) {

@@ -6,7 +6,7 @@ import com.tpb.coinz.data.users.User
 
 interface CoinBank {
 
-    fun bankCoins(user: User, coins: List<Coin>, callback: Result<Boolean>)
+    fun bankCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit)
 
     fun getBankableCoins(user: User, callback: (Result<List<Coin>>) -> Unit)
 

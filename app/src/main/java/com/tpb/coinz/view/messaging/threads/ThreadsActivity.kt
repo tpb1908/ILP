@@ -90,7 +90,7 @@ class ThreadsActivity : AppCompatActivity() {
         })
         edit.setHint(R.string.hint_chat_creation_email)
         AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_chat_creation_title)
+                .setTitle(R.string.title_chat_creation_dialog)
                 .setView(container)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     vm.createChat(edit.text.toString())

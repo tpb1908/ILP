@@ -41,28 +41,42 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
     }
 
 
-    override fun bankCoins(user: User, coins: List<Coin>, callback: Result<Boolean>) {
+    override fun bankCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit) {
         if (coins.size <= numBankable) {
+            val successfullyBanked = mutableListOf<Coin>()
+            var successCount = 0
             coins.forEach { coin ->
-                coins(user).whereEqualTo("id", coin.id).get().addOnCompleteListener { getTask ->
+                // We have to check that received as well as id to stop banking of a collected coin when we
+                // actually want to bank a received coin
+                coins(user).whereEqualTo("id", coin.id).whereEqualTo("received", coin.received).get()
+                        .addOnCompleteListener { getTask ->
                     if (getTask.isSuccessful) {
+                        // The query could return more than one document if the user has been sent the same coin twice
+                        // In this case it doesn't matter which one of the coins we bank
                         getTask.result?.documents?.first()?.let { ds ->
                             banked(user).add(coin).addOnCompleteListener { addTask ->
                                 if (addTask.isSuccessful) {
                                     ds.reference.delete()
+                                    successfullyBanked.add(coin)
                                     if (!coin.received) numBankable -= 1
                                 } else {
                                     Timber.e(addTask.exception, "Failed to bank coin $coin")
                                     //TODO: Error
                                 }
+                                successCount++
+                                if (successCount == coins.size) callback(Result.Value(successfullyBanked))
                             }
                         }
                     } else {
                         Timber.e(getTask.exception, "Failed to get coin $coin")
+                        successCount++
+                        if (successCount == coins.size) callback(Result.Value(successfullyBanked))
                         //TODO: Error
                     }
                 }
             }
+        } else {
+            callback(Result.None) //TODO: Proper error
         }
     }
 

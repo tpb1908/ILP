@@ -34,16 +34,16 @@ class BankActivity : AppCompatActivity() {
             Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)
         })
-        vm.numStillBankable.observe(this, Observer {
-            Timber.i("Number bankable $it")
-            adapter.setNumStillBankable(it)
-        })
         vm.actions.observe(this, Observer {
             if (it is BankViewModel.BankAction.SetLoadingState) {
                 bank_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
             } else if (it is BankViewModel.BankAction.SelectionFull) {
 
             }
+        })
+        vm.numStillBankable.observe(this, Observer {
+            //TODO: Move 25 somewhere else
+            bank_coins_text.text = resources.getQuantityString(R.plurals.bank_coins_banked_info, 25-it, 25-it, it)
         })
         adapter.selectionManager = vm
         vm.bind()

@@ -6,4 +6,10 @@
         <item quantity="other">%1$d coinz collected. %2$d remaining</item>
     </plurals>
 
+    <plurals name="bank_coins_banked_info">
+        <item quantity="zero">%1$d coinz banked. %2$d remaining</item>
+        <item quantity="one">%1$d coin banked. %2$d remaining</item>
+        <item quantity="other">%1$d coinz banked. %2$d remaining</item>
+    </plurals>
+
 </resources>

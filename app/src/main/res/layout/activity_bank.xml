@@ -33,7 +33,7 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/available_coins_count"
+                android:id="@+id/bank_coins_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 collected of 25"/>
