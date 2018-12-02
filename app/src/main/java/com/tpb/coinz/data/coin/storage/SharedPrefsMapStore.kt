@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Map
-import java.util.*
 
 /**
  * Simple implementation of [MapStore] which stores a single [Map]

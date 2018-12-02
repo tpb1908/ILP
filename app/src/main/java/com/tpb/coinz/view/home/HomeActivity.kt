@@ -22,7 +22,6 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
-import com.tpb.coinz.view.bank.BankActivity
 import com.tpb.coinz.view.map.MapActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsActivity
 import kotlinx.android.synthetic.main.activity_home.*

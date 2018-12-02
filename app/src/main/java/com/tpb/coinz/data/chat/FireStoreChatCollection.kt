@@ -1,13 +1,15 @@
 package com.tpb.coinz.data.chat
 
-import com.google.firebase.firestore.*
-import com.google.firebase.firestore.util.ListenerRegistrationImpl
-import com.tpb.coinz.data.util.CompositeRegistration
-import com.tpb.coinz.data.util.FireStoreRegistration
-import com.tpb.coinz.data.util.Registration
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.CompositeRegistration
 import com.tpb.coinz.data.util.Conversion
+import com.tpb.coinz.data.util.FireStoreRegistration
+import com.tpb.coinz.data.util.Registration
 import timber.log.Timber
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {

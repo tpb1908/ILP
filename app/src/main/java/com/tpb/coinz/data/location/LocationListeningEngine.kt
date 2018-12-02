@@ -6,7 +6,7 @@ import com.mapbox.android.core.location.LocationEngine
 import timber.log.Timber
 
 /**
- * Implementation of [LocationEngine] for [LocationLayerPlugin] which uses [LocationProvider]
+ * Implementation of [LocationEngine] using [LocationProvider]
  */
 class LocationListeningEngine(private val locationProvider: LocationProvider) : LocationEngine(), LocationListener {
 

@@ -4,7 +4,6 @@ import android.location.Location
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.collection.CoinCollection
-import com.tpb.coinz.data.coin.collection.collectionDistance
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.location.LocationListener
@@ -76,7 +75,7 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
     }
 
     private fun collectable(coin: Coin, location: Location): Boolean =
-            coin.location.distanceTo(LatLng(location.latitude, location.longitude)) < collectionDistance
+            coin.location.distanceTo(LatLng(location.latitude, location.longitude)) < 25
 
 
     private fun collect(collectable: List<Coin>) {
