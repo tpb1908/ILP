@@ -1,9 +1,10 @@
 package com.tpb.coinz.data.chat
 
 import com.google.firebase.firestore.*
-import com.tpb.coinz.CompositeRegistration
-import com.tpb.coinz.FireStoreRegistration
-import com.tpb.coinz.Registration
+import com.google.firebase.firestore.util.ListenerRegistrationImpl
+import com.tpb.coinz.data.util.CompositeRegistration
+import com.tpb.coinz.data.util.FireStoreRegistration
+import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.users.User
 import timber.log.Timber
@@ -106,9 +107,9 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
         threadsListener = listener
         Timber.i("Getting threads for user $user")
-        return CompositeRegistration(mutableListOf(
+        return CompositeRegistration(
                 FireStoreRegistration(creatorQuery.addSnapshotListener(threadsSnapshotListener)),
-                FireStoreRegistration(recipientQuery.addSnapshotListener(threadsSnapshotListener)))
+                FireStoreRegistration(recipientQuery.addSnapshotListener(threadsSnapshotListener))
         )
 
 

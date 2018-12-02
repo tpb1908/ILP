@@ -2,7 +2,7 @@ package com.tpb.coinz.data.coin.bank
 
 import android.content.SharedPreferences
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tpb.coinz.FireStoreRegistration
+import com.tpb.coinz.data.util.FireStoreRegistration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager

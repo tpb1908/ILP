@@ -1,7 +1,7 @@
 package com.tpb.coinz.view.messaging.thread
 
 import androidx.lifecycle.MutableLiveData
-import com.tpb.coinz.Registration
+import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection

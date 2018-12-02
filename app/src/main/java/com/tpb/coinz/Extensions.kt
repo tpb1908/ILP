@@ -9,7 +9,6 @@ import android.location.Location
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.core.content.ContextCompat
-import com.google.firebase.firestore.ListenerRegistration
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -24,28 +23,6 @@ fun Location.asCameraUpdate(): CameraUpdate = CameraUpdateFactory.newLatLngZoom(
 sealed class Result<out T> {
     object None : Result<Nothing>()
     data class Value<T>(val v: T) : Result<T>()
-}
-
-abstract class Registration {
-
-    abstract fun deregister()
-
-}
-
-class FireStoreRegistration(private val reg: ListenerRegistration?): Registration() {
-
-    override fun deregister() {
-        reg?.remove()
-    }
-}
-
-class CompositeRegistration(private val registrations: MutableList<Registration> = mutableListOf()): Registration() {
-
-    fun add(registration: Registration) = registrations.add(registration)
-
-    override fun deregister() {
-        registrations.forEach(Registration::deregister)
-    }
 }
 
 fun coinToMarkerOption(context: Context, coin: Coin): MarkerOptions {

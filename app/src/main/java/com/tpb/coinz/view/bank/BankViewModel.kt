@@ -1,8 +1,7 @@
 package com.tpb.coinz.view.bank
 
 import androidx.lifecycle.MutableLiveData
-import com.tpb.coinz.CompositeRegistration
-import com.tpb.coinz.Registration
+import com.tpb.coinz.data.util.CompositeRegistration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
