@@ -54,7 +54,11 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
     fun transferCoin(coin: Coin) {
         Timber.i("Transferring $coin in thread $thread")
         thread?.let {
-            coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin)
+            coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin) {
+                if (it is Result.Value) {
+                    chatCollection.postMessage(it.v, {})
+                }
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.tpb.coinz.data.coin.collection
 
 import com.tpb.coinz.Result
+import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.users.User
 
@@ -23,8 +24,7 @@ interface CoinCollection {
 
     /**
      * Transfer [coin] from [User] [from] to [User] [to]
-     * TODO: Callback
      */
-    fun transferCoin(from: User, to: User, coin: Coin)
+    fun transferCoin(from: User, to: User, coin: Coin, callback: (Result<Message>) -> Unit)
 
 }

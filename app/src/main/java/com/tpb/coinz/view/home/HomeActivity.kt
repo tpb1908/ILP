@@ -25,6 +25,7 @@ import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.view.bank.BankActivity
 import com.tpb.coinz.view.map.MapActivity
+import com.tpb.coinz.view.messaging.threads.ThreadsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
         initViews(savedInstanceState)
         bindViewModel()
-        startActivity(Intent(this, BankActivity::class.java))
+        startActivity(Intent(this, ThreadsActivity::class.java))
     }
 
     private fun initViews(savedInstanceState: Bundle?) {

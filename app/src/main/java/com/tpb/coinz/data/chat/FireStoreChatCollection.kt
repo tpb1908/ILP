@@ -7,6 +7,7 @@ import com.tpb.coinz.data.util.FireStoreRegistration
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.Conversion
 import timber.log.Timber
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
@@ -55,7 +56,8 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                             (doc["sender"] as Map<String, Any>)["uid"] as String,
                             (doc["sender"] as Map<String, Any>)["email"] as String
                     ),
-                    doc["message"] as String
+                    doc["message"] as String,
+                    if (doc.contains("coin")) Conversion.fromMap(doc["coin"] as Map<String, Any>) else null
             ))
         }
         Timber.i("New messages $newMessages")

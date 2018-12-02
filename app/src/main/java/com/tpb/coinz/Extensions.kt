@@ -25,6 +25,10 @@ sealed class Result<out T> {
     data class Value<T>(val v: T) : Result<T>()
 }
 
+inline fun <R> R?.orElse(block: () -> R): R {
+    return this ?: block()
+}
+
 fun coinToMarkerOption(context: Context, coin: Coin): MarkerOptions {
     return MarkerOptions()
             .position(coin.location)

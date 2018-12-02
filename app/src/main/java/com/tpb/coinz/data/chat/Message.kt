@@ -1,5 +1,6 @@
 package com.tpb.coinz.data.chat
 
+import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.users.User
 
 /**
@@ -8,4 +9,4 @@ import com.tpb.coinz.data.users.User
  * @param sender The user who sent the message
  * @param message The message body
  */
-data class Message(val timestamp: Long, val sender: User, val message: String)
+data class Message(val timestamp: Long, val sender: User, val message: String, val coin: Coin? = null)

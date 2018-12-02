@@ -7,6 +7,7 @@ import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.Conversion.fromMap
 import timber.log.Timber
 import java.util.*
 

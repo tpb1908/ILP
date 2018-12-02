@@ -42,6 +42,6 @@ class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         holder.message = messages[position]
-
+        holder.setMessageType(isCurrentUser(messages[position].sender))
     }
 }
