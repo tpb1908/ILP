@@ -3,13 +3,13 @@ package com.tpb.coinz.view.messaging.threads
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.R
-import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.Result
-import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
+import com.tpb.coinz.data.util.Registration
+import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -82,6 +82,6 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     sealed class ThreadsAction {
         class SetLoadingState(val loading: Boolean) : ThreadsAction()
-        class DisplayMessage(@StringRes val message: Int): ThreadsAction()
+        class DisplayMessage(@StringRes val message: Int) : ThreadsAction()
     }
 }
