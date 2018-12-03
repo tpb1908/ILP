@@ -1,5 +1,6 @@
 package com.tpb.coinz.dagger.component
 
+import com.tpb.coinz.dagger.module.ChatModule
 import com.tpb.coinz.dagger.module.CoinCollectionModule
 import com.tpb.coinz.dagger.module.UserModule
 import com.tpb.coinz.view.home.HomeActivity
@@ -8,7 +9,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [UserModule::class, CoinCollectionModule::class])
+@Component(modules = [UserModule::class, CoinCollectionModule::class, ChatModule::class])
 interface HomeComponent {
 
 

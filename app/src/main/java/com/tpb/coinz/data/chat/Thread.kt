@@ -11,7 +11,7 @@ import kotlinx.android.parcel.Parcelize
  * @param partner The user that the creator is sending messages to
  */
 @Parcelize
-data class Thread(val threadId: String, val creator: User, val partner: User) : Parcelable {
+data class Thread(val threadId: String, val creator: User, val partner: User, val updated: Long) : Parcelable {
 
     /**
      * Given one [User] from the [Thread], returns the other [User]

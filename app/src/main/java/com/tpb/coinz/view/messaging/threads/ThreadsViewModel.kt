@@ -32,14 +32,14 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
     private var threadsRegistration: Registration? = null
 
     init {
-        var lastCreatedThreads = listOf<Thread>()
-        var lastReceivedThreads = listOf<Thread>()
+        val lastCreatedThreads = mutableListOf<Thread>()
+        val lastReceivedThreads = mutableListOf<Thread>()
         threads.addSource(createdThreads) {
-            lastCreatedThreads = it
+            lastCreatedThreads.addAll(it)
             threads.postValue(lastCreatedThreads + lastReceivedThreads)
         }
         threads.addSource(receivedThreads) {
-            lastReceivedThreads = it
+            lastReceivedThreads.addAll(it)
             threads.postValue(lastCreatedThreads + lastReceivedThreads)
         }
     }
@@ -47,7 +47,7 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
     override fun bind() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
 
-        chatCollection.openThreads(userCollection.getCurrentUser()) {
+        threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<Thread>>) {
                 if (it.v.isNotEmpty()) {
                     Timber.i("Retrieved threads ${it.v}")
@@ -67,19 +67,20 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
         userCollection.retrieveUserFromEmail(userEmail) { user ->
             if (user is Result.Value<User>) {
                 chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
+                    Timber.i("Creating thread")
                     if (it is Result.Value<Thread>) {
                         threads.postValue((threads.value ?: emptyList()) + it.v)
-                        actions.postValue(ThreadsAction.SetLoadingState(false))
                         threadIntents.postValue(it.v)
                     }
+                    actions.postValue(ThreadsAction.SetLoadingState(false))
                 }
+            } else {
+                Timber.e("Couldn't retrieve user to create thread")
+                actions.postValue(ThreadsAction.SetLoadingState(false))
             }
         }
     }
 
-    fun openChat() {
-
-    }
 
     fun searchUsers(partialEmail: String) {
         userCollection.searchUsersByEmail(partialEmail) {

@@ -1,9 +1,6 @@
 package com.tpb.coinz.data.chat
 
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.CompositeRegistration
@@ -16,7 +13,6 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
     private var openThread: Thread? = null
     private var newMessageListener: ((Result<List<Message>>) -> Unit)? = null
-    private var threadsListener: ((Result<List<Thread>>) -> Unit)? = null
 
     private val threads = "threads"
 
@@ -37,7 +33,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         ).addOnCompleteListener {
             if (it.isSuccessful) {
                 Timber.i("Created thread $threadId")
-                callback(Result.Value(Thread(threadId, creator, partner)))
+                callback(Result.Value(Thread(threadId, creator, partner, System.currentTimeMillis())))
 
             } else  {
                 Timber.e(it.exception, "Failed thread creation $threadId")
@@ -52,6 +48,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         snapshot?.documentChanges?.forEach {
             Timber.i("Document change ${it.document}")
             val doc = it.document
+            Timber.i("Coin: ${doc.contains("coin")}")
             newMessages.add(Message(
                     doc["timestamp"] as Long,
                     User(
@@ -59,7 +56,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                             (doc["sender"] as Map<String, Any>)["email"] as String
                     ),
                     doc["message"] as String,
-                    if (doc.contains("coin")) Conversion.fromMap(doc["coin"] as Map<String, Any>) else null
+                    if (doc.contains("coin") && doc["coin"] != null) Conversion.fromMap(doc["coin"] as Map<String, Any>) else null
             ))
         }
         Timber.i("New messages $newMessages")
@@ -67,30 +64,36 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         newMessageListener?.invoke(Result.Value(newMessages))
     }
 
-    private val threadsSnapshotListener: EventListener<QuerySnapshot> = EventListener { snapshot, exception ->
-        val threads = mutableListOf<Thread>()
-        //TODO: How do we merge the two sources of the threads?
-        snapshot?.documentChanges?.forEach { change ->
-            if (change.type == DocumentChange.Type.ADDED) {
-                val doc = change.document
-                Timber.i("Thread downloaded $doc")
-                threads.add(Thread(doc.id,
-                        User(
-                                doc["creator"] as String,
-                                doc["creator_email"] as String
-                        ),
-                        User(
-                                doc["recipient"] as String,
-                                doc["recipient_email"] as String
-                        )))
-            } else {
-                //TODO: For the moment, this should never happen, as we have not way to delete threads
-                Timber.e("Document changed $change")
+    private class ThreadsSnapshotListener(val threadsListener: ((Result<List<Thread>>) -> Unit)) : EventListener<QuerySnapshot> {
+
+        override fun onEvent(snapshot: QuerySnapshot?, exception: FirebaseFirestoreException?) {
+            Timber.i("Change to threads")
+            val threads = mutableListOf<Thread>()
+            //TODO: Deletion and proper change notification
+            //TODO: How do we merge the two sources of the threads?
+            snapshot?.documentChanges?.forEach { change ->
+                if (change.type == DocumentChange.Type.ADDED) {
+                    val doc = change.document
+                    Timber.i("Thread downloaded $doc")
+                    threads.add(Thread(doc.id,
+                            User(
+                                    doc["creator"] as String,
+                                    doc["creator_email"] as String
+                            ),
+                            User(
+                                    doc["recipient"] as String,
+                                    doc["recipient_email"] as String
+                            ),
+                            if (doc.contains("last_updated")) doc["last_updated"] as Long else doc["created"] as Long))
+                } else {
+                    //TODO: For the moment, this should never happen, as we have not way to delete threads
+                    Timber.e("Document changed $change")
+                }
             }
+            threadsListener.invoke(Result.Value(threads))
         }
-        Timber.i("Returning threads $threads")
-        threadsListener?.invoke(Result.Value(threads))
     }
+
 
     override fun openThread(thread: Thread, listener: (Result<List<Message>>) -> Unit): Registration {
         openThread = thread
@@ -103,19 +106,28 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         openThread?.let {
             //TODO: Error handling
             messages(it).add(message)
+            store.collection(threads).document(it.threadId).set(mapOf("last_updated" to message.timestamp), SetOptions.merge())
         }
     }
 
     override fun openThreads(user: User, listener: (Result<List<Thread>>) -> Unit): Registration {
         val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid)
         val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
-        threadsListener = listener
         Timber.i("Getting threads for user $user")
         return CompositeRegistration(
-                FireStoreRegistration(creatorQuery.addSnapshotListener(threadsSnapshotListener)),
-                FireStoreRegistration(recipientQuery.addSnapshotListener(threadsSnapshotListener))
+                FireStoreRegistration(creatorQuery.addSnapshotListener(ThreadsSnapshotListener(listener))),
+                FireStoreRegistration(recipientQuery.addSnapshotListener(ThreadsSnapshotListener(listener)))
         )
-
-
     }
+
+    override fun openRecentThreads(user: User, count: Int, listener: (Result<List<Thread>>) -> Unit): Registration {
+        val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid).orderBy("last_updated", Query.Direction.DESCENDING)
+        val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid).orderBy("last_updated", Query.Direction.DESCENDING)
+        Timber.i("Getting recent threads for user $user")
+        return CompositeRegistration(
+                FireStoreRegistration(creatorQuery.addSnapshotListener(ThreadsSnapshotListener(listener))),
+                FireStoreRegistration(recipientQuery.addSnapshotListener(ThreadsSnapshotListener(listener)))
+        )
+    }
+
 }

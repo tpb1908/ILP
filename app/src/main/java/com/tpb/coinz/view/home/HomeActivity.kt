@@ -10,6 +10,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseUser
@@ -19,12 +20,15 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
+import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.view.map.MapActivity
+import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsActivity
+import com.tpb.coinz.view.messaging.threads.ThreadsRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,6 +42,8 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     @Inject
     lateinit var locationProvider: LocationProvider
     private lateinit var permissionsManager: PermissionsManager
+
+    private val adapter = ThreadsRecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +75,10 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         }
         moveToCoinArea()
         initLocationSystem()
+
+        recent_threads_recycler.layoutManager = LinearLayoutManager(this)
+        recent_threads_recycler.adapter = adapter
+        adapter.onClick = this::openThread
     }
 
     private fun moveToCoinArea() {
@@ -121,6 +131,9 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             }
 
         })
+        vm.threads.observe(this, Observer {
+            adapter.setThreads(it)
+        })
         vm.actions.observe(this, Observer {
             when (it) {
                 is HomeViewModel.HomeAction.BeginLoginFlow -> beginLoginFlow()
@@ -157,6 +170,12 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                         .setAvailableProviders(providers)
                         .build(),
                 rcLogin)
+    }
+
+    private fun openThread(thread: Thread) {
+        val intent = Intent(this, ThreadActivity::class.java)
+        intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

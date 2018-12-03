@@ -38,4 +38,6 @@ interface ChatCollection {
      * @param listener A listener which is passed the current list of user threads on change
      */
     fun openThreads(user: User, listener: (Result<List<Thread>>) -> Unit): Registration
+
+    fun openRecentThreads(user: User, count: Int, listener: (Result<List<Thread>>) -> Unit): Registration
 }

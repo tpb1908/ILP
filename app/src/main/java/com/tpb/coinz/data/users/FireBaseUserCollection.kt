@@ -28,7 +28,7 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
     }
 
     override fun retrieveUserFromEmail(email: String, callback: (Result<User>) -> Unit) {
-        store.collection(users).whereEqualTo(email, email).get().addOnCompleteListener {
+        store.collection(users).whereEqualTo("email", email).get().addOnCompleteListener {
             if (it.isSuccessful) {
                 Timber.i("Retrieved user for $email")
                 it.result?.documents?.let { documents ->
@@ -36,7 +36,7 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
                         val doc = documents.first()
                         Timber.i("Retrieved user document $doc")
                         callback(Result.Value(User(doc.id,
-                                doc.getString(email) ?: "")))
+                                doc.getString("email") ?: "")))
                     } else {
                         Timber.e("No matching user for $email")
                         callback(Result.None)

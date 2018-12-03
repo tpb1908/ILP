@@ -33,7 +33,7 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
             if (result is Result.Value<Map> && result.v.isValidForDay(Calendar.getInstance())) {
                 map = result.v
                 listeners.forEach { it.mapLoaded(result.v) }
-                Timber.i("Coins loaded from room. Remaining coins: ${result.v.remainingCoins.size}")
+                Timber.i("Coins loaded from store. Remaining coins: ${result.v.remainingCoins.size}")
             } else {
                 loadFromNetwork()
             }

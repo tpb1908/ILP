@@ -62,7 +62,7 @@ class ThreadsActivity : AppCompatActivity() {
     }
 
     private fun openThread(thread: Thread) {
-        val intent = Intent(this@ThreadsActivity, ThreadActivity::class.java)
+        val intent = Intent(this, ThreadActivity::class.java)
         intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
         startActivity(intent)
     }

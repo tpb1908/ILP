@@ -1,16 +1,22 @@
 package com.tpb.coinz.view.home
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.annotations.Marker
+import com.tpb.coinz.Result
+import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.util.Registration
+import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -31,11 +37,34 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
     @Inject
     lateinit var userCollection: UserCollection
 
+    @Inject lateinit var chatCollection: ChatCollection
+
     val user = MutableLiveData<FirebaseUser>()
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
+    val threads = MediatorLiveData<List<Thread>>()
+    private val createdThreads = MutableLiveData<List<Thread>>()
+
+    private val receivedThreads = MutableLiveData<List<Thread>>()
+
+    private var threadsRegistration: Registration? = null
+
     override val actions: MutableLiveData<HomeAction> = MutableLiveData()
+
+
+    init {
+        val lastCreatedThreads = mutableListOf<Thread>()
+        val lastReceivedThreads = mutableListOf<Thread>()
+        threads.addSource(createdThreads) {
+            lastCreatedThreads.addAll(it)
+            threads.postValue(lastCreatedThreads + lastReceivedThreads)
+        }
+        threads.addSource(receivedThreads) {
+            lastReceivedThreads.addAll(it)
+            threads.postValue(lastCreatedThreads + lastReceivedThreads)
+        }
+    }
 
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
@@ -47,6 +76,20 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
             coinCollector.addCollectionListener(this)
             coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
+
+            threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {
+                Timber.i("Received new threads $it")
+                if (it is Result.Value) {
+                    if (it.v.isNotEmpty()) {
+                        Timber.i("Retrieved threads ${it.v}")
+                        if (it.v.first().creator == userCollection.getCurrentUser()) {
+                            createdThreads.postValue(it.v)
+                        } else {
+                            receivedThreads.postValue(it.v)
+                        }
+                    }
+                }
+            }
         }
 
     }

@@ -10,7 +10,7 @@ class ThreadViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         set(value) {
             field = value
             value?.let {
-                view.viewholder_thread_title.text = it.partner.email
+                view.viewholder_thread_title.text = "${it.creator.email} -> ${it.partner.email}"
                 view.viewholder_thread_info.text = it.threadId
             }
         }
