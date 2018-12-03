@@ -1,6 +1,5 @@
 package com.tpb.coinz.view.messaging.threads
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.Result
@@ -18,10 +17,8 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     @Inject lateinit var userCollection: UserCollection
 
-    val threads = MediatorLiveData<List<Thread>>()
-    private val createdThreads = MutableLiveData<List<Thread>>()
-
-    private val receivedThreads = MutableLiveData<List<Thread>>()
+    val threads = MutableLiveData<List<Thread>>()
+    private val allThreads = mutableListOf<Thread>()
 
     val threadIntents = MutableLiveData<Thread>()
 
@@ -31,32 +28,14 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     private var threadsRegistration: Registration? = null
 
-    init {
-        val lastCreatedThreads = mutableListOf<Thread>()
-        val lastReceivedThreads = mutableListOf<Thread>()
-        threads.addSource(createdThreads) {
-            lastCreatedThreads.addAll(it)
-            threads.postValue(lastCreatedThreads + lastReceivedThreads)
-        }
-        threads.addSource(receivedThreads) {
-            lastReceivedThreads.addAll(it)
-            threads.postValue(lastCreatedThreads + lastReceivedThreads)
-        }
-    }
-
     override fun bind() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
 
         threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {
             if (it is Result.Value<List<Thread>>) {
-                if (it.v.isNotEmpty()) {
-                    Timber.i("Retrieved threads ${it.v}")
-                    if (it.v.first().creator == userCollection.getCurrentUser()) {
-                        createdThreads.postValue(it.v)
-                    } else {
-                        receivedThreads.postValue(it.v)
-                    }
-                }
+                Timber.i("Retrieved threads ${it.v}")
+                allThreads.addAll(it.v)
+                threads.postValue(allThreads)
                 actions.postValue(ThreadsAction.SetLoadingState(false))
             }
         }

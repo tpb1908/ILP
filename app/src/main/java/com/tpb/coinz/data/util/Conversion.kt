@@ -3,6 +3,7 @@ package com.tpb.coinz.data.util
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
+import com.tpb.coinz.data.users.User
 
 object Conversion {
 
@@ -18,6 +19,13 @@ object Conversion {
                 "banked" to coin.banked,
                 "received" to coin.received)
 
+    }
+
+    fun toMap(user: User): HashMap<String, Any> {
+        return hashMapOf(
+                "uid" to user.uid,
+                "email" to user.email
+        )
     }
 
     fun fromMap(map: Map<String, Any>): Coin {

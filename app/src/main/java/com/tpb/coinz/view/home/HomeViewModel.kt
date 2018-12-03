@@ -43,28 +43,12 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
-    val threads = MediatorLiveData<List<Thread>>()
-    private val createdThreads = MutableLiveData<List<Thread>>()
-
-    private val receivedThreads = MutableLiveData<List<Thread>>()
+    val threads = MutableLiveData<List<Thread>>()
+    private val allThreads = mutableListOf<Thread>()
 
     private var threadsRegistration: Registration? = null
 
     override val actions: MutableLiveData<HomeAction> = MutableLiveData()
-
-
-    init {
-        val lastCreatedThreads = mutableListOf<Thread>()
-        val lastReceivedThreads = mutableListOf<Thread>()
-        threads.addSource(createdThreads) {
-            lastCreatedThreads.addAll(it)
-            threads.postValue(lastCreatedThreads + lastReceivedThreads)
-        }
-        threads.addSource(receivedThreads) {
-            lastReceivedThreads.addAll(it)
-            threads.postValue(lastCreatedThreads + lastReceivedThreads)
-        }
-    }
 
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
@@ -80,14 +64,9 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
             threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
                 Timber.i("Received new threads $it")
                 if (it is Result.Value) {
-                    if (it.v.isNotEmpty()) {
-                        Timber.i("Retrieved threads ${it.v}")
-                        if (it.v.first().creator == userCollection.getCurrentUser()) {
-                            createdThreads.postValue(it.v)
-                        } else {
-                            receivedThreads.postValue(it.v)
-                        }
-                    }
+                    Timber.i("Retrieved threads ${it.v}")
+                    allThreads.addAll(it.v)
+                    threads.postValue(allThreads)
                 }
             }
         }

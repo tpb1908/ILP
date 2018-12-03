@@ -26,6 +26,8 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         // Create thread document
         store.collection(threads).document(threadId).set(
                 mapOf(
+                        "participants" to listOf(creator.uid, partner.uid),
+                        "participant_emails" to listOf(creator.email, partner.email),
                         "created" to System.currentTimeMillis(),
                         "last_updated" to System.currentTimeMillis(),
                         "creator" to creator.uid, "creator_email" to creator.email,
@@ -76,15 +78,12 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                 if (change.type == DocumentChange.Type.ADDED) {
                     val doc = change.document
                     Timber.i("Thread downloaded $doc")
+                    val participants = doc["participants"] as List<String>
+                    val emails = doc["participant_emails"] as List<String>
                     threads.add(Thread(doc.id,
-                            User(
-                                    doc["creator"] as String,
-                                    doc["creator_email"] as String
-                            ),
-                            User(
-                                    doc["recipient"] as String,
-                                    doc["recipient_email"] as String
-                            ),
+
+                            User(participants[0], emails[0]),
+                            User(participants[1], emails[1]),
                             if (doc.contains("last_updated")) doc["last_updated"] as Long else doc["created"] as Long))
                 } else {
                     //TODO: For the moment, this should never happen, as we have not way to delete threads
@@ -112,13 +111,9 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     }
 
     override fun openThreads(user: User, listener: (Result<List<Thread>>) -> Unit): Registration {
-        val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid)
-        val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid)
+        val query = store.collection(threads).whereArrayContains("participants", user.uid)
         Timber.i("Getting threads for user $user")
-        return CompositeRegistration(
-                FireStoreRegistration(creatorQuery.addSnapshotListener(ThreadsSnapshotListener(listener))),
-                FireStoreRegistration(recipientQuery.addSnapshotListener(ThreadsSnapshotListener(listener)))
-        )
+        return FireStoreRegistration(query.addSnapshotListener(ThreadsSnapshotListener(listener)))
     }
 
     override fun openRecentThreads(user: User, count: Int, listener: (Result<List<Thread>>) -> Unit): Registration {
@@ -126,13 +121,10 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         ////https://github.com/invertase/react-native-firebase/issues/568
         // Solution is to add indices for creator-last_updated and recipient-last_updated
         //TODO: Move creator-recipient into array and have a single index
-        val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid).orderBy("last_updated", Query.Direction.DESCENDING).limit(count.toLong())
-        val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid).orderBy("last_updated", Query.Direction.DESCENDING).limit(count.toLong())
+        val query = store.collection(threads).whereArrayContains("participants", user.uid).orderBy("last_updated", Query.Direction.DESCENDING).limit(count.toLong())
         Timber.i("Getting recent threads for user $user")
-        return CompositeRegistration(
-                FireStoreRegistration(creatorQuery.addSnapshotListener(ThreadsSnapshotListener(listener))),
-                FireStoreRegistration(recipientQuery.addSnapshotListener(ThreadsSnapshotListener(listener)))
-        )
+        return FireStoreRegistration(query.addSnapshotListener(ThreadsSnapshotListener(listener)))
+
     }
 
 }
