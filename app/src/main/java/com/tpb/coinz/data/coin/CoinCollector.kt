@@ -12,7 +12,7 @@ import com.tpb.coinz.data.users.User
 import timber.log.Timber
 import java.util.*
 
-class CoinCollector(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore) : LocationListener {
+class CoinCollector(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore) : LocationListener.SimpleLocationListener {
 
     private var map: Map? = null
 
@@ -94,15 +94,6 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
         }
     }
 
-    override fun locationAvailable() {
-
-    }
-
-    override fun locationUnavailable() {
-    }
-
-    override fun locationUpdateError(exception: Exception) {
-    }
 
     interface CoinCollectorListener {
 

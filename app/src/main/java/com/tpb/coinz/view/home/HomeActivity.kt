@@ -2,6 +2,7 @@ package com.tpb.coinz.view.home
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -42,17 +43,19 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         (application as App).homeComponent.inject(this)
-        home_minimap.onCreate(savedInstanceState)
 
         initViews(savedInstanceState)
         bindViewModel()
-        startActivity(Intent(this, ThreadsActivity::class.java))
+        if (savedInstanceState == null) {
+            moveToCoinArea()
+            moveToUserLocation()
+            startActivity(Intent(this, ThreadsActivity::class.java))
+        }
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
         home_minimap.onCreate(savedInstanceState)
         home_minimap.getMapAsync {
-            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
             it.addOnMapClickListener { latLng ->
                 val cameraPosition = it.cameraPosition
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
@@ -64,7 +67,27 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                 startActivityForResult(intent, rcMap, options.toBundle())
             }
         }
+        moveToCoinArea()
         initLocationSystem()
+    }
+
+    private fun moveToCoinArea() {
+        home_minimap.getMapAsync {
+            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
+            it.addPolygon(LocationUtils.polygon
+                    .strokeColor(Color.RED)
+                    .fillColor(Color.TRANSPARENT))
+        }
+    }
+
+    private fun moveToUserLocation() {
+        Timber.i("Moving to user location")
+        locationProvider.addListener(object: LocationListener.SimpleLocationListener {
+            override fun locationUpdate(location: Location) {
+                home_minimap.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
+                locationProvider.removeListener(this)
+            }
+        })
     }
 
     private fun initLocationSystem() {
@@ -78,12 +101,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                 engine.activate()
                 lc.activateLocationComponent(this, engine)
                 lc.renderMode = RenderMode.NORMAL
-                locationProvider.addListener(object: LocationListener.SimpleLocationListener {
-                    override fun locationUpdate(location: Location) {
-                        home_minimap.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
-                        locationProvider.removeListener(this)
-                    }
-                })
             }
 
         } else {
@@ -196,6 +213,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     public override fun onPause() {
         super.onPause()
         home_minimap.onPause()
+        locationProvider.pause()
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

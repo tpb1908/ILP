@@ -48,8 +48,12 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         if (intent.hasExtra(getString(R.string.extra_camera_position))) {
             val position = intent.getParcelableExtra<CameraPosition>(getString(R.string.extra_camera_position))
             setCameraPosition(position)
+            intent.removeExtra(getString(R.string.extra_camera_position))
         } else {
-            moveToInitialLocation()
+            if (savedInstanceState == null) {
+                moveToCoinArea()
+                moveToUserLocation()
+            }
         }
     }
 
@@ -88,7 +92,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
             fab_coin_area.setOnClickListener(coinLocationOnClick)
             fab_my_location.setOnClickListener(myLocationOnClick)
 
-
             mapview.getMapAsync {
                 val lc = it.locationComponent
                 lc.isLocationComponentEnabled = true
@@ -96,22 +99,35 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                 engine.activate()
                 lc.activateLocationComponent(this, engine)
                 lc.renderMode = RenderMode.NORMAL
-
             }
-            locationProvider.addListener(object: LocationListener.SimpleLocationListener {
-                override fun locationUpdate(location: Location) {
-                    mapview.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
-                    locationProvider.removeListener(this)
-                }
-            })
         } else {
             permissionsManager.requestLocationPermissions(this)
         }
     }
 
 
+    private fun moveToCoinArea() {
+        mapview.getMapAsync {
+            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
+            it.addPolygon(LocationUtils.polygon
+                    .strokeColor(Color.RED)
+                    .fillColor(Color.TRANSPARENT))
+        }
+
+    }
+
+    private fun moveToUserLocation() {
+        Timber.i("Moving to user location")
+        locationProvider.addListener(object: LocationListener.SimpleLocationListener {
+            override fun locationUpdate(location: Location) {
+                mapview.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
+                locationProvider.removeListener(this)
+            }
+        })
+    }
+
     private val coinLocationOnClick: View.OnClickListener = View.OnClickListener {
-        moveToInitialLocation()
+        moveToCoinArea()
     }
 
     private val myLocationOnClick: View.OnClickListener = View.OnClickListener {
@@ -124,16 +140,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun setCameraPosition(position: CameraPosition) = mapview.getMapAsync {
+        Timber.i("Setting camera position to $position")
         it.animateCamera(CameraUpdateFactory.newCameraPosition(position))
-    }
-
-    private fun moveToInitialLocation() {
-        mapview.getMapAsync {
-            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
-            it.addPolygon(LocationUtils.polygon
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.TRANSPARENT))
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -177,6 +185,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     public override fun onPause() {
         super.onPause()
         mapview.onPause()
+        locationProvider.pause()
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

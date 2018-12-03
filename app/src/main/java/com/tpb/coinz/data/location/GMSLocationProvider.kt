@@ -18,6 +18,7 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
 
     override fun addListener(listener: LocationListener) {
         listeners.add(listener)
+        lastLocation?.let { listener.locationUpdate(it) }
     }
 
     override fun removeListener(listener: LocationListener) {
