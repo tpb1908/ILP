@@ -1,6 +1,8 @@
 package com.tpb.coinz
 
 import android.app.Application
+import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.dagger.component.*
@@ -48,7 +50,18 @@ class App : Application() {
     private fun init() {
         FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
+    }
+
+    // Timber tree which only logs errors and warnings
+    private object CrashlyticsTree : Timber.Tree() {
+
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+            when (priority) {
+                Log.ERROR -> { Crashlytics.logException(t) }
+                Log.WARN -> { Crashlytics.log(priority, tag, message)}
+            }
+        }
     }
 
 }
