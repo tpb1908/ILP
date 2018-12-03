@@ -89,6 +89,7 @@ class ThreadsActivity : AppCompatActivity() {
             adapter.addAll(users.map { user -> user.email })
         })
         edit.setHint(R.string.hint_chat_creation_email)
+        edit.maxLines = 1
         AlertDialog.Builder(this)
                 .setTitle(R.string.title_chat_creation_dialog)
                 .setView(container)

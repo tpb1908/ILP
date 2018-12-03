@@ -1,6 +1,8 @@
 package com.tpb.coinz.view.messaging.threads
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
+import com.tpb.coinz.R
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
@@ -43,19 +45,24 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     fun createChat(userEmail: String) {
         actions.postValue(ThreadsAction.SetLoadingState(true))
-        userCollection.retrieveUserFromEmail(userEmail) { user ->
-            if (user is Result.Value<User>) {
-                chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
-                    Timber.i("Creating thread")
-                    if (it is Result.Value<Thread>) {
-                        threads.postValue((threads.value ?: emptyList()) + it.v)
-                        threadIntents.postValue(it.v)
+        if (userCollection.getCurrentUser().email == userEmail) {
+            actions.postValue(ThreadsAction.SetLoadingState(false))
+            actions.postValue(ThreadsAction.DisplayMessage(R.string.error_thread_to_self))
+        } else {
+            userCollection.retrieveUserFromEmail(userEmail) { user ->
+                if (user is Result.Value<User>) {
+                    chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
+                        Timber.i("Creating thread")
+                        if (it is Result.Value<Thread>) {
+                            threads.postValue((threads.value ?: emptyList()) + it.v)
+                            threadIntents.postValue(it.v)
+                        }
+                        actions.postValue(ThreadsAction.SetLoadingState(false))
                     }
+                } else {
+                    Timber.e("Couldn't retrieve user to create thread")
                     actions.postValue(ThreadsAction.SetLoadingState(false))
                 }
-            } else {
-                Timber.e("Couldn't retrieve user to create thread")
-                actions.postValue(ThreadsAction.SetLoadingState(false))
             }
         }
     }
@@ -75,5 +82,6 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     sealed class ThreadsAction {
         class SetLoadingState(val loading: Boolean) : ThreadsAction()
+        class DisplayMessage(@StringRes val message: Int): ThreadsAction()
     }
 }
