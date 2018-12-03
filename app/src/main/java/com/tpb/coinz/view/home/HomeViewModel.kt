@@ -77,7 +77,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
             coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
 
-            threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {
+            threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
                 Timber.i("Received new threads $it")
                 if (it is Result.Value) {
                     if (it.v.isNotEmpty()) {
@@ -146,6 +146,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
         super.onCleared()
         coinCollector.removeCollectionListener(this)
         coinCollector.dispose()
+        threadsRegistration?.deregister()
     }
 
     sealed class HomeAction {

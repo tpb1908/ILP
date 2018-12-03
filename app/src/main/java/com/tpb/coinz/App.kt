@@ -4,6 +4,10 @@ import android.app.Application
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.core.OrderBy
+import com.google.firestore.v1beta1.StructuredQuery
 import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.dagger.component.*
 import com.tpb.coinz.dagger.module.*
@@ -51,6 +55,14 @@ class App : Application() {
         FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
+
+
+        FirebaseFirestore.getInstance().collection("threads").whereEqualTo("creator", "VDLK8igUKmMqpx9O2DcnEyovpa92").addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+            Timber.i("Simple query updated")
+        }
+        FirebaseFirestore.getInstance().collection("threads").whereEqualTo("creator", "VDLK8igUKmMqpx9O2DcnEyovpa92").orderBy("last_updated", Query.Direction.DESCENDING).limit(10).addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+            Timber.i("Compound query updated")
+        }
     }
 
     // Timber tree which only logs errors and warnings

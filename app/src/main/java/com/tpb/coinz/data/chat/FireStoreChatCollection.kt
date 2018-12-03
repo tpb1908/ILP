@@ -27,6 +27,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         store.collection(threads).document(threadId).set(
                 mapOf(
                         "created" to System.currentTimeMillis(),
+                        "last_updated" to System.currentTimeMillis(),
                         "creator" to creator.uid, "creator_email" to creator.email,
                         "recipient" to partner.uid, "recipient_email" to partner.email
                 )
@@ -121,8 +122,12 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     }
 
     override fun openRecentThreads(user: User, count: Int, listener: (Result<List<Thread>>) -> Unit): Registration {
-        val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid).orderBy("last_updated", Query.Direction.DESCENDING)
-        val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid).orderBy("last_updated", Query.Direction.DESCENDING)
+        //TODO: Query with order by last_updated doesn't seem to update snapshots
+        ////https://github.com/invertase/react-native-firebase/issues/568
+        // Solution is to add indices for creator-last_updated and recipient-last_updated
+        //TODO: Move creator-recipient into array and have a single index
+        val creatorQuery = store.collection(threads).whereEqualTo("creator", user.uid).orderBy("last_updated", Query.Direction.DESCENDING).limit(count.toLong())
+        val recipientQuery = store.collection(threads).whereEqualTo("recipient", user.uid).orderBy("last_updated", Query.Direction.DESCENDING).limit(count.toLong())
         Timber.i("Getting recent threads for user $user")
         return CompositeRegistration(
                 FireStoreRegistration(creatorQuery.addSnapshotListener(ThreadsSnapshotListener(listener))),
