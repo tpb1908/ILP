@@ -13,6 +13,7 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
     private val email = "email"
 
     override fun getCurrentUser(): User {
+        //TODO: Listen for firebase user creation
         val firebaseUser = FirebaseAuth.getInstance().currentUser
         return User(firebaseUser?.uid ?: "uid_error", firebaseUser?.email ?: "email_error")
     }

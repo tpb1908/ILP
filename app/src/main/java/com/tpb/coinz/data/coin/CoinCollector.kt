@@ -21,6 +21,8 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
     private var coinCollection: CoinCollection? = null
     private var user: User? = null
 
+    private var paused = false
+
     fun setCoinCollection(coinCollection: CoinCollection, user: User) {
         this.coinCollection = coinCollection
         this.user = user
@@ -58,6 +60,15 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
 
     fun removeCollectionListener(listener: CoinCollectorListener) = listeners.remove(listener)
 
+    fun start() {
+        paused = false
+        lp.start()
+    }
+
+    fun pause() {
+        paused = true
+        lp.pause()
+    }
 
     fun dispose() {
         lp.removeListener(this)
@@ -65,6 +76,7 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
 
 
     override fun locationUpdate(location: Location) {
+        if (paused) return
         map?.let { m ->
             if (m.isValidForDay(Calendar.getInstance())) {
                 collect(m.remainingCoins.filter { collectable(it, location) })

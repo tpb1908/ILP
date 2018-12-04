@@ -24,17 +24,20 @@
         android:name=".App"
         android:fullBackupContent="@xml/backup_descriptor"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.tpb.coinz.view.map.MapActivity" />
         <activity android:name="com.tpb.coinz.view.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.tpb.coinz.view.map.MapActivity" />
         <activity android:name="com.tpb.coinz.view.bank.BankActivity" />
         <activity android:name="com.tpb.coinz.view.messaging.threads.ThreadsActivity" />
         <activity android:name="com.tpb.coinz.view.messaging.thread.ThreadActivity" />
         <activity android:name=".view.scoreboard.ScoreBoardActivity" />
+
+        <service android:name=".data.location.background.GeofenceTransitionsIntentService"/>
+        <service android:name=".data.location.background.ForegroundLocationService" />
     </application>
 
 </manifest>

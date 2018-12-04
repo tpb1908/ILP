@@ -1,6 +1,8 @@
 package com.tpb.coinz.view.home
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Color
 import android.location.Location
@@ -13,6 +15,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseUser
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -23,6 +28,7 @@ import com.tpb.coinz.*
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.config.ConfigProvider
+import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
@@ -33,6 +39,7 @@ import com.tpb.coinz.view.messaging.threads.ThreadsRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.max
 
 class HomeActivity : AppCompatActivity(), PermissionsListener {
 
@@ -59,6 +66,8 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             moveToUserLocation()
 
         }
+
+
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
@@ -106,6 +115,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         })
     }
 
+    @SuppressLint("MissingPermission")
     private fun initLocationSystem() {
         locationProvider.start()
         permissionsManager = PermissionsManager(this)
@@ -118,10 +128,30 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                 lc.activateLocationComponent(this, engine)
                 lc.renderMode = RenderMode.NORMAL
             }
-
+            initGeofence()
         } else {
             permissionsManager.requestLocationPermissions(this)
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initGeofence() {
+        val geofencingClient = LocationServices.getGeofencingClient(this)
+        val bounds = config.collectionAreaBounds
+        val center = bounds.center
+        val radius = max(bounds.longitudeSpan, bounds.latitudeSpan)
+        val fence = Geofence.Builder().setRequestId("coinz_geofence_id")
+                .setCircularRegion(center.latitude, center.longitude, radius.toFloat())
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build()
+
+        val intent = Intent(this, GeofenceTransitionsIntentService::class.java)
+        geofencingClient.addGeofences(GeofencingRequest.Builder().apply {
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            addGeofence(fence)
+        }.build(), PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+
     }
 
     private fun bindViewModel() {
