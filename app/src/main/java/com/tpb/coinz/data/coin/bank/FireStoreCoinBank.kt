@@ -7,6 +7,7 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.Conversion.fromMap
 import timber.log.Timber
 import java.lang.Exception
@@ -45,7 +46,7 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
     override fun bankCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit) {
         if (coins.size <= numBankable) {
             val successfullyBanked = mutableListOf<Coin>()
-            var successCount = 0
+            var callCompleteCount = 0
             coins.forEach { coin ->
                 // We have to check that received as well as id to stop banking of a collected coin when we
                 // actually want to bank a received coin
@@ -64,20 +65,20 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
                                             Timber.e(addTask.exception, "Failed to bank coin $coin")
                                             //TODO: Error
                                         }
-                                        successCount++
-                                        if (successCount == coins.size) callback(Result.success(successfullyBanked))
+                                        callCompleteCount++
+                                        if (callCompleteCount == coins.size) callback(Result.success(successfullyBanked))
                                     }
                                 }
                             } else {
                                 Timber.e(getTask.exception, "Failed to get coin $coin")
-                                successCount++
-                                if (successCount == coins.size) callback(Result.success(successfullyBanked))
+                                callCompleteCount++
+                                if (callCompleteCount == coins.size) callback(Result.success(successfullyBanked))
                                 //TODO: Error
                             }
                         }
             }
         } else {
-            callback(Result.failure(Exception())) //TODO: Proper error
+            callback(Result.failure(Exception())) // TODO Proper error
         }
     }
 
@@ -92,7 +93,8 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
                     listener(Result.success(coins))
                 } else {
                     Timber.e(exception, "Query unsuccessful")
-                    listener(Result.failure(getException(exception)))
+                    exception?.code
+                    listener(Result.failure(Conversion.convertFireStoreException(exception)))
                 }
             })
 
@@ -110,5 +112,4 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
         return numBankable
     }
 
-    private fun getException(fe: Exception?): Exception = Exception()
 }

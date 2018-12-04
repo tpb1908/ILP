@@ -5,6 +5,8 @@ import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.CoinzException
+import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.Conversion.fromMap
 import com.tpb.coinz.data.util.Conversion.toMap
 import com.tpb.coinz.orElse
@@ -35,7 +37,7 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
                 callback(Result.success(coins))
             } else {
                 Timber.e(qs.exception, "Query unsuccessful")
-                callback(Result.failure(getException(qs.exception)))
+                callback(Result.failure(CoinzException.UnknownException()))
             }
         }
     }
@@ -57,6 +59,7 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
                         } else {
                             //TODO: Error callback
                             Timber.e(addTask.exception, "Couldn't transfer coin")
+                            callback(Result.failure(CoinzException.UnknownException()))
                         }
                     }
                 }
@@ -68,5 +71,4 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
             }
         }
     }
-    private fun getException(fe: Exception?): Exception = Exception()
 }

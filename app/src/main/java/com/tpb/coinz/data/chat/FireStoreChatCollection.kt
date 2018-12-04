@@ -2,10 +2,7 @@ package com.tpb.coinz.data.chat
 
 import com.google.firebase.firestore.*
 import com.tpb.coinz.data.users.User
-import com.tpb.coinz.data.util.CompositeRegistration
-import com.tpb.coinz.data.util.Conversion
-import com.tpb.coinz.data.util.FireStoreRegistration
-import com.tpb.coinz.data.util.Registration
+import com.tpb.coinz.data.util.*
 import timber.log.Timber
 import java.lang.Exception
 
@@ -40,7 +37,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
             } else  {
                 Timber.e(it.exception, "Failed thread creation $threadId")
-                callback(Result.failure(getException(it.exception)))
+                callback(Result.failure(CoinzException.UnknownException()))
             }
         }
     }
@@ -128,5 +125,4 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
     }
 
-    private fun getException(fe: Exception?): Exception = Exception()
 }

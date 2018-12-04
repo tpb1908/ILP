@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.tpb.coinz.data.DoesNotExistException
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.util.CoinzException
 
 /**
  * Simple implementation of [MapStore] which stores a single [Map]
@@ -33,7 +34,7 @@ class SharedPrefsMapStore(private val prefs: SharedPreferences) : MapStore {
                     callback(Result.success(Gson().fromJson(json, Map::class.java)))
                 }
             } else {
-                callback(Result.failure(DoesNotExistException()))
+                callback(Result.failure(CoinzException.NotFoundException()))
             }
         } else {
             // Return from cached value if available

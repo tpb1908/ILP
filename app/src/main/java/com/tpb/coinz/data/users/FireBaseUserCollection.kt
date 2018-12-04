@@ -3,6 +3,7 @@ package com.tpb.coinz.data.users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.DoesNotExistException
+import com.tpb.coinz.data.util.CoinzException
 import timber.log.Timber
 import java.lang.Exception
 
@@ -40,12 +41,12 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
                                 doc.getString("email") ?: "")))
                     } else {
                         Timber.e("No matching user for $email")
-                        callback(Result.failure(DoesNotExistException()))
+                        callback(Result.failure(CoinzException.NotFoundException()))
                     }
                 }
             } else {
                 Timber.e(it.exception, "Cannot retrieve user for $email")
-                callback(Result.failure(getException(it.exception)))
+                callback(Result.failure(CoinzException.UnknownException()))
             }
         }
     }
@@ -70,5 +71,4 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
         }
     }
 
-    private fun getException(fe: Exception?): Exception = Exception()
 }
