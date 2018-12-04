@@ -55,7 +55,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         if (savedInstanceState == null) {
             moveToCoinArea()
             moveToUserLocation()
-            startActivity(Intent(this, ThreadsActivity::class.java))
+
         }
     }
 
@@ -79,6 +79,10 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         recent_threads_recycler.layoutManager = LinearLayoutManager(this)
         recent_threads_recycler.adapter = adapter
         adapter.onClick = this::openThread
+
+        recent_threads_header.setOnClickListener {
+            startActivity(Intent(this, ThreadsActivity::class.java))
+        }
     }
 
     private fun moveToCoinArea() {

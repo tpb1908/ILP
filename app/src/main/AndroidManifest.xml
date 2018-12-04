@@ -34,6 +34,7 @@
         <activity android:name="com.tpb.coinz.view.bank.BankActivity" />
         <activity android:name="com.tpb.coinz.view.messaging.threads.ThreadsActivity" />
         <activity android:name="com.tpb.coinz.view.messaging.thread.ThreadActivity" />
+        <activity android:name=".view.scoreboard.ScoreBoardActivity" />
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
 package com.tpb.coinz.view.home
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -16,7 +15,7 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.util.Registration
-import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
+import com.tpb.coinz.view.base.ActionLiveData
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -26,20 +25,17 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
-    @Inject
-    lateinit var coinCollection: CoinCollection
+    @Inject lateinit var coinCollection: CoinCollection
 
     private var fbUser: FirebaseUser? = null
 
-    @Inject
-    lateinit var coinCollector: CoinCollector
+    val user = MutableLiveData<FirebaseUser>()
 
-    @Inject
-    lateinit var userCollection: UserCollection
+    @Inject lateinit var coinCollector: CoinCollector
+
+    @Inject lateinit var userCollection: UserCollection
 
     @Inject lateinit var chatCollection: ChatCollection
-
-    val user = MutableLiveData<FirebaseUser>()
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
@@ -48,7 +44,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
 
     private var threadsRegistration: Registration? = null
 
-    override val actions: MutableLiveData<HomeAction> = MutableLiveData()
+    override val actions = ActionLiveData<HomeAction>()
 
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser

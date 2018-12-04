@@ -27,7 +27,7 @@
     <string name="message_all_coins_collected">All coins collected</string>
     <string name="message_need_to_select_coins">Select coins to bank</string>
     <string name="text_coin_message">%1$s %2$f</string>
-
+    <string name="text_recent_threads_header">Messages</string>
 
     <string name="content_coin_icon">Icon for coin type</string>
 </resources>

@@ -10,6 +10,7 @@ import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.view.base.ActionLiveData
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,7 +26,7 @@ class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.Coin
 
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
-    override val actions = MutableLiveData<MapAction>()
+    override val actions = ActionLiveData<MapAction>()
 
     @Inject
     lateinit var coinCollector: CoinCollector

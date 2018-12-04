@@ -6,6 +6,7 @@ import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.users.UserCollection
+import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
 
     val numSelected = MutableLiveData<Int>()
 
-    override val actions = MutableLiveData<BankAction>()
+    override val actions = ActionLiveData<BankAction>()
 
     private var numCollectedCoinsSelected = 0
         set(value) {

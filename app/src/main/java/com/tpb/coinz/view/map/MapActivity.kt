@@ -55,6 +55,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                 moveToUserLocation()
             }
         }
+
     }
 
     private fun bindViewModel() {
@@ -82,8 +83,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         })
 
     }
-
-
 
     private fun initLocationSystem() {
         locationProvider.start()

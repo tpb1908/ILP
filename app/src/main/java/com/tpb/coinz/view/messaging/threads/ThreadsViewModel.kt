@@ -9,6 +9,7 @@ import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
+import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,7 +27,7 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
     val userSearchResults = MutableLiveData<List<User>>()
 
-    override val actions = MutableLiveData<ThreadsAction>()
+    override val actions = ActionLiveData<ThreadsAction>()
 
     private var threadsRegistration: Registration? = null
 
