@@ -16,6 +16,7 @@ class App : Application() {
 
     val activityComponent: ActivityComponent by lazy {
         DaggerActivityComponent.builder()
+                .locationModule(LocationModule(this))
                 .connectivityModule(ConnectivityModule(this))
                 .build()
     }

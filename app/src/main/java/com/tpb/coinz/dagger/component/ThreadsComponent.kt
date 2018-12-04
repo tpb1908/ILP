@@ -13,8 +13,6 @@ import javax.inject.Singleton
 @Component(modules = [ConnectivityModule::class, ChatModule::class, UserModule::class])
 interface ThreadsComponent {
 
-
-
     fun inject(viewModel: ThreadsViewModel)
 
 }

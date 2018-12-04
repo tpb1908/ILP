@@ -14,6 +14,7 @@ import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.view.base.ActionLiveData
 import timber.log.Timber
@@ -21,6 +22,8 @@ import java.util.*
 import javax.inject.Inject
 
 class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener {
+
+    @Inject lateinit var config: ConfigProvider
 
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
@@ -79,7 +82,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
                 Timber.e("No marker for $coin")
             }
             //TODO: Probably not the best way to do this
-            collectionInfo.postValue(MapInfo(50-markers.size, markers.size))
+            collectionInfo.postValue(MapInfo(config.coinsPerMap-markers.size, markers.size))
         }
     }
 

@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
@@ -32,6 +33,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     @Inject lateinit var connection: ConnectionLiveData
 
+    @Inject lateinit var config: ConfigProvider
+
     private lateinit var permissionsManager: PermissionsManager
 
 
@@ -40,7 +43,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
-        (application as App).mapComponent.inject(this)
+        (application as App).activityComponent.inject(this)
         mapview.onCreate(savedInstanceState)
         bindViewModel()
 
@@ -107,8 +110,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     private fun moveToCoinArea() {
         mapview.getMapAsync {
-            it.animateCamera(CameraUpdateFactory.newLatLngBounds(LocationUtils.bounds, 10))
-            it.addPolygon(LocationUtils.polygon
+            it.animateCamera(CameraUpdateFactory.newLatLngBounds(config.collectionAreaBounds, 10))
+            it.addPolygon(config.collectionAreaPolygon
                     .strokeColor(Color.RED)
                     .fillColor(Color.TRANSPARENT))
         }

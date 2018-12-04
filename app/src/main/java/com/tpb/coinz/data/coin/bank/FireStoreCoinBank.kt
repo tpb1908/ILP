@@ -14,7 +14,7 @@ import java.util.*
 
 class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFirestore, val config: ConfigProvider) : FireStoreCoinManager(store), CoinBank {
 
-    private val maxBankable = config.maxDailyCoins
+    private val maxBankable = config.dailyCollectionLimit
 
     private var numBankable = 0
         set(value) {
