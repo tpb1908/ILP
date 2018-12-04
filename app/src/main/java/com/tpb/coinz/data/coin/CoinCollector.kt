@@ -6,13 +6,14 @@ import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
+import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.data.users.User
 import timber.log.Timber
 import java.util.*
 
-class CoinCollector(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore) : LocationListener.SimpleLocationListener {
+class CoinCollector(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore, private val config: ConfigProvider) : LocationListener.SimpleLocationListener {
 
     private var map: Map? = null
 
@@ -75,7 +76,7 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
     }
 
     private fun collectable(coin: Coin, location: Location): Boolean =
-            coin.location.distanceTo(LatLng(location.latitude, location.longitude)) < 25
+            coin.location.distanceTo(LatLng(location.latitude, location.longitude)) < config.collectionDistance
 
 
     private fun collect(collectable: List<Coin>) {

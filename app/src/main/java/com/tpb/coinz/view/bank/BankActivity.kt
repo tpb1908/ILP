@@ -9,19 +9,23 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tpb.coinz.App
 import com.tpb.coinz.R
+import com.tpb.coinz.data.config.ConfigProvider
 import kotlinx.android.synthetic.main.activity_bank.*
 import timber.log.Timber
+import javax.inject.Inject
 
 class BankActivity : AppCompatActivity() {
 
     private lateinit var vm: BankViewModel
+
+    @Inject lateinit var config: ConfigProvider
 
     private val adapter = CoinRecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bank)
-
+        (application as App).activityComponent.inject(this)
         initViews()
         bindViewModel()
 
@@ -42,8 +46,9 @@ class BankActivity : AppCompatActivity() {
             }
         })
         vm.numStillBankable.observe(this, Observer {
-            //TODO: Move 25 somewhere else
-            bank_coins_text.text = resources.getQuantityString(R.plurals.bank_coins_banked_info, 25-it, 25-it, it)
+            bank_coins_text.text = resources.getQuantityString(
+                    R.plurals.bank_coins_banked_info,
+                    config.maxDailyCoins-it, config.maxDailyCoins-it, it)
         })
         vm.numSelected.observe(this, Observer {
             //TODO: Display this text somewhere

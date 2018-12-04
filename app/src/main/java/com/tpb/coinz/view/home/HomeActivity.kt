@@ -39,8 +39,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     private val rcMap = 6543
     private lateinit var vm: HomeViewModel
 
-    @Inject
-    lateinit var locationProvider: LocationProvider
+    @Inject lateinit var locationProvider: LocationProvider
     private lateinit var permissionsManager: PermissionsManager
 
     private val adapter = ThreadsRecyclerAdapter()

@@ -6,14 +6,15 @@ import com.tpb.coinz.data.util.FireStoreRegistration
 import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
+import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.Conversion.fromMap
 import timber.log.Timber
 import java.util.*
 
-class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFirestore) : FireStoreCoinManager(store), CoinBank {
+class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFirestore, val config: ConfigProvider) : FireStoreCoinManager(store), CoinBank {
 
-    private val maxBankable = 25
+    private val maxBankable = config.maxDailyCoins
 
     private var numBankable = 0
         set(value) {

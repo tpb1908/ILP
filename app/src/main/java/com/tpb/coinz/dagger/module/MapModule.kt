@@ -1,14 +1,15 @@
 package com.tpb.coinz.dagger.module
 
 import android.content.Context
+import com.tpb.coinz.data.coin.loading.MapDownloader
+import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.coin.storage.SharedPrefsMapStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module
-class StoreModule(val context: Context) {
+@Module class MapModule(val context: Context) {
 
     @Provides
     @Singleton
@@ -21,6 +22,12 @@ class StoreModule(val context: Context) {
 //                    }
 //                }).build()
 //        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideMapLoader(): MapLoader {
+        return MapDownloader()
     }
 
 }

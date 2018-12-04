@@ -6,8 +6,6 @@ import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.core.OrderBy
-import com.google.firestore.v1beta1.StructuredQuery
 import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.dagger.component.*
 import com.tpb.coinz.dagger.module.*
@@ -16,22 +14,27 @@ import timber.log.Timber
 
 class App : Application() {
 
+    val activityComponent: ActivityComponent by lazy {
+        DaggerActivityComponent.builder()
+                .connectivityModule(ConnectivityModule(this))
+                .build()
+    }
+
     val homeComponent: HomeComponent by lazy {
         DaggerHomeComponent.builder()
                 .locationModule(LocationModule(this))
-                .storeModule(StoreModule(this))
+                .mapModule(MapModule(this))
                 .build()
     }
     val mapComponent: MapComponent by lazy {
         DaggerMapComponent.builder()
                 .locationModule(LocationModule(this))
-                .storeModule(StoreModule(this))
                 .connectivityModule(ConnectivityModule(this))
+                .mapModule(MapModule(this))
                 .build()
     }
     val bankComponent: BankComponent by lazy {
         DaggerBankComponent.builder()
-                .connectivityModule(ConnectivityModule(this))
                 .coinBankModule(CoinBankModule(this))
                 .build()
     }
@@ -70,10 +73,13 @@ class App : Application() {
 
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
             when (priority) {
-                Log.ERROR -> { Crashlytics.logException(t) }
-                Log.WARN -> { Crashlytics.log(priority, tag, message)}
+                Log.ERROR -> {
+                    Crashlytics.logException(t)
+                }
+                Log.WARN -> {
+                    Crashlytics.log(priority, tag, message)
+                }
             }
         }
     }
-
 }

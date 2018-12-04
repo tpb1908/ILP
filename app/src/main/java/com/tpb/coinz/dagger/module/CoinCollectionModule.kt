@@ -6,18 +6,19 @@ import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.FireStoreCoinCollection
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
+import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationProvider
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module(includes = [LocationModule::class, LoaderModule::class, StoreModule::class])
+@Module(includes = [LocationModule::class, MapModule::class, ConfigModule::class])
 class CoinCollectionModule {
 
     @Singleton
     @Provides
-    fun provideCoinCollector(locationProvider: LocationProvider, mapLoader: MapLoader, mapStore: MapStore): CoinCollector {
-        return CoinCollector(locationProvider, mapLoader, mapStore)
+    fun provideCoinCollector(locationProvider: LocationProvider, mapLoader: MapLoader, mapStore: MapStore, config: ConfigProvider): CoinCollector {
+        return CoinCollector(locationProvider, mapLoader, mapStore, config)
     }
 
     @Singleton

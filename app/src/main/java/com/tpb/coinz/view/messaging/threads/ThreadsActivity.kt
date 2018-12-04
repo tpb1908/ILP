@@ -29,7 +29,6 @@ class ThreadsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messages)
-        (application as App).threadsComponent.inject(this)
         initViews()
         bindViewModel()
     }

@@ -14,7 +14,6 @@ import javax.inject.Singleton
 interface ThreadsComponent {
 
 
-    fun inject(activity: ThreadsActivity)
 
     fun inject(viewModel: ThreadsViewModel)
 
