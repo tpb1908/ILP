@@ -5,7 +5,6 @@ import android.graphics.Color
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Map
@@ -44,11 +43,11 @@ class MapDownloader : MapLoader {
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
             val map = convert(json)
-            listeners.forEach { it(Result.Value(map)) }
+            listeners.forEach { it(Result.success(map)) }
             listeners.clear()
         } catch (ioe: IOException) {
             Timber.e(ioe, "MapDownloader exception")
-            listeners.forEach { it(Result.None) }
+            listeners.forEach { it(Result.failure(ioe)) }
             listeners.clear()
         }
     }

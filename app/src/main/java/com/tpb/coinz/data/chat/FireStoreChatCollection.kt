@@ -1,13 +1,13 @@
 package com.tpb.coinz.data.chat
 
 import com.google.firebase.firestore.*
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.CompositeRegistration
 import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.FireStoreRegistration
 import com.tpb.coinz.data.util.Registration
 import timber.log.Timber
+import java.lang.Exception
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
 
@@ -36,11 +36,11 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         ).addOnCompleteListener {
             if (it.isSuccessful) {
                 Timber.i("Created thread $threadId")
-                callback(Result.Value(Thread(threadId, creator, partner, System.currentTimeMillis())))
+                callback(Result.success(Thread(threadId, creator, partner, System.currentTimeMillis())))
 
             } else  {
                 Timber.e(it.exception, "Failed thread creation $threadId")
-                callback(Result.None)
+                callback(Result.failure(getException(it.exception)))
             }
         }
     }
@@ -64,7 +64,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         }
         Timber.i("New messages $newMessages")
         newMessages.sortBy { it.timestamp }
-        newMessageListener?.invoke(Result.Value(newMessages))
+        newMessageListener?.invoke(Result.success(newMessages))
     }
 
     private class ThreadsSnapshotListener(val threadsListener: ((Result<List<Thread>>) -> Unit)) : EventListener<QuerySnapshot> {
@@ -90,7 +90,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                     Timber.e("Document changed $change")
                 }
             }
-            threadsListener.invoke(Result.Value(threads))
+            threadsListener.invoke(Result.success(threads))
         }
     }
 
@@ -128,4 +128,5 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
     }
 
+    private fun getException(fe: Exception?): Exception = Exception()
 }

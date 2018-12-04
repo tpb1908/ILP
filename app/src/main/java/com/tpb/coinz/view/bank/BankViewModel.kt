@@ -2,7 +2,6 @@ package com.tpb.coinz.view.bank
 
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.data.util.CompositeRegistration
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.users.UserCollection
@@ -42,16 +41,17 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
 
     private fun loadBankableCoins() {
         actions.postValue(BankAction.SetLoadingState(true))
-        registrations.add(coinBank.getBankableCoins(userCollection.getCurrentUser()) {
-            if (it is Result.Value) {
+        registrations.add(coinBank.getBankableCoins(userCollection.getCurrentUser()) { result ->
+            result.onSuccess { coins ->
                 collectedCoins.clear()
-                collectedCoins.addAll(it.v.filterNot(Coin::received).map { SelectableItem(false, it) })
+                collectedCoins.addAll(coins.filterNot(Coin::received).map { SelectableItem(false, it) })
                 receivedCoins.clear()
-                receivedCoins.addAll(it.v.filter(Coin::received).map { SelectableItem(false, it) })
+                receivedCoins.addAll(coins.filter(Coin::received).map { SelectableItem(false, it) })
                 bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
-            } else {
-                //TODO error handling
+            }.onFailure {
+                //TODO
             }
+
             actions.postValue(BankAction.SetLoadingState(false))
         })
         numStillBankable.postValue(coinBank.getNumBankable())
@@ -62,11 +62,13 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
         actions.postValue(BankAction.SetLoadingState(true))
         val selected = (collectedCoins + receivedCoins).filter { it.selected }.map { it.item }
         coinBank.bankCoins(userCollection.getCurrentUser(), selected) { result ->
-            if (result is Result.Value) {
+            result.onSuccess {coins ->
                 numStillBankable.postValue(coinBank.getNumBankable())
-                collectedCoins.removeAll(result.v.map { SelectableItem(true, it) })
-                receivedCoins.removeAll(result.v.map { SelectableItem(true, it) })
+                collectedCoins.removeAll(coins.map { SelectableItem(true, it) })
+                receivedCoins.removeAll(coins.map { SelectableItem(true, it) })
                 bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
+            }.onFailure {
+                //TODO
             }
             actions.postValue(BankAction.SetLoadingState(false))
         }
@@ -81,7 +83,7 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
         if (numCollectedCoinsSelected < bankable) {
             item.selected = true
             numCollectedCoinsSelected++
-            if (numCollectedCoinsSelected == bankable) selectionFull()
+            if (numCollectedCoinsSelected == bankable) actions.postValue(BankAction.SelectionFull)
             return true
         }
         return false
@@ -90,11 +92,6 @@ class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManage
     override fun deselect(item: SelectableItem<Coin>) {
         item.selected = false
         if (!item.item.received) numCollectedCoinsSelected--
-    }
-
-
-    fun selectionFull() {
-        actions.postValue(BankAction.SelectionFull)
     }
 
     override fun onCleared() {

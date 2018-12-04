@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.annotations.Marker
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.view.base.BaseViewModel
@@ -62,9 +61,9 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
 
             threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
                 Timber.i("Received new threads $it")
-                if (it is Result.Value) {
-                    Timber.i("Retrieved threads ${it.v}")
-                    allThreads.addAll(it.v)
+                it.onSuccess { newThreads ->
+                    Timber.i("Retrieved threads ${newThreads}")
+                    allThreads.addAll(newThreads)
                     threads.postValue(allThreads)
                 }
             }

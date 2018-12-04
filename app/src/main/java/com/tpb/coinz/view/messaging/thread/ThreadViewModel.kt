@@ -2,7 +2,6 @@ package com.tpb.coinz.view.messaging.thread
 
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.data.util.Registration
-import com.tpb.coinz.Result
 import com.tpb.coinz.view.base.BaseViewModel
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Message
@@ -46,18 +45,17 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
     fun postMessage(message: String) {
         Timber.i("Posting message $message")
         chatCollection.postMessage(Message(System.currentTimeMillis(), userCollection.getCurrentUser(), message)) {
-            if (it is Result.Value) {
-
-            }
+            //TODO
         }
     }
 
     fun transferCoin(coin: Coin) {
         Timber.i("Transferring $coin in thread $thread")
         thread?.let {
-            coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin) {
-                if (it is Result.Value) {
-                    chatCollection.postMessage(it.v, {})
+            coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin) { result ->
+                //TODO
+                result.onSuccess {
+                    chatCollection.postMessage(it, {})
                 }
             }
         }
@@ -65,20 +63,20 @@ class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
     fun loadCoinsForTransfer() {
         actions.postValue(ThreadAction.SetLoadingState(true))
-        coinCollection.getCollectedCoins(userCollection.getCurrentUser()) {
+        coinCollection.getCollectedCoins(userCollection.getCurrentUser()) { result ->
             actions.postValue(ThreadAction.SetLoadingState(false))
-            if (it is Result.Value) {
-                actions.postValue(ThreadAction.ShowCoinsDialog(it.v))
-            } else {
-                //TODO: Error display
+            result.onSuccess {
+                actions.postValue(ThreadAction.ShowCoinsDialog(it))
+            }.onFailure {
+                //TODO
             }
         }
     }
 
     private fun messageUpdate(change: Result<List<Message>>) {
-        if (change is Result.Value) {
+        change.onSuccess {
             actions.postValue(ThreadAction.SetLoadingState(true))
-            messages.postValue((messages.value ?: emptyList()) + change.v)
+            messages.postValue((messages.value ?: emptyList()) + it)
             actions.postValue(ThreadAction.SetLoadingState(false))
         }
     }

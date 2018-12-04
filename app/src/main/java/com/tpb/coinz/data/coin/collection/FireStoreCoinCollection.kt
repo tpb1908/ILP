@@ -1,7 +1,6 @@
 package com.tpb.coinz.data.coin.collection
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
@@ -10,6 +9,7 @@ import com.tpb.coinz.data.util.Conversion.fromMap
 import com.tpb.coinz.data.util.Conversion.toMap
 import com.tpb.coinz.orElse
 import timber.log.Timber
+import java.lang.Exception
 
 
 class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(store), CoinCollection {
@@ -32,10 +32,10 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
                     ds.data?.let { coins.add(fromMap(it)) }
                 }
                 Timber.i("Collected coins $coins")
-                callback(Result.Value(coins))
+                callback(Result.success(coins))
             } else {
                 Timber.e(qs.exception, "Query unsuccessful")
-                callback(Result.None)
+                callback(Result.failure(getException(qs.exception)))
             }
         }
     }
@@ -53,7 +53,7 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
                         if (addTask.isSuccessful) {
                             Timber.i("Transferred coin. Deleting original")
                             ds.reference.delete()
-                            callback(Result.Value(Message(System.currentTimeMillis(), from, "", coin)))
+                            callback(Result.success(Message(System.currentTimeMillis(), from, "", coin)))
                         } else {
                             //TODO: Error callback
                             Timber.e(addTask.exception, "Couldn't transfer coin")
@@ -68,5 +68,5 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
             }
         }
     }
-
+    private fun getException(fe: Exception?): Exception = Exception()
 }

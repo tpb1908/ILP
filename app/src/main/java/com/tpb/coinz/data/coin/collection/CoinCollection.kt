@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.coin.collection
 
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.users.User

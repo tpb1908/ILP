@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.users
 
-import com.tpb.coinz.Result
 
 interface UserCollection {
 

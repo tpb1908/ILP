@@ -2,7 +2,6 @@ package com.tpb.coinz.data.coin
 
 import android.location.Location
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
@@ -30,24 +29,27 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
     fun loadMap() {
         lp.addListener(this)
         mapStore.getLatest { result ->
-            // If a map exists, and is valid, we use it
-            if (result is Result.Value<Map> && result.v.isValidForDay(Calendar.getInstance())) {
-                map = result.v
-                listeners.forEach { it.mapLoaded(result.v) }
-                Timber.i("Coins loaded from store. Remaining coins: ${result.v.remainingCoins.size}")
-            } else {
-                loadFromNetwork()
-            }
+            result.onSuccess {
+                if (it.isValidForDay(Calendar.getInstance())) {
+                    map = it
+                    listeners.forEach { l -> l.mapLoaded(it) }
+                    Timber.i("Coins loaded from store. Remaining coins: ${it.remainingCoins.size}")
+                } else {
+                    loadFromNetwork()
+                }
+            }.onFailure { loadFromNetwork() }
         }
     }
 
     private fun loadFromNetwork() {
         Timber.i("Loading coins from network")
         mapLoader.loadCoins(Calendar.getInstance()) { result ->
-            if (result is Result.Value) {
-                map = result.v
-                mapStore.store(result.v)
-                listeners.forEach { it.mapLoaded(result.v) }
+            result.onSuccess {
+                map = it
+                mapStore.store(it)
+                listeners.forEach { l -> l.mapLoaded(it) }
+            }.onFailure {
+                //TODO
             }
         }
     }

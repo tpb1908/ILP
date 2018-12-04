@@ -60,13 +60,6 @@ class App : Application() {
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
 
-
-        FirebaseFirestore.getInstance().collection("threads").whereEqualTo("creator", "VDLK8igUKmMqpx9O2DcnEyovpa92").addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-            Timber.i("Simple query updated")
-        }
-        FirebaseFirestore.getInstance().collection("threads").whereEqualTo("creator", "VDLK8igUKmMqpx9O2DcnEyovpa92").orderBy("last_updated", Query.Direction.DESCENDING).limit(10).addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-            Timber.i("Compound query updated")
-        }
     }
 
     // Timber tree which only logs errors and warnings

@@ -1,7 +1,7 @@
 package com.tpb.coinz.data.coin.storage
 
 import androidx.room.*
-import com.tpb.coinz.Result
+import com.tpb.coinz.data.DoesNotExistException
 import com.tpb.coinz.data.coin.Map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -48,8 +48,8 @@ class RoomMapStore(database: Database) : MapStore {
         GlobalScope.launch(Dispatchers.IO) {
             dao.update(RoomMap(map))
             getLatest {
-                if (it is Result.Value) {
-                    Timber.i("CoinCollector Latest map ${it.v.remainingCoins.size}")
+                if (it.isSuccess) {
+                    Timber.i("CoinCollector Latest map ${it.getOrThrow().remainingCoins.size}")
                 }
             }
         }
@@ -59,10 +59,10 @@ class RoomMapStore(database: Database) : MapStore {
         GlobalScope.launch(Dispatchers.IO) {
             val map = dao.getMostRecent()
             if (map == null) {
-                callback(Result.None)
+                callback(Result.failure(DoesNotExistException()))
             } else {
                 Timber.i("Loaded map $map")
-                map.apply { callback(Result.Value(this.map)) }
+                map.apply { callback(Result.success(this.map)) }
             }
 
         }

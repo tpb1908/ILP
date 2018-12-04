@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.coin.loading
 
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.coin.Map
 import java.util.*
 

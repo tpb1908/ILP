@@ -3,7 +3,6 @@ package com.tpb.coinz.view.messaging.threads
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.R
-import com.tpb.coinz.Result
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.users.User
@@ -34,13 +33,16 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
     override fun bind() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
 
-        threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {
-            if (it is Result.Value<List<Thread>>) {
-                Timber.i("Retrieved threads ${it.v}")
-                allThreads.addAll(it.v)
+        threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {result ->
+            result.onSuccess {
+                Timber.i("Retrieved threads ${it}")
+                allThreads.addAll(it)
                 threads.postValue(allThreads)
                 actions.postValue(ThreadsAction.SetLoadingState(false))
+            }.onFailure {
+
             }
+
         }
     }
 
@@ -50,17 +52,20 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
             actions.postValue(ThreadsAction.SetLoadingState(false))
             actions.postValue(ThreadsAction.DisplayMessage(R.string.error_thread_to_self))
         } else {
-            userCollection.retrieveUserFromEmail(userEmail) { user ->
-                if (user is Result.Value<User>) {
-                    chatCollection.createThread(userCollection.getCurrentUser(), user.v) {
-                        Timber.i("Creating thread")
-                        if (it is Result.Value<Thread>) {
-                            threads.postValue((threads.value ?: emptyList()) + it.v)
-                            threadIntents.postValue(it.v)
+            userCollection.retrieveUserFromEmail(userEmail) { result ->
+                result.onSuccess { user ->
+                    chatCollection.createThread(userCollection.getCurrentUser(), user) { threadResult ->
+                        threadResult.onSuccess {
+                            Timber.i("Creating thread")
+                            threads.postValue((threads.value ?: emptyList()) + it)
+                            threadIntents.postValue(it)
+                        }.onFailure {
+
                         }
+
                         actions.postValue(ThreadsAction.SetLoadingState(false))
                     }
-                } else {
+                }.onFailure {
                     Timber.e("Couldn't retrieve user to create thread")
                     actions.postValue(ThreadsAction.SetLoadingState(false))
                 }
@@ -70,8 +75,8 @@ class ThreadsViewModel : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
 
     fun searchUsers(partialEmail: String) {
-        userCollection.searchUsersByEmail(partialEmail) {
-            if (it is Result.Value) userSearchResults.postValue(it.v)
+        userCollection.searchUsersByEmail(partialEmail) { result ->
+            result.onSuccess { userSearchResults.postValue(it) }
         }
     }
 
