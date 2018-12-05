@@ -1,6 +1,8 @@
 package com.tpb.coinz
 
+import android.app.Activity
 import android.app.Application
+import android.os.Bundle
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.location.Geofence
@@ -15,6 +17,8 @@ import timber.log.Timber
 
 
 class App : Application() {
+
+
 
     val activityComponent: ActivityComponent by lazy {
         DaggerActivityComponent.builder()
@@ -83,4 +87,6 @@ class App : Application() {
             }
         }
     }
+
+
 }

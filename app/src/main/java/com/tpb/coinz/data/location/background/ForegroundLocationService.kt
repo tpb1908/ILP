@@ -1,9 +1,8 @@
 package com.tpb.coinz.data.location.background
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Intent
+import android.os.Bundle
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -16,7 +15,7 @@ import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.home.HomeActivity
 import javax.inject.Inject
 
-class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener {
+class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener, Application.ActivityLifecycleCallbacks {
 
     private val id = 353
     private var rootNotif: Notification? = null
@@ -35,10 +34,9 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
         super.onCreate()
         moveToForeground()
         (application as App).serviceComponent.inject(this)
-
+        application.registerActivityLifecycleCallbacks(this)
         collector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         collector.addCollectionListener(this)
-        //TODO: Collector pause method
     }
 
     private fun moveToForeground() {
@@ -50,11 +48,6 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
                 .setGroup(group)
                 .setContentIntent(pendingIntent).build()
         startForeground(id, rootNotif)
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        collector.start()
-        return super.onStartCommand(intent, flags, startId)
     }
 
     private fun updateSummaryNotification(collected: List<Coin>): Notification {
@@ -90,7 +83,47 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
 
     override fun onDestroy() {
         super.onDestroy()
+        application.unregisterActivityLifecycleCallbacks(this)
         collector.removeCollectionListener(this)
         collector.dispose()
+    }
+
+    private var activityCount = 0
+
+    private fun run() {
+        collector.addCollectionListener(this)
+    }
+
+    private fun pause() {
+        // If the app is in the foreground, the CoinCollector will still be running
+        // but we don't have to care about
+        collector.removeCollectionListener(this)
+    }
+
+    override fun onActivityPaused(p0: Activity?) {
+        activityCount--
+        if (activityCount == 0) run()
+    }
+
+    override fun onActivityResumed(activity: Activity?) {
+        activityCount++
+        pause()
+    }
+
+    // We don't care about any of these
+    override fun onActivityDestroyed(p0: Activity?) {
+
+    }
+
+    override fun onActivityStarted(p0: Activity?) {
+    }
+
+    override fun onActivitySaveInstanceState(p0: Activity?, p1: Bundle?) {
+    }
+
+    override fun onActivityStopped(p0: Activity?) {
+    }
+
+    override fun onActivityCreated(p0: Activity?, p1: Bundle?) {
     }
 }
