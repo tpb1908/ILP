@@ -44,7 +44,7 @@ class BankActivity : AppCompatActivity() {
         vm.numStillBankable.observe(this, Observer {
             bank_coins_text.text = resources.getQuantityString(
                     R.plurals.bank_coins_banked_info,
-                    config.dailyCollectionLimit - it, config.dailyCollectionLimit - it, it)
+                    config.dailyBankLimit - it, config.dailyBankLimit - it, it)
         })
         vm.numSelected.observe(this, Observer {
             //TODO: Display this text somewhere

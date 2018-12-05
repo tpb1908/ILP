@@ -60,8 +60,8 @@ class MapViewModel(val coinCollection: CoinCollection,
 
     override fun notifyReloading() {
         actions.postValue(MapAction.ClearMarkers)
-        coins.postValue(emptyList())
         markers.clear()
+        coins.postValue(emptyList())
     }
 
     fun mapMarkers(markers: MutableMap<Coin, Marker>) {

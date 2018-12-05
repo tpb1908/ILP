@@ -10,6 +10,10 @@ interface CoinBank {
 
     fun getBankableCoins(user: User, listener: (Result<List<Coin>>) -> Unit): Registration
 
+    fun getBankedCoins(user: User, listener: (Result<List<Coin>>) -> Unit): Registration
+
+    fun getRecentlyBankedCoins(user: User, count: Int, listener: (Result<List<Coin>>) -> Unit): Registration
+
     fun getNumBankable(): Int
 
 }

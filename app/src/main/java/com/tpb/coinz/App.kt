@@ -89,7 +89,7 @@ class App : Application() {
         val viewModelModule = module {
             viewModel { HomeViewModel(get(), get()) }
             viewModel { MapViewModel(get(), get(), get()) }
-            viewModel { ThreadViewModel(get(), get(), get()) }
+            viewModel { ThreadViewModel(get(), get(), get(), get()) }
             viewModel { ThreadsViewModel(get(), get()) }
             viewModel { BankViewModel(get(), get()) }
         }

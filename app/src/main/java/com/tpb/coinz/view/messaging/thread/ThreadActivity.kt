@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.SimpleAdapter
 import android.widget.Toast
 import androidx.annotation.StyleRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
 import androidx.lifecycle.Observer
@@ -65,8 +66,10 @@ class ThreadActivity : AppCompatActivity() {
                     thread_loading_bar.visibility = if (it.isLoading) View.VISIBLE else View.GONE
                 }
                 is ThreadViewModel.ThreadAction.ShowCoinsDialog -> {
-
                     showCoinsDialog(it.coins)
+                }
+                is ThreadViewModel.ThreadAction.DisplayBankDialog -> {
+                    showBankingRequirementDialog(it.numStillBankable)
                 }
             }
         })
@@ -81,6 +84,12 @@ class ThreadActivity : AppCompatActivity() {
         Timber.i("Received collected coins $coins")
         thread_loading_bar.visibility = View.GONE
         CoinSelectionDialog(coins, this, R.style.CoinDialog, vm::transferCoin).show()
+    }
+
+    private fun showBankingRequirementDialog(numStillBankable: Int) {
+        AlertDialog.Builder(this).setTitle("Banking error")
+                .setMessage(getString(R.string.error_spare_change, numStillBankable))
+                .create().show()
     }
 
     private class CoinSelectionDialog(val coins: List<Coin>,

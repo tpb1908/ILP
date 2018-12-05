@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng
  * @param markerSymbol The value to be displayed on the coins marker
  * @param markerColor The colour of the coins marker on the map
  * @param location The location of the coin
- * @param banked Whether the coin has been banked
  * @param received Whether the coin was received from another user as spare change
  */
 data class Coin(val id: String,
@@ -19,6 +18,5 @@ data class Coin(val id: String,
                 val markerSymbol: Int,
                 val markerColor: Int,
                 val location: LatLng,
-                val banked: Boolean = false,
                 val received: Boolean = false)
 

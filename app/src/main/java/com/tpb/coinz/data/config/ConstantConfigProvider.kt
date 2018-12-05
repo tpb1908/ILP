@@ -16,7 +16,7 @@ object ConstantConfigProvider : ConfigProvider {
         get() = 25
     override val coinsPerMap: Int
         get() = 50
-    override val dailyCollectionLimit: Int
+    override val dailyBankLimit: Int
         get() = 25
     override val collectionAreaBounds: LatLngBounds
         get() = LatLngBounds.Builder().includes(points).build()

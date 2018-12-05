@@ -9,7 +9,7 @@ interface ConfigProvider {
 
     val coinsPerMap: Int
 
-    val dailyCollectionLimit: Int
+    val dailyBankLimit: Int
 
     val collectionAreaBounds: LatLngBounds
 

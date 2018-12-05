@@ -5,6 +5,7 @@ import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
@@ -16,7 +17,8 @@ import timber.log.Timber
 
 class ThreadViewModel(val chatCollection: ChatCollection,
                       val userCollection: UserCollection,
-                      val coinCollection: CoinCollection) : BaseViewModel<ThreadViewModel.ThreadAction>() {
+                      val coinCollection: CoinCollection,
+                      val coinBank: CoinBank) : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
 
     override val actions = ActionLiveData<ThreadAction>()
@@ -59,14 +61,19 @@ class ThreadViewModel(val chatCollection: ChatCollection,
     }
 
     fun loadCoinsForTransfer() {
-        actions.postValue(ThreadAction.SetLoadingState(true))
-        coinCollection.getCollectedCoins(userCollection.getCurrentUser()) { result ->
-            actions.postValue(ThreadAction.SetLoadingState(false))
-            result.onSuccess {
-                actions.postValue(ThreadAction.ShowCoinsDialog(it))
-            }.onFailure {
-                //TODO
+        val numStillBankable = coinBank.getNumBankable()
+        if (numStillBankable == 0) {
+            actions.postValue(ThreadAction.SetLoadingState(true))
+            coinCollection.getCollectedCoins(userCollection.getCurrentUser()) { result ->
+                actions.postValue(ThreadAction.SetLoadingState(false))
+                result.onSuccess {
+                    actions.postValue(ThreadAction.ShowCoinsDialog(it))
+                }.onFailure {
+                    //TODO
+                }
             }
+        } else {
+            actions.postValue(ThreadAction.DisplayBankDialog(numStillBankable))
         }
     }
 
@@ -84,7 +91,8 @@ class ThreadViewModel(val chatCollection: ChatCollection,
     }
 
     sealed class ThreadAction {
-        class SetLoadingState(val isLoading: Boolean) : ThreadAction()
-        class ShowCoinsDialog(val coins: List<Coin>) : ThreadAction()
+        data class SetLoadingState(val isLoading: Boolean) : ThreadAction()
+        data class ShowCoinsDialog(val coins: List<Coin>) : ThreadAction()
+        data class DisplayBankDialog(val numStillBankable: Int) : ThreadAction()
     }
 }

@@ -31,7 +31,6 @@ object Conversion {
                 "markerColor" to coin.markerColor,
                 "latitude" to coin.location.latitude,
                 "longitude" to coin.location.longitude,
-                "banked" to coin.banked,
                 "received" to coin.received)
 
     }
@@ -47,7 +46,7 @@ object Conversion {
         return Coin(map["id"] as String, map["value"] as Double, Currency.fromString(map["currency"] as String),
                 (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
                 latLngFromMap(map),
-                map["banked"] as Boolean, map["received"] as Boolean)
+                map["received"] as Boolean)
     }
 
     private fun latLngFromMap(map: Map<String, Any>): LatLng {

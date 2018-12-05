@@ -1,7 +1,10 @@
 package com.tpb.coinz.data.coin.bank
 
 import android.content.SharedPreferences
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.config.ConfigProvider
@@ -9,12 +12,15 @@ import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.Conversion.fromMap
 import com.tpb.coinz.data.util.FireStoreRegistration
+import com.tpb.coinz.data.util.Registration
 import timber.log.Timber
 import java.util.*
 
 class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFirestore, val config: ConfigProvider) : FireStoreCoinManager(store), CoinBank {
 
-    private val maxBankable = config.dailyCollectionLimit
+    private inline fun banked(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(banked)
+
+    private val maxBankable = config.dailyBankLimit
 
     private var numBankable = 0
         set(value) {
@@ -55,7 +61,9 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
                                 // The query could return more than one document if the user has been sent the same coin twice
                                 // In this case it doesn't matter which one of the coins we bank
                                 getTask.result?.documents?.first()?.let { ds ->
-                                    banked(user).add(coin).addOnCompleteListener { addTask ->
+                                    val map = Conversion.toMap(coin)
+                                    map["bank_time"] = System.currentTimeMillis()
+                                    banked(user).add(Conversion.toMap(coin)).addOnCompleteListener { addTask ->
                                         if (addTask.isSuccessful) {
                                             ds.reference.delete()
                                             successfullyBanked.add(coin)
@@ -83,20 +91,32 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
 
     override fun getBankableCoins(user: User, listener: (Result<List<Coin>>) -> Unit) =
             FireStoreRegistration(coins(user).addSnapshotListener { qs, exception ->
-                if (qs != null) {
-                    val coins = mutableListOf<Coin>()
-                    qs.documents.forEach { ds ->
-                        ds.data?.let { coins.add(fromMap(it)) }
-                    }
-                    Timber.i("Bankable coins $coins")
-                    listener(Result.success(coins))
-                } else {
-                    Timber.e(exception, "Query unsuccessful")
-                    exception?.code
-                    listener(Result.failure(Conversion.convertFireStoreException(exception)))
-                }
+                convertQuerySnapshot(qs, exception, listener)
             })
 
+    override fun getBankedCoins(user: User, listener: (Result<List<Coin>>) -> Unit): Registration =
+            FireStoreRegistration(banked(user).addSnapshotListener { qs, exception ->
+                convertQuerySnapshot(qs, exception, listener)
+            })
+
+    override fun getRecentlyBankedCoins(user: User, count: Int, listener: (Result<List<Coin>>) -> Unit): Registration =
+            FireStoreRegistration(banked(user).orderBy("bank_time").limit(count.toLong()).addSnapshotListener { qs, exception ->
+                convertQuerySnapshot(qs, exception, listener)
+            })
+
+    private fun convertQuerySnapshot(qs: QuerySnapshot?, exception: FirebaseFirestoreException?, listener: (Result<List<Coin>>) -> Unit) {
+        if (qs != null) {
+            val coins = mutableListOf<Coin>()
+            qs.documents.forEach { ds ->
+                ds.data?.let { coins.add(fromMap(it)) }
+            }
+            Timber.i("Coins $coins")
+            listener(Result.success(coins))
+        } else {
+            Timber.e(exception, "Query unsuccessful")
+            listener(Result.failure(Conversion.convertFireStoreException(exception)))
+        }
+    }
 
     private fun checkCurrentDay() {
         val now = Calendar.getInstance()

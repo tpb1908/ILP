@@ -10,7 +10,7 @@ class UpdatingConfigProvider(val prefs: SharedPreferences) : ConfigProvider {
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val coinsPerMap: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val dailyCollectionLimit: Int
+    override val dailyBankLimit: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val collectionAreaBounds: LatLngBounds
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
