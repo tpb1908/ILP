@@ -49,9 +49,10 @@ class App : Application() {
         FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
-
+        
+        val firestore = FirebaseFirestore.getInstance()
         val chatModule = module {
-            single<ChatCollection> { FireStoreChatCollection(FirebaseFirestore.getInstance()) }
+            single<ChatCollection> { FireStoreChatCollection(firestore) }
         }
         val configModule = module {
             single<ConfigProvider> { ConstantConfigProvider() }
@@ -60,14 +61,14 @@ class App : Application() {
             single<CoinBank> {
                 FireStoreCoinBank(
                         getSharedPreferences("coinbank", Context.MODE_PRIVATE),
-                        FirebaseFirestore.getInstance(),
+                        firestore,
                         get()
                 )
             }
         }
         val coinCollectionModule = module {
             single { CoinCollector(get(), get(), get(), get()) }
-            single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
+            single<CoinCollection> { FireStoreCoinCollection(firestore) }
         }
         val connectivityModule = module {
             single { ConnectionLiveData(this@App) }
@@ -80,7 +81,7 @@ class App : Application() {
             single<MapLoader> { MapDownloader() }
         }
         val userModule = module {
-            single<UserCollection> { FireBaseUserCollection(FirebaseFirestore.getInstance()) }
+            single<UserCollection> { FireBaseUserCollection(firestore) }
         }
         val viewModelModule = module {
             viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
@@ -97,7 +98,17 @@ class App : Application() {
                 mapModule,
                 userModule,
                 chatModule,
-                coinBankModule, coinCollectionModule))
+                coinBankModule, coinCollectionModule),
+                logger = TimberKoinLogger)
+    }
+
+    private object TimberKoinLogger : org.koin.log.Logger {
+        override fun debug(msg: String) = Timber.d(msg)
+
+        override fun err(msg: String) = Timber.e(msg)
+
+        override fun info(msg: String) = Timber.i(msg)
+
     }
 
     // Timber tree which only logs errors and warnings
