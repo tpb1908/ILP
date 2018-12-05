@@ -7,11 +7,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -59,7 +59,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
         initViews(savedInstanceState)
         bindViewModel()
         if (savedInstanceState == null) {
@@ -67,7 +66,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             moveToUserLocation()
 
         }
-
 
     }
 

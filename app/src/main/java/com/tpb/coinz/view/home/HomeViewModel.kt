@@ -16,6 +16,9 @@ import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
@@ -63,8 +66,9 @@ class HomeViewModel(val config: ConfigProvider,
     }
 
     private fun initInBackground() {
-        thread {
-            coinCollector.addCollectionListener(this)
+        GlobalScope.launch(Dispatchers.IO) {
+
+            coinCollector.addCollectionListener(this@HomeViewModel)
             coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
 

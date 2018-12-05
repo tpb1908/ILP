@@ -3,6 +3,7 @@ package com.tpb.coinz
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.os.Looper
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
@@ -48,10 +49,8 @@ class App : Application() {
 
 
     private fun init() {
-        FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
-
         val firestore = FirebaseFirestore.getInstance()
         val chatModule = module {
             single<ChatCollection> { FireStoreChatCollection(firestore) }
@@ -69,7 +68,9 @@ class App : Application() {
             }
         }
         val coinCollectionModule = module {
-            single { CoinCollector(get(), get(), get(), get()) }
+            single {
+                Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
+                CoinCollector(get(), get(), get(), get()) }
             single<CoinCollection> { FireStoreCoinCollection(firestore) }
         }
         val connectivityModule = module {
@@ -92,7 +93,6 @@ class App : Application() {
             viewModel { ThreadsViewModel(get(), get()) }
             viewModel { BankViewModel(get(), get()) }
         }
-
         startKoin(this, listOf(viewModelModule,
                 configModule,
                 connectivityModule,
