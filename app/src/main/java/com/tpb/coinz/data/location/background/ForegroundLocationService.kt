@@ -1,12 +1,14 @@
 package com.tpb.coinz.data.location.background
 
 import android.app.*
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.tpb.coinz.App
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
@@ -20,7 +22,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
 
     private val id = 353
     private var rootNotif: Notification? = null
-    private val channel = "coinz_collection_channel"
+    private val CHANNEL_ID = "coinz_collection_channel"
     private val SUMMARY_ID = 534
     private val group = "coin_collection_group"
 
@@ -33,16 +35,29 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
 
     override fun onCreate() {
         super.onCreate()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel()
+        }
         moveToForeground()
         application.registerActivityLifecycleCallbacks(this)
         collector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         collector.addCollectionListener(this)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(CHANNEL_ID, "GPS tracking", NotificationManagerCompat.IMPORTANCE_NONE)
+        channel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
+    }
+
     private fun moveToForeground() {
         val notifIntent = Intent(this, HomeActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notifIntent, 0)
-        rootNotif = NotificationCompat.Builder(this, channel)
+        rootNotif = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentTitle("title for notification")
                 .setContentText("App is watching you")
                 .setGroup(group)
@@ -51,7 +66,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     }
 
     private fun updateSummaryNotification(collected: List<Coin>): Notification {
-        return NotificationCompat.Builder(this, channel)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Summary notification")
                 .setContentText("Some summary information")
                 .setGroup(group)
@@ -65,7 +80,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
         //https://developer.android.com/training/notify-user/group
         NotificationManagerCompat.from(this).apply {
             collected.forEach {
-                notify(it.markerColor, NotificationCompat.Builder(this@ForegroundLocationService, channel)
+                notify(it.markerColor, NotificationCompat.Builder(this@ForegroundLocationService, CHANNEL_ID)
                         .setContentTitle(it.currency.name)
                         .setContentText(it.id)
                         .setGroup(group)

@@ -2,15 +2,14 @@ package com.tpb.coinz.data.coin.bank
 
 import android.content.SharedPreferences
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tpb.coinz.data.util.FireStoreRegistration
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.Conversion.fromMap
+import com.tpb.coinz.data.util.FireStoreRegistration
 import timber.log.Timber
-import java.lang.Exception
 import java.util.*
 
 class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFirestore, val config: ConfigProvider) : FireStoreCoinManager(store), CoinBank {

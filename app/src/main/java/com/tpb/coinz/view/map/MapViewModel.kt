@@ -4,13 +4,13 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.tpb.coinz.R
-import com.tpb.coinz.view.base.BaseViewModel
-import com.tpb.coinz.data.coin.collection.CoinCollection
-import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.base.ActionLiveData
+import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
 
 

@@ -31,7 +31,7 @@ class ThreadsViewModel(val chatCollection: ChatCollection,
     override fun bind() {
         actions.postValue(ThreadsAction.SetLoadingState(true))
 
-        threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) {result ->
+        threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) { result ->
             result.onSuccess {
                 Timber.i("Retrieved threads ${it}")
                 allThreads.addAll(it)

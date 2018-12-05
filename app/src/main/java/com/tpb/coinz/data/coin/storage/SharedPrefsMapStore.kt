@@ -2,7 +2,6 @@ package com.tpb.coinz.data.coin.storage
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.tpb.coinz.data.DoesNotExistException
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.util.CoinzException
 

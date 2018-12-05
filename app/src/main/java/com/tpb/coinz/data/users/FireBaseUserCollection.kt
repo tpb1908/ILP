@@ -5,7 +5,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.DoesNotExistException
 import com.tpb.coinz.data.util.CoinzException
 import timber.log.Timber
-import java.lang.Exception
 
 class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollection {
 

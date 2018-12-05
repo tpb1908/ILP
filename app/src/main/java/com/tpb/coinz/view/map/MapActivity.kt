@@ -2,20 +2,21 @@ package com.tpb.coinz.view.map
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.*
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.tpb.coinz.*
+import com.tpb.coinz.R
+import com.tpb.coinz.asCameraUpdate
+import com.tpb.coinz.coinToMarkerOption
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.config.ConfigProvider
@@ -26,7 +27,6 @@ import kotlinx.android.synthetic.main.activity_map.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
-
 
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
@@ -66,7 +66,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         vm.bind()
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {
-                vm.mapMarkers(coins.zip(it.addMarkers(coins.map{coinToMarkerOption(this, it)})).toMap().toMutableMap())
+                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coinToMarkerOption(this, it) })).toMap().toMutableMap())
             }
         })
         vm.actions.observe(this, Observer {
@@ -119,7 +119,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     private fun moveToUserLocation() {
         Timber.i("Moving to user location")
-        locationProvider.addListener(object: LocationListener.SimpleLocationListener {
+        locationProvider.addListener(object : LocationListener.SimpleLocationListener {
             override fun locationUpdate(location: Location) {
                 mapview.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
                 locationProvider.removeListener(this)

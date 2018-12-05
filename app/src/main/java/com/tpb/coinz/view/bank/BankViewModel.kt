@@ -1,10 +1,10 @@
 package com.tpb.coinz.view.bank
 
 import androidx.lifecycle.MutableLiveData
-import com.tpb.coinz.data.util.CompositeRegistration
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.users.UserCollection
+import com.tpb.coinz.data.util.CompositeRegistration
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 
@@ -58,7 +58,7 @@ class BankViewModel(val coinBank: CoinBank, val userCollection: UserCollection) 
         actions.postValue(BankAction.SetLoadingState(true))
         val selected = (collectedCoins + receivedCoins).filter { it.selected }.map { it.item }
         coinBank.bankCoins(userCollection.getCurrentUser(), selected) { result ->
-            result.onSuccess {coins ->
+            result.onSuccess { coins ->
                 numStillBankable.postValue(coinBank.getNumBankable())
                 collectedCoins.removeAll(coins.map { SelectableItem(true, it) })
                 receivedCoins.removeAll(coins.map { SelectableItem(true, it) })

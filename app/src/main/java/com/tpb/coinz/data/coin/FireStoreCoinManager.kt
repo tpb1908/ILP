@@ -14,5 +14,4 @@ abstract class FireStoreCoinManager(protected val store: FirebaseFirestore) {
     protected inline fun banked(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(banked)
 
 
-
 }

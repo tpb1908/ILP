@@ -2,6 +2,7 @@ package com.tpb.coinz
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
@@ -23,6 +24,7 @@ import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.config.ConstantConfigProvider
 import com.tpb.coinz.data.location.GMSLocationProvider
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.data.location.background.ForegroundLocationService
 import com.tpb.coinz.data.users.FireBaseUserCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.bank.BankViewModel
@@ -49,13 +51,13 @@ class App : Application() {
         FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
-        
+
         val firestore = FirebaseFirestore.getInstance()
         val chatModule = module {
             single<ChatCollection> { FireStoreChatCollection(firestore) }
         }
         val configModule = module {
-            single<ConfigProvider> { ConstantConfigProvider() }
+            single<ConfigProvider> { ConstantConfigProvider }
         }
         val coinBankModule = module {
             single<CoinBank> {
@@ -84,7 +86,7 @@ class App : Application() {
             single<UserCollection> { FireBaseUserCollection(firestore) }
         }
         val viewModelModule = module {
-            viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
+            viewModel { HomeViewModel(get(), get()) }
             viewModel { MapViewModel(get(), get(), get()) }
             viewModel { ThreadViewModel(get(), get(), get()) }
             viewModel { ThreadsViewModel(get(), get()) }
@@ -100,6 +102,7 @@ class App : Application() {
                 chatModule,
                 coinBankModule, coinCollectionModule),
                 logger = TimberKoinLogger)
+
     }
 
     private object TimberKoinLogger : org.koin.log.Logger {

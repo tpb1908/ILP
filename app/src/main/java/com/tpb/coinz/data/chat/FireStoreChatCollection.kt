@@ -2,11 +2,17 @@ package com.tpb.coinz.data.chat
 
 import com.google.firebase.firestore.*
 import com.tpb.coinz.data.users.User
-import com.tpb.coinz.data.util.*
+import com.tpb.coinz.data.util.CoinzException
+import com.tpb.coinz.data.util.Conversion
+import com.tpb.coinz.data.util.FireStoreRegistration
+import com.tpb.coinz.data.util.Registration
 import timber.log.Timber
-import java.lang.Exception
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
+
+    init {
+        Timber.i("Koin: chat collection instantiated")
+    }
 
     private var openThread: Thread? = null
     private var newMessageListener: ((Result<List<Message>>) -> Unit)? = null
@@ -35,7 +41,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                 Timber.i("Created thread $threadId")
                 callback(Result.success(Thread(threadId, creator, partner, System.currentTimeMillis())))
 
-            } else  {
+            } else {
                 Timber.e(it.exception, "Failed thread creation $threadId")
                 callback(Result.failure(CoinzException.UnknownException()))
             }

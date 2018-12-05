@@ -17,13 +17,15 @@ import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 import java.util.*
+import kotlin.concurrent.thread
+
 
 class HomeViewModel(val config: ConfigProvider,
-                    val coinCollection: CoinCollection,
-                    val coinCollector: CoinCollector,
-                    val userCollection: UserCollection,
-                    val chatCollection: ChatCollection) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener {
+                    val userCollection: UserCollection
+                    ) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener, KoinComponent {
 
 
     val coins = MutableLiveData<List<Coin>>()
@@ -42,6 +44,10 @@ class HomeViewModel(val config: ConfigProvider,
 
     private var threadsRegistration: Registration? = null
 
+    val coinCollection: CoinCollection by inject()
+    val chatCollection: ChatCollection by inject()
+    val coinCollector: CoinCollector by inject()
+
     override val actions = ActionLiveData<HomeAction>()
 
     override fun bind() {
@@ -51,6 +57,13 @@ class HomeViewModel(val config: ConfigProvider,
             actions.postValue(HomeAction.BeginLoginFlow)
         } else {
             user.postValue(fbUser)
+            initInBackground()
+        }
+
+    }
+
+    private fun initInBackground() {
+        thread {
             coinCollector.addCollectionListener(this)
             coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
@@ -64,7 +77,6 @@ class HomeViewModel(val config: ConfigProvider,
                 }
             }
         }
-
     }
 
     override fun coinsCollected(collected: List<Coin>) {

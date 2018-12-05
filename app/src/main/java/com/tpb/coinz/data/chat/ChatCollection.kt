@@ -1,7 +1,7 @@
 package com.tpb.coinz.data.chat
 
-import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.Registration
 
 /**
  * Interface for managing the threads between a user and other users

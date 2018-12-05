@@ -5,9 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tpb.coinz.App
 import com.tpb.coinz.R
 import com.tpb.coinz.data.config.ConfigProvider
 import kotlinx.android.synthetic.main.activity_bank.*
@@ -46,7 +44,7 @@ class BankActivity : AppCompatActivity() {
         vm.numStillBankable.observe(this, Observer {
             bank_coins_text.text = resources.getQuantityString(
                     R.plurals.bank_coins_banked_info,
-                    config.dailyCollectionLimit-it, config.dailyCollectionLimit-it, it)
+                    config.dailyCollectionLimit - it, config.dailyCollectionLimit - it, it)
         })
         vm.numSelected.observe(this, Observer {
             //TODO: Display this text somewhere

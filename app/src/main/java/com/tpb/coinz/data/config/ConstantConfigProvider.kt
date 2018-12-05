@@ -4,7 +4,7 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 
-class ConstantConfigProvider : ConfigProvider {
+object ConstantConfigProvider : ConfigProvider {
 
     private val points = arrayListOf(LatLng(55.946233, -3.192473)
             , LatLng(55.946233, -3.184319)

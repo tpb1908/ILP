@@ -12,7 +12,7 @@ object Conversion {
         if (fe == null) return CoinzException.UnknownException()
         return when (fe.code) {
             FirebaseFirestoreException.Code.OK, FirebaseFirestoreException.Code.INTERNAL, FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED,
-                    FirebaseFirestoreException.Code.UNIMPLEMENTED, FirebaseFirestoreException.Code.UNKNOWN -> CoinzException.UnknownException()
+            FirebaseFirestoreException.Code.UNIMPLEMENTED, FirebaseFirestoreException.Code.UNKNOWN -> CoinzException.UnknownException()
             FirebaseFirestoreException.Code.NOT_FOUND -> CoinzException.NotFoundException()
             FirebaseFirestoreException.Code.ALREADY_EXISTS -> CoinzException.AlreadyExistsException()
             FirebaseFirestoreException.Code.INVALID_ARGUMENT, FirebaseFirestoreException.Code.FAILED_PRECONDITION, FirebaseFirestoreException.Code.OUT_OF_RANGE -> CoinzException.InvalidArgumentException()

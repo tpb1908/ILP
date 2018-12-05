@@ -6,16 +6,17 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.CoinzException
-import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.Conversion.fromMap
 import com.tpb.coinz.data.util.Conversion.toMap
 import com.tpb.coinz.orElse
 import timber.log.Timber
-import java.lang.Exception
 
 
 class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(store), CoinCollection {
 
+    init {
+        Timber.i("Koin: coin collection instantiated")
+    }
 
     override fun collectCoin(user: User, coin: Coin) {
         Timber.i("Collecting ${toMap(coin)} for $user")

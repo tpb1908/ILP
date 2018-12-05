@@ -9,9 +9,7 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tpb.coinz.App
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency

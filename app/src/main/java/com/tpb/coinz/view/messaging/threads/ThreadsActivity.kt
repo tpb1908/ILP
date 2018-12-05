@@ -10,9 +10,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tpb.coinz.App
 import com.tpb.coinz.R
 import com.tpb.coinz.SimpleTextWatcher
 import com.tpb.coinz.data.chat.Thread

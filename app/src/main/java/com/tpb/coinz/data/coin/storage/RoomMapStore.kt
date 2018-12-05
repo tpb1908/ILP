@@ -1,7 +1,6 @@
 package com.tpb.coinz.data.coin.storage
 
 import androidx.room.*
-import com.tpb.coinz.data.DoesNotExistException
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.util.CoinzException
 import kotlinx.coroutines.Dispatchers

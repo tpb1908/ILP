@@ -30,7 +30,8 @@ class MapDownloader : MapLoader {
 
     override fun loadCoins(date: Calendar, listener: (Result<Map>) -> Unit) {
         listeners.add(listener)
-        GlobalScope.launch(Dispatchers.IO) { // launch download on the IO threadpool
+        GlobalScope.launch(Dispatchers.IO) {
+            // launch download on the IO threadpool
             loadCoinsFromUrl(date)
         }
 

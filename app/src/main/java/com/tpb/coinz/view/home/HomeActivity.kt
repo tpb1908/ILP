@@ -108,7 +108,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
     private fun moveToUserLocation() {
         Timber.i("Moving to user location")
-        locationProvider.addListener(object: LocationListener.SimpleLocationListener {
+        locationProvider.addListener(object : LocationListener.SimpleLocationListener {
             override fun locationUpdate(location: Location) {
                 home_minimap.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
                 locationProvider.removeListener(this)
@@ -162,7 +162,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         vm.collectionInfo.observe(this, collectionObserver)
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             home_minimap.getMapAsync {
-                vm.mapMarkers(coins.zip(it.addMarkers(coins.map{coinToMarkerOption(this, it)})).toMap().toMutableMap())
+                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coinToMarkerOption(this, it) })).toMap().toMutableMap())
             }
 
         })

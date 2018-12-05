@@ -1,8 +1,8 @@
 package com.tpb.coinz.data.coin.bank
 
-import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.Registration
 
 interface CoinBank {
 

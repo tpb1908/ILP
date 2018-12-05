@@ -19,7 +19,7 @@ import com.tpb.coinz.data.coin.Coin
 
 fun Location.asCameraUpdate(): CameraUpdate = CameraUpdateFactory.newLatLngZoom(LatLng(this), 15.0)
 
-inline fun<T> Result<out T>.ifElse() {
+inline fun <T> Result<out T>.ifElse() {
 
 }
 
