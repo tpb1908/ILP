@@ -14,6 +14,10 @@ import java.util.*
 
 class CoinCollector(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore, private val config: ConfigProvider) : LocationListener.SimpleLocationListener {
 
+    init {
+        Timber.i("Coin collector instantiated")
+    }
+
     private var map: Map? = null
 
     private val listeners: MutableSet<CoinCollectorListener> = hashSetOf()

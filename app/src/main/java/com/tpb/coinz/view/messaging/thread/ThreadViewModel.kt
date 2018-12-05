@@ -12,15 +12,12 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.view.base.ActionLiveData
 import timber.log.Timber
-import javax.inject.Inject
 
-class ThreadViewModel : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
-    @Inject lateinit var chatCollection: ChatCollection
+class ThreadViewModel(val chatCollection: ChatCollection,
+                      val userCollection: UserCollection,
+                      val coinCollection: CoinCollection) : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
-    @Inject lateinit var userCollection: UserCollection
-
-    @Inject lateinit var coinCollection: CoinCollection
 
     override val actions = ActionLiveData<ThreadAction>()
 

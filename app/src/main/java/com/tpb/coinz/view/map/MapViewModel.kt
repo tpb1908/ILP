@@ -12,25 +12,18 @@ import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.view.base.ActionLiveData
 import timber.log.Timber
-import javax.inject.Inject
 
-class MapViewModel : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
+
+class MapViewModel(val coinCollection: CoinCollection,
+                   val userCollection: UserCollection,
+                   val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
 
-    @Inject
-    lateinit var coinCollection: CoinCollection
-
-    @Inject
-    lateinit var userCollection: UserCollection
 
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
     override val actions = ActionLiveData<MapAction>()
-
-    @Inject
-    lateinit var coinCollector: CoinCollector
-
 
     override fun bind() {
         coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())

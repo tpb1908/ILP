@@ -23,27 +23,28 @@ import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import kotlinx.android.synthetic.main.activity_map.*
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
-import javax.inject.Inject
+
 
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
 
-    @Inject lateinit var locationProvider: LocationProvider
+    val locationProvider: LocationProvider by inject()
 
-    @Inject lateinit var connection: ConnectionLiveData
+    val connection: ConnectionLiveData by inject()
 
-    @Inject lateinit var config: ConfigProvider
+    val config: ConfigProvider by inject()
 
     private lateinit var permissionsManager: PermissionsManager
 
 
-    private lateinit var vm: MapViewModel
+    val vm: MapViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
-        (application as App).activityComponent.inject(this)
         mapview.onCreate(savedInstanceState)
         bindViewModel()
 
@@ -62,8 +63,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun bindViewModel() {
-        vm = ViewModelProviders.of(this).get(MapViewModel::class.java)
-        (application as App).mapComponent.inject(vm)
         vm.bind()
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {

@@ -17,11 +17,12 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import kotlinx.android.synthetic.main.activity_thread.*
 import kotlinx.android.synthetic.main.dialog_coin_selection.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class ThreadActivity : AppCompatActivity() {
 
-    private lateinit var vm: ThreadViewModel
+    val vm: ThreadViewModel by viewModel()
 
     private val adapter = ThreadRecyclerAdapter()
 
@@ -59,8 +60,6 @@ class ThreadActivity : AppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        vm = ViewModelProviders.of(this).get(ThreadViewModel::class.java)
-        (application as App).threadComponent.inject(vm)
         vm.bind()
         vm.actions.observe(this, Observer {
             when (it) {

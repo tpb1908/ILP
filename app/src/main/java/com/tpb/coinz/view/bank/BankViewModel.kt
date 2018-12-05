@@ -7,13 +7,9 @@ import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
-import javax.inject.Inject
 
-class BankViewModel : BaseViewModel<BankViewModel.BankAction>(), SelectionManager<Coin> {
 
-    @Inject lateinit var coinBank: CoinBank
-
-    @Inject lateinit var userCollection: UserCollection
+class BankViewModel(val coinBank: CoinBank, val userCollection: UserCollection) : BaseViewModel<BankViewModel.BankAction>(), SelectionManager<Coin> {
 
     val bankableCoins = MutableLiveData<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
 

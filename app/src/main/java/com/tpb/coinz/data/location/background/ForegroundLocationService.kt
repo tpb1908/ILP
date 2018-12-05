@@ -13,7 +13,8 @@ import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.home.HomeActivity
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+
 
 class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener, Application.ActivityLifecycleCallbacks {
 
@@ -23,9 +24,9 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     private val SUMMARY_ID = 534
     private val group = "coin_collection_group"
 
-    @Inject lateinit var userCollection: UserCollection
-    @Inject lateinit var coinCollection: CoinCollection
-    @Inject lateinit var collector: CoinCollector
+    val userCollection: UserCollection by inject()
+    val coinCollection: CoinCollection by inject()
+    val collector: CoinCollector by inject()
 
 
     override fun onBind(p0: Intent?): IBinder? = null
@@ -33,7 +34,6 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     override fun onCreate() {
         super.onCreate()
         moveToForeground()
-        (application as App).serviceComponent.inject(this)
         application.registerActivityLifecycleCallbacks(this)
         collector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         collector.addCollectionListener(this)

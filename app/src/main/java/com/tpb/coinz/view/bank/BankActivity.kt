@@ -11,29 +11,27 @@ import com.tpb.coinz.App
 import com.tpb.coinz.R
 import com.tpb.coinz.data.config.ConfigProvider
 import kotlinx.android.synthetic.main.activity_bank.*
+import org.koin.android.ext.android.inject
 import timber.log.Timber
-import javax.inject.Inject
+
 
 class BankActivity : AppCompatActivity() {
 
-    private lateinit var vm: BankViewModel
+    val vm: BankViewModel by inject()
 
-    @Inject lateinit var config: ConfigProvider
+    val config: ConfigProvider by inject()
 
     private val adapter = CoinRecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bank)
-        (application as App).activityComponent.inject(this)
         initViews()
         bindViewModel()
 
     }
 
     private fun bindViewModel() {
-        vm = ViewModelProviders.of(this).get(BankViewModel::class.java)
-        (application as App).bankComponent.inject(vm)
         vm.bankableCoins.observe(this, Observer {
             Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)

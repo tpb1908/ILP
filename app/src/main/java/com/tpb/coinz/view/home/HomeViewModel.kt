@@ -7,37 +7,33 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
-import com.tpb.coinz.view.base.BaseViewModel
-import com.tpb.coinz.data.coin.collection.CoinCollection
-import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.config.ConfigProvider
+import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.view.base.ActionLiveData
+import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
-class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener {
+class HomeViewModel(val config: ConfigProvider,
+                    val coinCollection: CoinCollection,
+                    val coinCollector: CoinCollector,
+                    val userCollection: UserCollection,
+                    val chatCollection: ChatCollection) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener {
 
-    @Inject lateinit var config: ConfigProvider
 
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
-    @Inject lateinit var coinCollection: CoinCollection
 
     private var fbUser: FirebaseUser? = null
 
     val user = MutableLiveData<FirebaseUser>()
 
-    @Inject lateinit var coinCollector: CoinCollector
-
-    @Inject lateinit var userCollection: UserCollection
-
-    @Inject lateinit var chatCollection: ChatCollection
 
     val collectionInfo = MutableLiveData<MapInfo>()
 
@@ -81,7 +77,7 @@ class HomeViewModel : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.C
                 Timber.e("No marker for $coin")
             }
             //TODO: Probably not the best way to do this
-            collectionInfo.postValue(MapInfo(config.coinsPerMap-markers.size, markers.size))
+            collectionInfo.postValue(MapInfo(config.coinsPerMap - markers.size, markers.size))
         }
     }
 

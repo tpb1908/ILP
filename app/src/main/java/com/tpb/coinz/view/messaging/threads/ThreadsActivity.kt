@@ -18,11 +18,12 @@ import com.tpb.coinz.SimpleTextWatcher
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import kotlinx.android.synthetic.main.activity_messages.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class ThreadsActivity : AppCompatActivity() {
 
-    private lateinit var vm: ThreadsViewModel
+    val vm: ThreadsViewModel by viewModel()
 
     private val adapter = ThreadsRecyclerAdapter()
 
@@ -41,8 +42,6 @@ class ThreadsActivity : AppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        vm = ViewModelProviders.of(this).get(ThreadsViewModel::class.java)
-        (application as App).threadsComponent.inject(vm)
         vm.bind()
 
         vm.threadIntents.observe(this, Observer {

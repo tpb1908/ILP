@@ -1,76 +1,103 @@
 package com.tpb.coinz
 
-import android.app.Activity
 import android.app.Application
-import android.os.Bundle
+import android.content.Context
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.LocationServices
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.mapbox.mapboxsdk.Mapbox
-import com.tpb.coinz.dagger.component.*
-import com.tpb.coinz.dagger.module.*
+import com.tpb.coinz.data.ConnectionLiveData
+import com.tpb.coinz.data.chat.ChatCollection
+import com.tpb.coinz.data.chat.FireStoreChatCollection
+import com.tpb.coinz.data.coin.CoinCollector
+import com.tpb.coinz.data.coin.bank.CoinBank
+import com.tpb.coinz.data.coin.bank.FireStoreCoinBank
+import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.coin.collection.FireStoreCoinCollection
+import com.tpb.coinz.data.coin.loading.MapDownloader
+import com.tpb.coinz.data.coin.loading.MapLoader
+import com.tpb.coinz.data.coin.storage.MapStore
+import com.tpb.coinz.data.coin.storage.SharedPrefsMapStore
+import com.tpb.coinz.data.config.ConfigProvider
+import com.tpb.coinz.data.config.ConstantConfigProvider
+import com.tpb.coinz.data.location.GMSLocationProvider
+import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.data.users.FireBaseUserCollection
+import com.tpb.coinz.data.users.UserCollection
+import com.tpb.coinz.view.bank.BankViewModel
+import com.tpb.coinz.view.home.HomeViewModel
+import com.tpb.coinz.view.map.MapViewModel
+import com.tpb.coinz.view.messaging.thread.ThreadViewModel
+import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
+import org.koin.android.ext.android.startKoin
+import org.koin.androidx.viewmodel.ext.koin.viewModel
+import org.koin.dsl.module.module
 import timber.log.Timber
 
 
 class App : Application() {
 
 
-
-    val activityComponent: ActivityComponent by lazy {
-        DaggerActivityComponent.builder()
-                .configModule(ConfigModule())
-                .locationModule(LocationModule(this))
-                .connectivityModule(ConnectivityModule(this))
-                .build()
-    }
-
-    val homeComponent: HomeComponent by lazy {
-        DaggerHomeComponent.builder()
-                .locationModule(LocationModule(this))
-                .mapModule(MapModule(this))
-                .build()
-    }
-    val mapComponent: MapComponent by lazy {
-        DaggerMapComponent.builder()
-                .locationModule(LocationModule(this))
-                .connectivityModule(ConnectivityModule(this))
-                .mapModule(MapModule(this))
-                .build()
-    }
-    val bankComponent: BankComponent by lazy {
-        DaggerBankComponent.builder()
-                .coinBankModule(CoinBankModule(this))
-                .build()
-    }
-    val threadsComponent: ThreadsComponent by lazy {
-        DaggerThreadsComponent.builder()
-                .connectivityModule(ConnectivityModule(this))
-                .build()
-    }
-    val threadComponent: ThreadComponent by lazy {
-        DaggerThreadComponent.builder()
-                .connectivityModule(ConnectivityModule(this))
-                .build()
-    }
-
-    val serviceComponent: ServiceComponent by lazy {
-        DaggerServiceComponent.builder()
-                .build()
-    }
-
     override fun onCreate() {
         super.onCreate()
         init()
     }
 
+
     private fun init() {
         FirebaseApp.initializeApp(this)
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
+
+        val chatModule = module {
+            single<ChatCollection> { FireStoreChatCollection(FirebaseFirestore.getInstance()) }
+        }
+        val configModule = module {
+            single<ConfigProvider> { ConstantConfigProvider() }
+        }
+        val coinBankModule = module {
+            single<CoinBank> {
+                FireStoreCoinBank(
+                        getSharedPreferences("coinbank", Context.MODE_PRIVATE),
+                        FirebaseFirestore.getInstance(),
+                        get()
+                )
+            }
+        }
+        val coinCollectionModule = module {
+            single { CoinCollector(get(), get(), get(), get()) }
+            single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
+        }
+        val connectivityModule = module {
+            single { ConnectionLiveData(this@App) }
+        }
+        val locationModule = module {
+            single<LocationProvider> { GMSLocationProvider(this@App) }
+        }
+        val mapModule = module {
+            single<MapStore> { SharedPrefsMapStore(getSharedPreferences("map_storage_prefs", Context.MODE_PRIVATE)) }
+            single<MapLoader> { MapDownloader() }
+        }
+        val userModule = module {
+            single<UserCollection> { FireBaseUserCollection(FirebaseFirestore.getInstance()) }
+        }
+        val viewModelModule = module {
+            viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
+            viewModel { MapViewModel(get(), get(), get()) }
+            viewModel { ThreadViewModel(get(), get(), get()) }
+            viewModel { ThreadsViewModel(get(), get()) }
+            viewModel { BankViewModel(get(), get()) }
+        }
+
+        startKoin(this, listOf(viewModelModule,
+                configModule,
+                connectivityModule,
+                locationModule,
+                mapModule,
+                userModule,
+                chatModule,
+                coinBankModule, coinCollectionModule))
     }
 
     // Timber tree which only logs errors and warnings

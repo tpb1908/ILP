@@ -37,19 +37,21 @@ import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_home.*
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
-import javax.inject.Inject
+
 import kotlin.math.max
 
 class HomeActivity : AppCompatActivity(), PermissionsListener {
 
     private val rcLogin = 5534
     private val rcMap = 6543
-    private lateinit var vm: HomeViewModel
+    val vm: HomeViewModel by viewModel()
 
-    @Inject lateinit var config: ConfigProvider
+    val config: ConfigProvider by inject()
 
-    @Inject lateinit var locationProvider: LocationProvider
+    val locationProvider: LocationProvider by inject()
     private lateinit var permissionsManager: PermissionsManager
 
     private val adapter = ThreadsRecyclerAdapter()
@@ -57,7 +59,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        (application as App).activityComponent.inject(this)
 
         initViews(savedInstanceState)
         bindViewModel()
@@ -155,8 +156,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun bindViewModel() {
-        vm = ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        (application as App).homeComponent.inject(vm)
         vm.bind()
 
         vm.user.observe(this, userObserver)
