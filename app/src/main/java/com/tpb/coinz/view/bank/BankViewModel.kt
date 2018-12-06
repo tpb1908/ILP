@@ -1,6 +1,8 @@
 package com.tpb.coinz.view.bank
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
+import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.users.UserCollection
@@ -45,7 +47,7 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
                 receivedCoins.addAll(coins.filter(Coin::received).map { SelectableItem(false, it) })
                 bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
             }.onFailure {
-                //TODO
+                actions.postValue(BankAction.DisplayError(R.string.error_loading_coins, this::loadBankableCoins))
             }
 
             actions.postValue(BankAction.SetLoadingState(false))
@@ -64,7 +66,7 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
                 receivedCoins.removeAll(coins.map { SelectableItem(true, it) })
                 bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
             }.onFailure {
-                //TODO
+                actions.postValue(BankAction.DisplayError(R.string.error_banking_coins, this::bankCoins))
             }
             actions.postValue(BankAction.SetLoadingState(false))
         }
@@ -97,6 +99,7 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
 
     sealed class BankAction {
         data class SetLoadingState(val loading: Boolean) : BankAction()
+        data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): BankAction()
         object SelectionFull : BankAction()
     }
 

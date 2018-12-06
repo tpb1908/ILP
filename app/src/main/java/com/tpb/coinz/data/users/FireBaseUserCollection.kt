@@ -2,7 +2,6 @@ package com.tpb.coinz.data.users
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tpb.coinz.data.DoesNotExistException
 import com.tpb.coinz.data.util.CoinzException
 import timber.log.Timber
 
@@ -54,7 +53,7 @@ class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollect
     override fun searchUsersByEmail(partialEmail: String, callback: (Result<List<User>>) -> Unit) {
         store.collection(users).whereGreaterThan(email, partialEmail).limit(10).get().addOnCompleteListener {
             if (it.result == null) {
-                callback(Result.failure(DoesNotExistException()))
+                callback(Result.failure(CoinzException.NotFoundException()))
             } else {
                 it.result?.let { result ->
                     val users = mutableListOf<User>()

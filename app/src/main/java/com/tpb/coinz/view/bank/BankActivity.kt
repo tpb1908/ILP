@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.tpb.coinz.R
 import com.tpb.coinz.data.config.ConfigProvider
 import kotlinx.android.synthetic.main.activity_bank.*
@@ -34,11 +35,18 @@ class BankActivity : AppCompatActivity() {
             Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)
         })
-        vm.actions.observe(this, Observer {
-            if (it is BankViewModel.BankAction.SetLoadingState) {
-                bank_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
-            } else if (it is BankViewModel.BankAction.SelectionFull) {
+        vm.actions.observe(this, Observer { action ->
+            when (action) {
+                is BankViewModel.BankAction.SetLoadingState -> bank_loading_bar.visibility = if (action.loading) View.VISIBLE else View.GONE
+                is BankViewModel.BankAction.SelectionFull -> {
 
+                }
+                is BankViewModel.BankAction.DisplayError ->
+                    Snackbar.make(findViewById(android.R.id.content),
+                            action.message,
+                            Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
+                        action.retry()
+                    }.show()
             }
         })
         vm.numStillBankable.observe(this, Observer {

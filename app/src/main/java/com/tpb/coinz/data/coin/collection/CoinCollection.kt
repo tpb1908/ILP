@@ -9,11 +9,8 @@ import com.tpb.coinz.data.users.User
  */
 interface CoinCollection {
 
-    /**
-     * Registers the [coin] as being collected by the [user]
-     * TODO: Callback
-     */
-    fun collectCoin(user: User, coin: Coin)
+
+    fun collectCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit)
 
     /**
      * Loads all coins collected by [user]

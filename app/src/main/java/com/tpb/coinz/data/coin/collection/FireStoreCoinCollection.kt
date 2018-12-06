@@ -18,19 +18,26 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
         Timber.i("Koin: coin collection instantiated")
     }
 
-    override fun collectCoin(user: User, coin: Coin) {
-        Timber.i("Collecting ${toMap(coin)} for $user")
-        //TODO: Check result and callback
-        coins(user).add(toMap(coin))
+    override fun collectCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit) {
+        Timber.i("Collecting coins $coins for $user")
+        val collected = mutableListOf<Coin>()
+        var completeCalls = 0
+        coins.forEach { coin ->
+            coins(user).add(toMap(coin)).addOnCompleteListener { task ->
+                completeCalls++
+                if (task.isSuccessful) collected.add(coin)
+                if (completeCalls == coins.size) {
+                    callback(Result.success(collected))
+                }
+            }
+        }
     }
-
 
     override fun getCollectedCoins(user: User, callback: (Result<List<Coin>>) -> Unit) {
         Timber.i("Loading collected coins for $user")
         coins(user).get().addOnCompleteListener { qs ->
             if (qs.isSuccessful) {
                 val coins = mutableListOf<Coin>()
-                //TODO: Query for banked or not banked coins
                 qs.result?.documents?.forEach { ds ->
                     ds.data?.let { coins.add(fromMap(it)) }
                 }
@@ -58,7 +65,6 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
                             ds.reference.delete()
                             callback(Result.success(Message(System.currentTimeMillis(), from, "", coin)))
                         } else {
-                            //TODO: Error callback
                             Timber.e(addTask.exception, "Couldn't transfer coin")
                             callback(Result.failure(CoinzException.UnknownException()))
                         }
@@ -68,7 +74,7 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
                 // In theory this can only happen if the user opens the send dialog on one device, then on another device,
                 // and then attempts to send the same coin from both
                 Timber.e("Coin to send doesn't exist ${getTask.result}, ${getTask.result?.documents}")
-                //TODO Coin doesn't exist error
+                callback(Result.failure(CoinzException.NotFoundException()))
             }
         }
     }

@@ -88,16 +88,20 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
     private fun collect(collectable: List<Coin>) {
         if (collectable.isNotEmpty()) {
             Timber.i("Collecting coins $collectable from map ${map?.collectedCoins?.size}")
-            map?.let {
-                Timber.i("Map prior to update ${it.remainingCoins.size}")
-                it.remainingCoins.removeAll(collectable)
-                it.collectedCoins.addAll(collectable)
-                mapStore.update(it)
-            }
+
             user?.let { user ->
-                collectable.forEach { coinCollection?.collectCoin(user, it) }
+                coinCollection?.collectCoins(user, collectable) { result ->
+                    result.onSuccess { collected ->
+                        map?.let {
+                            Timber.i("Map prior to update ${it.remainingCoins.size}")
+                            it.remainingCoins.removeAll(collected)
+                            it.collectedCoins.addAll(collected)
+                            mapStore.update(it)
+                            listeners.forEach { it.coinsCollected(collected) }
+                        }
+                    }
+                }
             }
-            listeners.forEach { it.coinsCollected(collectable) }
         }
     }
 

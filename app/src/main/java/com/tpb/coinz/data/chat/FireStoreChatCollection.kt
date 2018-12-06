@@ -76,7 +76,6 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
             Timber.i("Change to threads")
             val threads = mutableListOf<Thread>()
             //TODO: Deletion and proper change notification
-            //TODO: How do we merge the two sources of the threads?
             snapshot?.documentChanges?.forEach { change ->
                 if (change.type == DocumentChange.Type.ADDED) {
                     val doc = change.document
@@ -107,8 +106,13 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
 
     override fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit) {
         openThread?.let {
-            //TODO: Error handling
-            messages(it).add(message)
+            messages(it).add(message).addOnCompleteListener { task ->
+                callback(if (task.isSuccessful)
+                    Result.success(true)
+                else
+                    Result.failure(CoinzException.UnknownException()))
+            }
+            // The last_updated stamp isn't really important
             store.collection(threads).document(it.threadId).set(mapOf("last_updated" to message.timestamp), SetOptions.merge())
         }
     }
