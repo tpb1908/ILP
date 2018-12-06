@@ -13,6 +13,7 @@ import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.config.ConfigProvider
+import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
 import com.tpb.coinz.view.base.ActionLiveData
@@ -37,9 +38,7 @@ class HomeViewModel(val config: ConfigProvider,
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
-    private var fbUser: FirebaseUser? = null
-
-    val user = MutableLiveData<FirebaseUser>()
+    val user = MutableLiveData<User>()
     val threads = MutableLiveData<List<Thread>>()
     private val allThreads = mutableListOf<Thread>()
 
@@ -54,13 +53,11 @@ class HomeViewModel(val config: ConfigProvider,
     private val coinBank: CoinBank by inject()
 
     override fun bind() {
-        fbUser = FirebaseAuth.getInstance().currentUser
-        Timber.i("User $fbUser")
-        if (fbUser == null) {
-            actions.postValue(HomeAction.BeginLoginFlow)
-        } else {
-            user.postValue(fbUser)
+        if (userCollection.isSignedIn()) {
+            user.postValue(userCollection.getCurrentUser())
             initInBackground()
+        } else {
+            actions.postValue(HomeAction.BeginLoginFlow)
         }
 
     }
@@ -125,18 +122,11 @@ class HomeViewModel(val config: ConfigProvider,
     }
 
 
-    fun userLoggedIn() {
-        fbUser = FirebaseAuth.getInstance().currentUser
-        user.postValue(fbUser)
-        //TODO: Clean this up and add proper error handling
-        fbUser?.let {
-            FirebaseFirestore.getInstance().collection("users").document(it.uid).set(
-                    mapOf("email" to it.email)
-            ).addOnCompleteListener { task ->
-                Timber.i("Stored user email ${it.email}")
-            }
+    fun userLoggedIn(id: String, email: String) {
+        userCollection.createUser(id, email) {
+            user.postValue(userCollection.getCurrentUser())
+            initInBackground()
         }
-
     }
 
     fun userLoginFailed() {

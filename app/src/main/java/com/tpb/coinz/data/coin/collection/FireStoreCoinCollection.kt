@@ -14,9 +14,6 @@ import timber.log.Timber
 
 class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(store), CoinCollection {
 
-    init {
-        Timber.i("Koin: coin collection instantiated")
-    }
 
     override fun collectCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit) {
         Timber.i("Collecting coins $coins for $user")

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
@@ -14,9 +15,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
+import com.firebase.ui.auth.data.model.User
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -82,6 +85,18 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                 intent.putExtra(getString(R.string.extra_camera_position), cameraPosition)
                 startActivityForResult(intent, rcMap, options.toBundle())
             }
+        }
+        //https://stackoverflow.com/questions/36692453/using-mapbox-in-scrollview-scrollview-sliding-to-the-position-where-mapbox-is-p
+        home_minimap.setOnTouchListener { view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_MOVE -> {
+                    home_scrollview.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    home_scrollview.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            home_minimap.onTouchEvent(motionEvent)
         }
         moveToCoinArea()
         initLocationSystem()
@@ -164,7 +179,9 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     private fun bindViewModel() {
         vm.bind()
 
-        vm.user.observe(this, userObserver)
+        vm.user.observe(this, Observer {
+            user_email.text = it.email
+        })
         vm.collectionInfo.observe(this, collectionObserver)
         vm.coins.observe(this, Observer { coins ->
             home_minimap.getMapAsync {
@@ -199,10 +216,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     }
 
 
-    private val userObserver = Observer<FirebaseUser> {
-        Timber.i("User updated $it")
-        user_email.text = it.email
-    }
 
     private val collectionObserver = Observer<MapInfo> {
         map_collection_info.text =
@@ -235,7 +248,12 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         if (requestCode == rcLogin) {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
-                vm.userLoggedIn()
+                Timber.i("Sign in response ok")
+                val user = FirebaseAuth.getInstance().currentUser
+                user?.let {
+                    Timber.i("Response details ${response?.idpToken} User details ${it.uid}")
+                    vm.userLoggedIn(it.uid, it.email!!)
+                }
 
             } else {
                 vm.userLoginFailed()

@@ -7,6 +7,7 @@ import android.os.Looper
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.data.ConnectionLiveData
@@ -84,7 +85,7 @@ class App : Application() {
             single<MapLoader> { MapDownloader() }
         }
         val userModule = module {
-            single<UserCollection> { FireBaseUserCollection(firestore) }
+            single<UserCollection> { FireBaseUserCollection(FirebaseAuth.getInstance(), firestore) }
         }
         val viewModelModule = module {
             viewModel { HomeViewModel(get(), get()) }

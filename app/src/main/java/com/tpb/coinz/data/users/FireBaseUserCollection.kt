@@ -5,15 +5,31 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.util.CoinzException
 import timber.log.Timber
 
-class FireBaseUserCollection(private val store: FirebaseFirestore) : UserCollection {
+class FireBaseUserCollection(private val auth: FirebaseAuth, private val store: FirebaseFirestore) : UserCollection {
 
     private val users = "users"
     private val email = "email"
 
+    override fun isSignedIn(): Boolean {
+        return auth.currentUser != null
+    }
+
+    override fun createUser(id: String, email: String, callback: (Result<User>) -> Unit) {
+        store.collection(users).document(id).set(
+                mapOf("email" to email)
+        ).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                callback(Result.success(getCurrentUser()))
+            } else {
+
+            }
+        }
+    }
+
     override fun getCurrentUser(): User {
-        //TODO: Listen for firebase user creation
-        val firebaseUser = FirebaseAuth.getInstance().currentUser
-        return User(firebaseUser?.uid ?: "uid_error", firebaseUser?.email ?: "email_error")
+        if (!isSignedIn()) throw Exception("User not signed in")
+        val firebaseUser = auth.currentUser
+        return User(firebaseUser!!.uid, firebaseUser.email!!)
     }
 
     override fun retrieveUsers(callback: (Result<List<User>>) -> Unit) {
