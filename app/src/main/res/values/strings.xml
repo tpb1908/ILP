@@ -16,12 +16,12 @@
 
     <string name="error_empty_message">Can\'t send empty message</string>
     <string name="error_thread_to_self">You can\'t talk to yourself</string>
-    <string name="error_spare_change"></string>
 
     <string name="recycler_section_collected_coins">Collected coinz</string>
     <string name="recycler_section_received_coins">Received coinz</string>
     <string name="extra_camera_position">camera_position</string>
     <string name="action_send">SEND</string>
+    <string name="action_bank">BANK</string>
     <string name="hint_enter_message">Enter message</string>
     <string name="title_chat_creation_dialog">Email</string>
     <string name="hint_chat_creation_email">Email of recipient</string>

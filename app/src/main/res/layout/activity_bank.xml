@@ -35,15 +35,14 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/bank_coins_text"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 collected of 25"/>
+                android:layout_height="wrap_content" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/bank_coins_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:text="Bank" />
+                android:text="@string/action_bank" />
 
         </LinearLayout>
 
