@@ -30,6 +30,7 @@ import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.view.bank.BankActivity
 import com.tpb.coinz.view.map.MapActivity
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsActivity
@@ -95,6 +96,10 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
         recently_banked_recycler.layoutManager = LinearLayoutManager(this)
         recently_banked_recycler.adapter = bankedAdapter
+
+        bank_header.setOnClickListener {
+            startActivity(Intent(this, BankActivity::class.java))
+        }
 
     }
 
@@ -173,6 +178,13 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         vm.recentlyBanked.observe(this, Observer {
             bankedAdapter.coins = it
         })
+        vm.bankInfo.observe(this, Observer {
+            coin_bank_info.text = resources.getQuantityString(
+                    R.plurals.bank_coins_banked_info,
+                    it.numCollected,
+                    it.numCollected,
+                    it.numRemaining)
+        })
         vm.actions.observe(this, Observer {
             when (it) {
                 is HomeViewModel.HomeAction.BeginLoginFlow -> beginLoginFlow()
@@ -216,6 +228,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
         startActivity(intent)
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

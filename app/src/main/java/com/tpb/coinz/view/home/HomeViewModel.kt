@@ -27,7 +27,7 @@ import java.util.*
 
 
 class HomeViewModel(val config: ConfigProvider,
-                    val userCollection: UserCollection
+                    private val userCollection: UserCollection
                     ) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener, KoinComponent {
 
 
@@ -43,6 +43,7 @@ class HomeViewModel(val config: ConfigProvider,
     val threads = MutableLiveData<List<Thread>>()
     private val allThreads = mutableListOf<Thread>()
 
+    val bankInfo = MutableLiveData<BankInfo>()
     val recentlyBanked = MutableLiveData<List<Coin>>()
 
     private val chatCollection: ChatCollection by inject()
@@ -79,12 +80,15 @@ class HomeViewModel(val config: ConfigProvider,
                     threads.postValue(allThreads)
                 }
             }
+            val numBankable = coinBank.getNumBankable()
+            bankInfo.postValue(BankInfo(config.dailyBankLimit-numBankable, numBankable))
             bankRegistration = coinBank.getRecentlyBankedCoins(userCollection.getCurrentUser(), 10) {
                 it.onSuccess { rb ->
                     Timber.i("Recently banked coins $rb")
                     recentlyBanked.postValue(rb)
                 }
             }
+
         }
     }
 
