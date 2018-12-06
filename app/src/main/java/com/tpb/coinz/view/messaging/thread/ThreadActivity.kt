@@ -113,8 +113,6 @@ class ThreadActivity : AppCompatActivity() {
                 selectionListener(coins[i])
             }
         }
-
-
     }
 
     companion object {

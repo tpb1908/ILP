@@ -10,6 +10,7 @@ import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.UserCollection
@@ -23,7 +24,6 @@ import timber.log.Timber
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import java.util.*
-import kotlin.concurrent.thread
 
 
 class HomeViewModel(val config: ConfigProvider,
@@ -31,27 +31,26 @@ class HomeViewModel(val config: ConfigProvider,
                     ) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener, KoinComponent {
 
 
+    override val actions = ActionLiveData<HomeAction>()
+
+    val collectionInfo = MutableLiveData<MapInfo>()
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
-
 
     private var fbUser: FirebaseUser? = null
 
     val user = MutableLiveData<FirebaseUser>()
-
-
-    val collectionInfo = MutableLiveData<MapInfo>()
-
     val threads = MutableLiveData<List<Thread>>()
     private val allThreads = mutableListOf<Thread>()
 
+    val recentlyBanked = MutableLiveData<List<Coin>>()
+
+    private val chatCollection: ChatCollection by inject()
     private var threadsRegistration: Registration? = null
-
-    val coinCollection: CoinCollection by inject()
-    val chatCollection: ChatCollection by inject()
-    val coinCollector: CoinCollector by inject()
-
-    override val actions = ActionLiveData<HomeAction>()
+    private val coinCollection: CoinCollection by inject()
+    private val coinCollector: CoinCollector by inject()
+    private var bankRegistration: Registration? = null
+    private val coinBank: CoinBank by inject()
 
     override fun bind() {
         fbUser = FirebaseAuth.getInstance().currentUser
@@ -78,6 +77,12 @@ class HomeViewModel(val config: ConfigProvider,
                     Timber.i("Retrieved threads ${newThreads}")
                     allThreads.addAll(newThreads)
                     threads.postValue(allThreads)
+                }
+            }
+            bankRegistration = coinBank.getRecentlyBankedCoins(userCollection.getCurrentUser(), 10) {
+                it.onSuccess { rb ->
+                    Timber.i("Recently banked coins $rb")
+                    recentlyBanked.postValue(rb)
                 }
             }
         }
@@ -136,6 +141,7 @@ class HomeViewModel(val config: ConfigProvider,
         coinCollector.removeCollectionListener(this)
         coinCollector.dispose()
         threadsRegistration?.deregister()
+        bankRegistration?.deregister()
     }
 
     sealed class HomeAction {

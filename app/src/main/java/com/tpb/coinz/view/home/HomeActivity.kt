@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
@@ -26,7 +25,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
 import com.tpb.coinz.data.chat.Thread
-import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.data.location.LocationListener
@@ -54,7 +52,8 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     val locationProvider: LocationProvider by inject()
     private lateinit var permissionsManager: PermissionsManager
 
-    private val adapter = ThreadsRecyclerAdapter()
+    private val threadsAdapter = ThreadsRecyclerAdapter()
+    private val bankedAdapter = BankedRecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,12 +86,16 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         initLocationSystem()
 
         recent_threads_recycler.layoutManager = LinearLayoutManager(this)
-        recent_threads_recycler.adapter = adapter
-        adapter.onClick = this::openThread
+        recent_threads_recycler.adapter = threadsAdapter
+        threadsAdapter.onClick = this::openThread
 
         recent_threads_header.setOnClickListener {
             startActivity(Intent(this, ThreadsActivity::class.java))
         }
+
+        recently_banked_recycler.layoutManager = LinearLayoutManager(this)
+        recently_banked_recycler.adapter = bankedAdapter
+
     }
 
     private fun moveToCoinArea() {
@@ -158,14 +161,17 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
         vm.user.observe(this, userObserver)
         vm.collectionInfo.observe(this, collectionObserver)
-        vm.coins.observe(this, Observer<List<Coin>> { coins ->
+        vm.coins.observe(this, Observer { coins ->
             home_minimap.getMapAsync {
                 vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coinToMarkerOption(this, it) })).toMap().toMutableMap())
             }
 
         })
         vm.threads.observe(this, Observer {
-            adapter.setThreads(it)
+            threadsAdapter.setThreads(it)
+        })
+        vm.recentlyBanked.observe(this, Observer {
+            bankedAdapter.coins = it
         })
         vm.actions.observe(this, Observer {
             when (it) {
