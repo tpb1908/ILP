@@ -53,7 +53,9 @@ class CoinCollector(private val lp: LocationProvider, private val mapLoader: Map
                 mapStore.store(it)
                 listeners.forEach { l -> l.mapLoaded(it) }
             }.onFailure {
-                //TODO
+                //TODO: BEtter handling here
+                listeners.forEach { l -> l.notifyReloading() }
+                loadFromNetwork()
             }
         }
     }

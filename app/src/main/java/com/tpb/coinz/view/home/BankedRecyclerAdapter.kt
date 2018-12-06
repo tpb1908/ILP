@@ -7,11 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
+import com.tpb.coinz.data.coin.Transaction
 import kotlinx.android.synthetic.main.viewholder_coin_simple.view.*
 
 class BankedRecyclerAdapter : RecyclerView.Adapter<BankedRecyclerAdapter.SimpleCoinViewHolder>() {
 
-    var coins: List<Coin> = listOf()
+    var transactions: List<Transaction> = listOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -21,18 +22,18 @@ class BankedRecyclerAdapter : RecyclerView.Adapter<BankedRecyclerAdapter.SimpleC
         SimpleCoinViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.viewholder_coin_simple, parent, false))
 
 
-    override fun getItemCount(): Int = coins.size
+    override fun getItemCount(): Int = transactions.size
 
     override fun onBindViewHolder(holder: SimpleCoinViewHolder, position: Int) {
-        holder.coin = coins[position]
+        holder.transaction = transactions[position]
     }
 
     class SimpleCoinViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        var coin: Coin? = null
+        var transaction: Transaction? = null
             set(value) {
                 field = value
                 value?.let {
-                    view.viewholder_coin_icon.setImageResource(Currency.getImageId(it.currency))
+                    view.viewholder_coin_icon.setImageResource(Currency.getImageId(it.coin.currency))
                     view.viewholder_coin_value.text = it.value.toString()
                 }
             }

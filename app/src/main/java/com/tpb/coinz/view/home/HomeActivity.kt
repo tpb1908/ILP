@@ -193,7 +193,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             threadsAdapter.setThreads(it)
         })
         vm.recentlyBanked.observe(this, Observer {
-            bankedAdapter.coins = it
+            bankedAdapter.transactions = it
         })
         vm.bankInfo.observe(this, Observer {
             coin_bank_info.text = resources.getQuantityString(

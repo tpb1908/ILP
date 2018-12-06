@@ -92,7 +92,7 @@ class App : Application() {
             viewModel { MapViewModel(get(), get(), get()) }
             viewModel { ThreadViewModel(get(), get(), get(), get()) }
             viewModel { ThreadsViewModel(get(), get()) }
-            viewModel { BankViewModel(get(), get()) }
+            viewModel { BankViewModel(get(), get(), get()) }
         }
         startKoin(this, listOf(viewModelModule,
                 configModule,

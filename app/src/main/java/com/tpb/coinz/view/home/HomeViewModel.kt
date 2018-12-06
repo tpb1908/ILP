@@ -10,6 +10,7 @@ import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
+import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.config.ConfigProvider
@@ -43,7 +44,7 @@ class HomeViewModel(val config: ConfigProvider,
     private val allThreads = mutableListOf<Thread>()
 
     val bankInfo = MutableLiveData<BankInfo>()
-    val recentlyBanked = MutableLiveData<List<Coin>>()
+    val recentlyBanked = MutableLiveData<List<Transaction>>()
 
     private val chatCollection: ChatCollection by inject()
     private var threadsRegistration: Registration? = null
@@ -79,17 +80,23 @@ class HomeViewModel(val config: ConfigProvider,
                     }
                 }
             }
-            val numBankable = coinBank.getNumBankable()
-            bankInfo.postValue(BankInfo(config.dailyBankLimit-numBankable, numBankable))
+            postBankedInfo()
             if (bankRegistration == null) {
                 bankRegistration = coinBank.getRecentlyBankedCoins(userCollection.getCurrentUser(), 10) {
                     it.onSuccess { rb ->
                         Timber.i("Recently banked coins $rb")
                         recentlyBanked.postValue(rb)
+                        postBankedInfo()
                     }
                 }
             }
         }
+    }
+
+    private fun postBankedInfo() {
+        val numBankable = coinBank.getNumBankable()
+        Timber.i("Updating bank info. Still bankable: $numBankable")
+        bankInfo.postValue(BankInfo(config.dailyBankLimit-numBankable, numBankable))
     }
 
     override fun coinsCollected(collected: List<Coin>) {
@@ -101,7 +108,6 @@ class HomeViewModel(val config: ConfigProvider,
             } else {
                 Timber.e("No marker for $coin")
             }
-            //TODO: Probably not the best way to do this
             collectionInfo.postValue(MapInfo(config.coinsPerMap - markers.size, markers.size))
         }
     }
