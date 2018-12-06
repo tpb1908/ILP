@@ -26,9 +26,9 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     private val SUMMARY_ID = 534
     private val group = "coin_collection_group"
 
-    val userCollection: UserCollection by inject()
-    val coinCollection: CoinCollection by inject()
-    val collector: CoinCollector by inject()
+    private val userCollection: UserCollection by inject()
+    private val coinCollection: CoinCollection by inject()
+    private val collector: CoinCollector by inject()
 
 
     override fun onBind(p0: Intent?): IBinder? = null

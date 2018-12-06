@@ -33,14 +33,14 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     val locationProvider: LocationProvider by inject()
 
-    val connection: ConnectionLiveData by inject()
+    private val connection: ConnectionLiveData by inject()
 
     val config: ConfigProvider by inject()
 
     private lateinit var permissionsManager: PermissionsManager
 
 
-    val vm: MapViewModel by viewModel()
+    private val vm: MapViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

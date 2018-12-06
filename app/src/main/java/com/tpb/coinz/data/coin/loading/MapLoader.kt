@@ -9,7 +9,7 @@ import java.util.*
 interface MapLoader {
 
     /**
-     *  Attempts to load the map for [date], returning [Result.Value] if the
+     *  Attempts to load the map for [date], returning [Result.success] if the
      *  [Map] is successfully loaded
      */
     fun loadCoins(date: Calendar, listener: (Result<Map>) -> Unit)

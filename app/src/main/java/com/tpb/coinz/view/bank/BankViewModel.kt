@@ -9,7 +9,7 @@ import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 
 
-class BankViewModel(val coinBank: CoinBank, val userCollection: UserCollection) : BaseViewModel<BankViewModel.BankAction>(), SelectionManager<Coin> {
+class BankViewModel(private val coinBank: CoinBank, private val userCollection: UserCollection) : BaseViewModel<BankViewModel.BankAction>(), SelectionManager<Coin> {
 
     val bankableCoins = MutableLiveData<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
 

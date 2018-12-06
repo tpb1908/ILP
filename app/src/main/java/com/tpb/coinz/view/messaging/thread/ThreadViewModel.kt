@@ -15,10 +15,10 @@ import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
 
 
-class ThreadViewModel(val chatCollection: ChatCollection,
-                      val userCollection: UserCollection,
-                      val coinCollection: CoinCollection,
-                      val coinBank: CoinBank) : BaseViewModel<ThreadViewModel.ThreadAction>() {
+class ThreadViewModel(private val chatCollection: ChatCollection,
+                      private val userCollection: UserCollection,
+                      private val coinCollection: CoinCollection,
+                      private val coinBank: CoinBank) : BaseViewModel<ThreadViewModel.ThreadAction>() {
 
 
     override val actions = ActionLiveData<ThreadAction>()
@@ -54,7 +54,7 @@ class ThreadViewModel(val chatCollection: ChatCollection,
             coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin) { result ->
                 //TODO
                 result.onSuccess {
-                    chatCollection.postMessage(it, {})
+                    chatCollection.postMessage(it) {}
                 }
             }
         }

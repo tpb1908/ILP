@@ -13,8 +13,8 @@ import com.tpb.coinz.view.base.BaseViewModel
 import timber.log.Timber
 
 
-class ThreadsViewModel(val chatCollection: ChatCollection,
-                       val userCollection: UserCollection) : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
+class ThreadsViewModel(private val chatCollection: ChatCollection,
+                       private val userCollection: UserCollection) : BaseViewModel<ThreadsViewModel.ThreadsAction>() {
 
 
     val threads = MutableLiveData<List<Thread>>()
@@ -33,7 +33,7 @@ class ThreadsViewModel(val chatCollection: ChatCollection,
 
         threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) { result ->
             result.onSuccess {
-                Timber.i("Retrieved threads ${it}")
+                Timber.i("Retrieved threads $it")
                 allThreads.addAll(it)
                 threads.postValue(allThreads)
                 actions.postValue(ThreadsAction.SetLoadingState(false))

@@ -46,7 +46,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
     private val rcLogin = 5534
     private val rcMap = 6543
-    val vm: HomeViewModel by viewModel()
+    private val vm: HomeViewModel by viewModel()
 
     val config: ConfigProvider by inject()
 

@@ -15,7 +15,7 @@ import timber.log.Timber
 
 class BankActivity : AppCompatActivity() {
 
-    val vm: BankViewModel by inject()
+    private val vm: BankViewModel by inject()
 
     val config: ConfigProvider by inject()
 

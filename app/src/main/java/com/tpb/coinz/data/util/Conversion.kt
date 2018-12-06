@@ -35,12 +35,6 @@ object Conversion {
 
     }
 
-    fun toMap(user: User): HashMap<String, Any> {
-        return hashMapOf(
-                "uid" to user.uid,
-                "email" to user.email
-        )
-    }
 
     fun fromMap(map: Map<String, Any>): Coin {
         return Coin(map["id"] as String, map["value"] as Double, Currency.fromString(map["currency"] as String),

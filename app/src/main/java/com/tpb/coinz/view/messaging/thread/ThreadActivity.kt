@@ -21,7 +21,7 @@ import timber.log.Timber
 
 class ThreadActivity : AppCompatActivity() {
 
-    val vm: ThreadViewModel by viewModel()
+    private val vm: ThreadViewModel by viewModel()
 
     private val adapter = ThreadRecyclerAdapter()
 

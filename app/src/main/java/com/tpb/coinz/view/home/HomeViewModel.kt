@@ -75,7 +75,7 @@ class HomeViewModel(val config: ConfigProvider,
             threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
                 Timber.i("Received new threads $it")
                 it.onSuccess { newThreads ->
-                    Timber.i("Retrieved threads ${newThreads}")
+                    Timber.i("Retrieved threads $newThreads")
                     allThreads.addAll(newThreads)
                     threads.postValue(allThreads)
                 }

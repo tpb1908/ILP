@@ -15,9 +15,9 @@ import timber.log.Timber
 
 // There is no need to delay heavy instantiations here as
 // the constructor injected values have already been instantiated for HomeViewModel
-class MapViewModel(val coinCollection: CoinCollection,
-                   val userCollection: UserCollection,
-                   val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
+class MapViewModel(private val coinCollection: CoinCollection,
+                   private val userCollection: UserCollection,
+                   private val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
 
