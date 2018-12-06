@@ -72,23 +72,26 @@ class HomeViewModel(val config: ConfigProvider,
             coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
 
-            threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
-                Timber.i("Received new threads $it")
-                it.onSuccess { newThreads ->
-                    Timber.i("Retrieved threads $newThreads")
-                    allThreads.addAll(newThreads)
-                    threads.postValue(allThreads)
+            if (threadsRegistration == null) {
+                threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
+                    Timber.i("Received new threads $it")
+                    it.onSuccess { newThreads ->
+                        Timber.i("Retrieved threads $newThreads")
+                        allThreads.addAll(newThreads)
+                        threads.postValue(allThreads)
+                    }
                 }
             }
             val numBankable = coinBank.getNumBankable()
             bankInfo.postValue(BankInfo(config.dailyBankLimit-numBankable, numBankable))
-            bankRegistration = coinBank.getRecentlyBankedCoins(userCollection.getCurrentUser(), 10) {
-                it.onSuccess { rb ->
-                    Timber.i("Recently banked coins $rb")
-                    recentlyBanked.postValue(rb)
+            if (bankRegistration == null) {
+                bankRegistration = coinBank.getRecentlyBankedCoins(userCollection.getCurrentUser(), 10) {
+                    it.onSuccess { rb ->
+                        Timber.i("Recently banked coins $rb")
+                        recentlyBanked.postValue(rb)
+                    }
                 }
             }
-
         }
     }
 

@@ -29,8 +29,13 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     private var threadsRegistration: Registration? = null
 
     override fun bind() {
-        actions.postValue(ThreadsAction.SetLoadingState(true))
+        if (threadsRegistration == null) {
+            loadThreads()
+        }
+    }
 
+    private fun loadThreads() {
+        actions.postValue(ThreadsAction.SetLoadingState(true))
         threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) { result ->
             result.onSuccess {
                 Timber.i("Retrieved threads $it")
@@ -38,9 +43,8 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
                 threads.postValue(allThreads)
                 actions.postValue(ThreadsAction.SetLoadingState(false))
             }.onFailure {
-
+                actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_threads, this::loadThreads))
             }
-
         }
     }
 
@@ -85,7 +89,8 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     }
 
     sealed class ThreadsAction {
-        class SetLoadingState(val loading: Boolean) : ThreadsAction()
-        class DisplayMessage(@StringRes val message: Int) : ThreadsAction()
+        data class SetLoadingState(val loading: Boolean) : ThreadsAction()
+        data class DisplayMessage(@StringRes val message: Int) : ThreadsAction()
+        data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): ThreadsAction()
     }
 }

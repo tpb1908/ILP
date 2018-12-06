@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
@@ -60,16 +61,21 @@ class ThreadActivity : AppCompatActivity() {
 
     private fun bindViewModel() {
         vm.bind()
-        vm.actions.observe(this, Observer {
-            when (it) {
+        vm.actions.observe(this, Observer { action ->
+            when (action) {
                 is ThreadViewModel.ThreadAction.SetLoadingState -> {
-                    thread_loading_bar.visibility = if (it.isLoading) View.VISIBLE else View.GONE
+                    thread_loading_bar.visibility = if (action.isLoading) View.VISIBLE else View.GONE
                 }
                 is ThreadViewModel.ThreadAction.ShowCoinsDialog -> {
-                    showCoinsDialog(it.coins)
+                    showCoinsDialog(action.coins)
                 }
                 is ThreadViewModel.ThreadAction.DisplayBankDialog -> {
-                    showBankingRequirementDialog(it.numStillBankable)
+                    showBankingRequirementDialog(action.numStillBankable)
+                }
+                is ThreadViewModel.ThreadAction.DisplayError -> {
+                    Snackbar.make(findViewById(android.R.id.content), action.message, Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
+                        action.retry()
+                    }.show()
                 }
             }
         })

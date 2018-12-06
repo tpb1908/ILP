@@ -1,5 +1,6 @@
 package com.tpb.coinz.view.messaging.thread
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Message
@@ -94,5 +95,6 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
         data class SetLoadingState(val isLoading: Boolean) : ThreadAction()
         data class ShowCoinsDialog(val coins: List<Coin>) : ThreadAction()
         data class DisplayBankDialog(val numStillBankable: Int) : ThreadAction()
+        data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): ThreadAction()
     }
 }

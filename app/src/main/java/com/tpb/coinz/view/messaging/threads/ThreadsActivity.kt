@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.tpb.coinz.R
 import com.tpb.coinz.SimpleTextWatcher
 import com.tpb.coinz.data.chat.Thread
@@ -50,9 +51,13 @@ class ThreadsActivity : AppCompatActivity() {
             Timber.i("Threads observed $it")
             adapter.setThreads(it)
         })
-        vm.actions.observe(this, Observer {
-            if (it is ThreadsViewModel.ThreadsAction.SetLoadingState) {
-                messages_loading_bar.visibility = if (it.loading) View.VISIBLE else View.GONE
+        vm.actions.observe(this, Observer { action ->
+            if (action is ThreadsViewModel.ThreadsAction.SetLoadingState) {
+                messages_loading_bar.visibility = if (action.loading) View.VISIBLE else View.GONE
+            } else if (action is ThreadsViewModel.ThreadsAction.DisplayError) {
+                Snackbar.make(findViewById(android.R.id.content), action.message, Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
+                    action.retry()
+                }.show()
             }
         })
     }
