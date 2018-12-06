@@ -88,7 +88,7 @@ class ThreadActivity : AppCompatActivity() {
 
     private fun showBankingRequirementDialog(numStillBankable: Int) {
         AlertDialog.Builder(this).setTitle("Banking error")
-                .setMessage(getString(R.string.error_spare_change, numStillBankable))
+                .setMessage(resources.getQuantityString(R.plurals.error_spare_change, numStillBankable, numStillBankable))
                 .create().show()
     }
 

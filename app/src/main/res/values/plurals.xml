@@ -12,4 +12,9 @@
         <item quantity="other">%1$d coinz banked. %2$d remaining</item>
     </plurals>
 
+    <plurals name="error_spare_change">
+        <item quantity="one">You can\'t send coins until you have reached your daily banking limit.\nYou can bank %1$d more coin</item>
+        <item quantity="other">You can\'t send coins until you have reached your daily banking limit.\nYou can bank %1$d more coinz</item>
+    </plurals>
+
 </resources>

@@ -16,7 +16,7 @@
 
     <string name="error_empty_message">Can\'t send empty message</string>
     <string name="error_thread_to_self">You can\'t talk to yourself</string>
-    <string name="error_spare_change">You can\'t send coins until you have reached your daily banking limit.\nYou can bank %1$d more coinz</string>
+    <string name="error_spare_change"></string>
 
     <string name="recycler_section_collected_coins">Collected coinz</string>
     <string name="recycler_section_received_coins">Received coinz</string>
