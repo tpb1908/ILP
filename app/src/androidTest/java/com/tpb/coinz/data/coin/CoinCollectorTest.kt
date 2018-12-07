@@ -62,8 +62,6 @@ class CoinCollectorTest {
         )
     }
 
-    inline fun <reified T: Any> argumentCaptor() = ArgumentCaptor.forClass(T::class.java)
-
 
     /**
      * Test that CoinCollectorListener is notified when map is loaded

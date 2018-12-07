@@ -54,7 +54,7 @@ class BankActivity : AppCompatActivity() {
                     R.plurals.bank_coins_banked_info,
                     config.dailyBankLimit - it, config.dailyBankLimit - it, it)
         })
-        vm.numSelected.observe(this, Observer {
+        vm.numCollectedSelected.observe(this, Observer {
             //TODO: Display this text somewhere
         })
         adapter.selectionManager = vm

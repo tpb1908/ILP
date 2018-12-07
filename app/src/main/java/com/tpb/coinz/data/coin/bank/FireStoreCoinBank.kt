@@ -54,7 +54,7 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
     }
 
     override fun bankCoins(user: User, coins: List<Coin>, rates: Map<Currency, Double>, callback: (Result<List<Coin>>) -> Unit) {
-        if (coins.size <= numBankable) {
+        if (coins.count {!it.received} <= numBankable) {
             val successfullyBanked = mutableListOf<Coin>()
             var callCompleteCount = 0
             coins.forEach { coin ->

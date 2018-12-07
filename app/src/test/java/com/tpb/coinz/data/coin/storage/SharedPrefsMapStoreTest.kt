@@ -1,8 +1,6 @@
 package com.tpb.coinz.data.coin.storage
 
 import android.content.SharedPreferences
-import com.tpb.coinz.anyFunction
-import com.tpb.coinz.argumentCaptor
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Map
 import org.junit.Before
@@ -13,6 +11,8 @@ import org.junit.BeforeClass
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import utils.MockitoUtils.anyOfType
+import utils.MockitoUtils.argumentCaptor
 import java.util.*
 
 class SharedPrefsMapStoreTest {
@@ -78,14 +78,14 @@ class SharedPrefsMapStoreTest {
     fun getLatestSuccess() {
         val testMap = Map(Calendar.getInstance(), mapOf(), mutableListOf(), mutableListOf())
         sharedPrefsMapStore.store(testMap)
-        val mockCallback = anyFunction<((Result<Map>) -> Unit)>()
+        val mockCallback = anyOfType<((Result<Map>) -> Unit)>()
         sharedPrefsMapStore.getLatest(mockCallback)
         verify(mockCallback, times(1)).invoke(Result.success(testMap))
     }
 
     @Test
     fun getLatestFailure() {
-        val mockCallback = anyFunction<((Result<Map>) -> Unit)>()
+        val mockCallback = anyOfType<((Result<Map>) -> Unit)>()
         sharedPrefsMapStore.getLatest(mockCallback)
         val captor = argumentCaptor<Result<Map>>()
         verify(mockCallback, times(1)).invoke(captor.capture())

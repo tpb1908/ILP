@@ -19,14 +19,14 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
 
     val numStillBankable = MutableLiveData<Int>()
 
-    val numSelected = MutableLiveData<Int>()
+    val numCollectedSelected = MutableLiveData<Int>()
 
     override val actions = ActionLiveData<BankAction>()
 
     private var numCollectedCoinsSelected = 0
         set(value) {
             field = value
-            numSelected.postValue(value)
+            numCollectedSelected.postValue(value)
         }
 
     private val registrations = CompositeRegistration()
@@ -84,6 +84,7 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
     }
 
     override fun attemptSelect(item: SelectableItem<Coin>): Boolean {
+        if (item.selected) return false
         if (item.item.received) {
             item.selected = true
             return true
@@ -99,8 +100,10 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
     }
 
     override fun deselect(item: SelectableItem<Coin>) {
-        item.selected = false
-        if (!item.item.received) numCollectedCoinsSelected--
+        if (item.selected) {
+            item.selected = false
+            if (!item.item.received) numCollectedCoinsSelected--
+        }
     }
 
     override fun onCleared() {
