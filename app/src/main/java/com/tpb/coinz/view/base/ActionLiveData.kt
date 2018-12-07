@@ -10,6 +10,14 @@ import androidx.lifecycle.Observer
  */
 class ActionLiveData<T> : MutableLiveData<T>() {
 
+    override fun observeForever(observer: Observer<in T>) {
+        super.observeForever(Observer { data ->
+            if (data == null) return@Observer
+            observer.onChanged(data)
+            value = null
+        })
+    }
+
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
         super.observe(owner, Observer { data ->
             if (data == null) return@Observer
