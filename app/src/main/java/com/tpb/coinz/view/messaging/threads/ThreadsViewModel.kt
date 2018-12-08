@@ -86,6 +86,7 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     fun searchUsers(partialEmail: String) {
         userCollection.searchUsersByEmail(partialEmail) { result ->
             result.onSuccess { userSearchResults.postValue(it) }
+            // We don't care about failure, that just means no match
         }
     }
 

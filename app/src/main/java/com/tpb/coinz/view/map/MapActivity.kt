@@ -66,7 +66,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         vm.bind()
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {
-                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coinToMarkerOption(this, it) })).toMap().toMutableMap())
+                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coin -> coinToMarkerOption(this, coin) })).toMap().toMutableMap())
             }
         })
         vm.actions.observe(this, Observer {
@@ -76,7 +76,7 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
                 }
                 is MapViewModel.MapAction.DisplayMessage -> Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
                 is MapViewModel.MapAction.ClearMarkers -> mapview.getMapAsync { map ->
-                    map.markers.forEach { map.removeMarker(it) }
+                    map.markers.forEach { marker -> map.removeMarker(marker) }
                 }
             }
         })

@@ -29,17 +29,24 @@ class ThreadsViewModelTest {
 
         private val chatCollection: ChatCollection = mock()
         private val userCollection: UserCollection = mock()
+        private val actionObserver: Observer<ThreadsViewModel.ThreadsAction> = mock()
+
+        private val threadsObserver: Observer<List<Thread>> = mock()
+
 
         private val user = DataGenerator.generateUser()
 
         private val threads = (1..10).map { DataGenerator.generateThread() }
 
     }
+    private lateinit var actionCaptor: KArgumentCaptor<ThreadsViewModel.ThreadsAction>
+    private lateinit var threadsCaptor: KArgumentCaptor<List<Thread>>
 
     @Before
     fun setUp() {
-        reset(chatCollection)
-        reset(userCollection)
+        actionCaptor = argumentCaptor()
+        threadsCaptor = argumentCaptor()
+        reset(chatCollection, userCollection, actionObserver, threadsObserver)
         `when`(userCollection.getCurrentUser()).thenReturn(user)
         `when`(chatCollection.openThreads(any(), any())).thenReturn(mock())
         vm = ThreadsViewModel(chatCollection, userCollection)
@@ -47,8 +54,6 @@ class ThreadsViewModelTest {
 
     @Test
     fun testThreadLoadingSuccess() {
-        val actionObserver = mock<Observer<ThreadsViewModel.ThreadsAction>>()
-        val actionCaptor = argumentCaptor<ThreadsViewModel.ThreadsAction>()
         vm.actions.observeForever(actionObserver)
         vm.bind()
 
@@ -62,8 +67,6 @@ class ThreadsViewModelTest {
         assertTrue("ViewModel should post true loading state",
                 (actionCaptor.lastValue as ThreadsViewModel.ThreadsAction.SetLoadingState).loading)
 
-        val threadsObserver = mock<Observer<List<Thread>>>()
-        val threadsCaptor = argumentCaptor<List<Thread>>()
         vm.threads.observeForever(threadsObserver)
 
         // Invoke the callback with a successful result
@@ -82,8 +85,6 @@ class ThreadsViewModelTest {
 
     @Test
     fun testThreadLoadingFailure() {
-        val actionObserver = mock<Observer<ThreadsViewModel.ThreadsAction>>()
-        val actionCaptor = argumentCaptor<ThreadsViewModel.ThreadsAction>()
         vm.actions.observeForever(actionObserver)
         vm.bind()
 
@@ -97,7 +98,6 @@ class ThreadsViewModelTest {
         assertTrue("ViewModel should post true loading state",
                 (actionCaptor.lastValue as ThreadsViewModel.ThreadsAction.SetLoadingState).loading)
 
-        val threadsObserver = mock<Observer<List<Thread>>>()
         vm.threads.observeForever(threadsObserver)
 
         // Invoke the callback with a failure result
@@ -117,8 +117,6 @@ class ThreadsViewModelTest {
 
     @Test
     fun createChatSuccess() {
-        val actionObserver = mock<Observer<ThreadsViewModel.ThreadsAction>>()
-        val actionCaptor = argumentCaptor<ThreadsViewModel.ThreadsAction>()
         vm.actions.observeForever(actionObserver)
 
         val partner = DataGenerator.generateUser()
@@ -133,11 +131,9 @@ class ThreadsViewModelTest {
 
         verify(chatCollection, times(1)).createThread(eq(user), eq(partner), threadCallbackCaptor.capture())
 
-        val threadObserver = mock<Observer<List<Thread>>>()
-        val threadCaptor = argumentCaptor<List<Thread>>()
         val threadIntentObserver = mock<Observer<Thread>>()
         val threadIntentCaptor = argumentCaptor<Thread>()
-        vm.threads.observeForever(threadObserver)
+        vm.threads.observeForever(threadsObserver)
         vm.threadIntents.observeForever(threadIntentObserver)
 
         val thread = DataGenerator.generateThread(creator = user, partner = partner)
@@ -147,8 +143,8 @@ class ThreadsViewModelTest {
         assertTrue(actionCaptor.lastValue is ThreadsViewModel.ThreadsAction.SetLoadingState)
         assertFalse((actionCaptor.lastValue as ThreadsViewModel.ThreadsAction.SetLoadingState).loading)
 
-        verify(threadObserver, times(1)).onChanged(threadCaptor.capture())
-        assertEquals(thread, threadCaptor.lastValue.last())
+        verify(threadsObserver, times(1)).onChanged(threadsCaptor.capture())
+        assertEquals(thread, threadsCaptor.lastValue.last())
         verify(threadIntentObserver, times(1)).onChanged(threadIntentCaptor.capture())
         assertEquals(thread, threadIntentCaptor.lastValue)
 
@@ -194,9 +190,8 @@ class ThreadsViewModelTest {
 
         verify(chatCollection, times(1)).createThread(eq(user), eq(partner), threadCallbackCaptor.capture())
 
-        val threadObserver = mock<Observer<List<Thread>>>()
         val threadIntentObserver = mock<Observer<Thread>>()
-        vm.threads.observeForever(threadObserver)
+        vm.threads.observeForever(threadsObserver)
         vm.threadIntents.observeForever(threadIntentObserver)
 
         threadCallbackCaptor.lastValue.invoke(Result.failure(java.lang.Exception()))
@@ -225,7 +220,4 @@ class ThreadsViewModelTest {
         assertEquals((actionCaptor.lastValue as ThreadsViewModel.ThreadsAction.DisplayMessage).message, R.string.error_thread_to_self)
     }
 
-    @Test
-    fun searchUsers() {
-    }
 }

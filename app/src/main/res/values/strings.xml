@@ -19,6 +19,8 @@
     <string name="error_loading_coins">Error loading coins</string>
     <string name="error_creating_thread">Error creating thread</string>
     <string name="error_loading_user">Error loading user</string>
+    <string name="error_posting_message">Error posting message</string>
+    <string name="error_sending_coin">Error sending coin</string>
 
     <string name="error_empty_message">Can\'t send empty message</string>
     <string name="error_thread_to_self">You can\'t talk to yourself</string>

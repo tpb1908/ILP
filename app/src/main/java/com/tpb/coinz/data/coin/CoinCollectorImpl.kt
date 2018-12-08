@@ -100,7 +100,7 @@ class CoinCollectorImpl(private val lp: LocationProvider, private val mapLoader:
                             it.remainingCoins.removeAll(collected)
                             it.collectedCoins.addAll(collected)
                             mapStore.update(it)
-                            listeners.forEach { it.coinsCollected(collected) }
+                            listeners.forEach { l -> l.coinsCollected(collected) }
                         }
                     }
                 }

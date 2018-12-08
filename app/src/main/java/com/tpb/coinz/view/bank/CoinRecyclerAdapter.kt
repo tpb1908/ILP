@@ -11,7 +11,7 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
     private var collectedCoins: List<SelectableItem<Coin>> = emptyList()
     private var receivedCoins: List<SelectableItem<Coin>> = emptyList()
-    var isSelectionEnabled = true
+    private var isSelectionEnabled = true
     var selectionManager: SelectionManager<Coin>? = null
 
     fun loadItems(newCollectedCoins: List<SelectableItem<Coin>>, newReceivedCoins: List<SelectableItem<Coin>>) {

@@ -185,7 +185,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         vm.collectionInfo.observe(this, collectionObserver)
         vm.coins.observe(this, Observer { coins ->
             home_minimap.getMapAsync {
-                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coinToMarkerOption(this, it) })).toMap().toMutableMap())
+                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coin -> coinToMarkerOption(this, coin) })).toMap().toMutableMap())
             }
 
         })
@@ -209,7 +209,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                     map.removeMarker(it.marker)
                 }
                 is HomeViewModel.HomeAction.ClearMarkers -> home_minimap.getMapAsync { map ->
-                    map.markers.forEach { map.removeMarker(it) }
+                    map.markers.forEach { marker -> map.removeMarker(marker) }
                 }
             }
         })

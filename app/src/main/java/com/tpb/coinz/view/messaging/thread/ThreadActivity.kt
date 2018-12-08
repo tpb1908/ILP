@@ -45,8 +45,7 @@ class ThreadActivity : AppCompatActivity() {
             if (thread_message_input.text.isNullOrEmpty()) {
                 Toast.makeText(this, R.string.error_empty_message, Toast.LENGTH_SHORT).show()
             } else {
-                vm.postMessage(thread_message_input.text.toString())
-                thread_message_input.text = null
+                vm.postTextMessage(thread_message_input.text.toString())
             }
         }
         thread_add_coin.setOnClickListener {
@@ -73,9 +72,12 @@ class ThreadActivity : AppCompatActivity() {
                     showBankingRequirementDialog(action.numStillBankable)
                 }
                 is ThreadViewModel.ThreadAction.DisplayError -> {
-                    Snackbar.make(findViewById(android.R.id.content), action.message, Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
+                    Snackbar.make(findViewById(android.R.id.content), action.message, Snackbar.LENGTH_LONG).setAction(R.string.action_retry) {
                         action.retry()
                     }.show()
+                }
+                is ThreadViewModel.ThreadAction.ClearMessageEntry -> {
+                    thread_message_input.text = null
                 }
             }
         })

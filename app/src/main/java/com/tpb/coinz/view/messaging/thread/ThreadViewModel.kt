@@ -2,6 +2,7 @@ package com.tpb.coinz.view.messaging.thread
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
+import com.tpb.coinz.R
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.chat.Thread
@@ -42,10 +43,18 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
         chatRegistration = chatCollection.openThread(thread, this::messageUpdate)
     }
 
-    fun postMessage(message: String) {
+    fun postTextMessage(message: String) {
         Timber.i("Posting message $message")
-        chatCollection.postMessage(Message(System.currentTimeMillis(), userCollection.getCurrentUser(), message)) {
-            //TODO
+        postMessage(Message(System.currentTimeMillis(), userCollection.getCurrentUser(), message))
+    }
+
+    private fun postMessage(message: Message) {
+        chatCollection.postMessage(message) {
+            if (it.isFailure || !it.getOrDefault(true)) {
+                actions.postValue(ThreadAction.DisplayError(R.string.error_posting_message) {postMessage(message)})
+            } else {
+                actions.postValue(ThreadAction.ClearMessageEntry)
+            }
         }
     }
 
@@ -53,9 +62,10 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
         Timber.i("Transferring $coin in thread $thread")
         thread?.let {
             coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin) { result ->
-                //TODO
-                result.onSuccess {
-                    chatCollection.postMessage(it) {}
+                result.onSuccess { message ->
+                    postMessage(message)
+                }.onFailure {
+                    actions.postValue(ThreadAction.DisplayError(R.string.error_sending_coin) {transferCoin(coin)})
                 }
             }
         }
@@ -70,7 +80,7 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
                 result.onSuccess {
                     actions.postValue(ThreadAction.ShowCoinsDialog(it))
                 }.onFailure {
-                    //TODO
+                    actions.postValue(ThreadAction.DisplayError(R.string.error_loading_coins) {loadCoinsForTransfer()})
                 }
             }
         } else {
@@ -96,5 +106,6 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
         data class ShowCoinsDialog(val coins: List<Coin>) : ThreadAction()
         data class DisplayBankDialog(val numStillBankable: Int) : ThreadAction()
         data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): ThreadAction()
+        object ClearMessageEntry : ThreadAction()
     }
 }
