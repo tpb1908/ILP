@@ -1,6 +1,11 @@
 package com.tpb.coinz.data.coin
 
 import android.location.Location
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.config.ConstantConfigProvider
@@ -11,7 +16,7 @@ import org.junit.Test
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
@@ -67,10 +72,10 @@ class CoinCollectorImplTest {
      */
     @Test
     fun testLoadMapListeners() {
-        val mockListener = Mockito.mock(com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener::class.java)
+        val mockListener = mock<CoinCollector.CoinCollectorListener>()
         collector.addCollectionListener(mockListener)
         collector.loadMap()
-        `when`(mockMapStore.getLatest(anyObject())).thenAnswer {
+        `when`(mockMapStore.getLatest(com.nhaarman.mockitokotlin2.any())).thenAnswer {
 
             (it.getArgument(0) as ((Result<Map>) -> Unit)).invoke(
                     Result.success(emptyMap)
@@ -82,11 +87,11 @@ class CoinCollectorImplTest {
     @Test
     fun testLoadFromNetwork() {
         collector.loadMap()
-        `when`(mockMapStore.getLatest(anyObject())).thenAnswer {
+        `when`(mockMapStore.getLatest(any())).thenAnswer {
             (it.getArgument(0) as ((Result<Map>) -> Unit)).invoke(
                 Result.failure(Exception())
             )
-            verify(mockMapLoader, times(1)).loadCoins(anyObject(), anyObject())
+            verify(mockMapLoader, times(1)).loadCoins(any(), any())
         }
     }
 

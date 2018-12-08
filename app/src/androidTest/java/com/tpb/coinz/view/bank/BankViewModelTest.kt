@@ -2,6 +2,8 @@ package com.tpb.coinz.view.bank
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.mock
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.storage.MapStore
@@ -16,9 +18,6 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import utils.DataGenerator
-import utils.MockitoUtils.anyOfType
-import utils.MockitoUtils.argumentCaptor
-import utils.MockitoUtils.typedAny
 
 class BankViewModelTest {
 
@@ -56,14 +55,14 @@ class BankViewModelTest {
      */
     @Test
     fun getBankableCoinsLoadingState() {
-        val actionObserver = anyOfType<Observer<BankViewModel.BankAction>>()
+        val actionObserver = mock<Observer<BankViewModel.BankAction>>()
         val actionCaptor = argumentCaptor<BankViewModel.BankAction>()
-        `when`(mockCoinBank.getBankableCoins(typedAny(), typedAny())).thenReturn(Mockito.mock(Registration::class.java))
+        `when`(mockCoinBank.getBankableCoins(com.nhaarman.mockitokotlin2.any(), com.nhaarman.mockitokotlin2.any())).thenReturn(Mockito.mock(Registration::class.java))
         vm.actions.observeForever(actionObserver)
         vm.bind()
         verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
-        assertTrue(actionCaptor.value is BankViewModel.BankAction.SetLoadingState)
-        assertTrue((actionCaptor.value as BankViewModel.BankAction.SetLoadingState).loading)
+        assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.SetLoadingState)
+        assertTrue((actionCaptor.lastValue as BankViewModel.BankAction.SetLoadingState).loading)
     }
 
     /**
@@ -73,24 +72,24 @@ class BankViewModelTest {
     @Test
     fun getBankableCoinsSuccess() {
         var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(typedAny(), typedAny())).thenAnswer {
+        `when`(mockCoinBank.getBankableCoins(com.nhaarman.mockitokotlin2.any(), com.nhaarman.mockitokotlin2.any())).thenAnswer {
             listener = it.getArgument(1)
             println("Returning mocked registration")
             Mockito.mock(Registration::class.java)
         }
         vm.bind()
         assertNotNull(listener)
-        val bankableObserver = anyOfType<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
+        val bankableObserver = mock<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
         vm.bankableCoins.observeForever(bankableObserver)
         val coins = (1..10).map { DataGenerator.generateCoin(received = it > 5) }
         listener?.invoke(Result.success(coins))
 
         val bankableCaptor = argumentCaptor<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
         verify(bankableObserver, times(1)).onChanged(bankableCaptor.capture())
-        assertTrue("First list should be collected coins", bankableCaptor.value.first.all { !it.item.received })
-        assertTrue("Second list should be received coins", bankableCaptor.value.second.all { it.item.received })
+        assertTrue("First list should be collected coins", bankableCaptor.lastValue.first.all { !it.item.received })
+        assertTrue("Second list should be received coins", bankableCaptor.lastValue.second.all { it.item.received })
         assertTrue("The same coins should be present", coins.all { coin ->
-            bankableCaptor.value.first.any { it.item == coin } || bankableCaptor.value.second.any { it.item == coin }
+            bankableCaptor.lastValue.first.any { it.item == coin } || bankableCaptor.lastValue.second.any { it.item == coin }
         })
     }
 
@@ -101,20 +100,20 @@ class BankViewModelTest {
     @Test
     fun getBankableCoinsFailure() {
         var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(typedAny(), typedAny())).thenAnswer {
+        `when`(mockCoinBank.getBankableCoins(com.nhaarman.mockitokotlin2.any(), com.nhaarman.mockitokotlin2.any())).thenAnswer {
             listener = it.getArgument(1)
             println("Returning mocked registration")
             Mockito.mock(Registration::class.java)
         }
         vm.bind()
         assertNotNull(listener)
-        val bankableObserver = anyOfType<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
+        val bankableObserver = mock<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
         vm.bankableCoins.observeForever(bankableObserver)
 
-        val actionObserver = anyOfType<Observer<BankViewModel.BankAction>>()
+        val actionObserver = mock<Observer<BankViewModel.BankAction>>()
         val actionCaptor = argumentCaptor<BankViewModel.BankAction>()
 
-        verify(bankableObserver, times(0)).onChanged(typedAny())
+        verify(bankableObserver, times(0)).onChanged(com.nhaarman.mockitokotlin2.any())
 
         vm.actions.observeForever(actionObserver)
         listener?.invoke(Result.failure(Exception()))
@@ -131,14 +130,14 @@ class BankViewModelTest {
     @Test
     fun testRetryOnFailedLoad() {
         var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(typedAny(), typedAny())).thenAnswer {
+        `when`(mockCoinBank.getBankableCoins(com.nhaarman.mockitokotlin2.any(), com.nhaarman.mockitokotlin2.any())).thenAnswer {
             listener = it.getArgument(1)
             println("Returning mocked registration")
             Mockito.mock(Registration::class.java)
         }
         vm.bind()
         assertNotNull(listener)
-        val actionObserver = anyOfType<Observer<BankViewModel.BankAction>>()
+        val actionObserver = mock<Observer<BankViewModel.BankAction>>()
         val actionCaptor = argumentCaptor<BankViewModel.BankAction>()
         vm.actions.observeForever(actionObserver)
         listener?.invoke(Result.failure(Exception()))
@@ -148,7 +147,7 @@ class BankViewModelTest {
         reset(actionObserver)
         val callback = (actionCaptor.allValues[1] as BankViewModel.BankAction.DisplayError).retry
         callback.invoke()
-        verify(mockCoinBank, times(2)).getBankableCoins(typedAny(), typedAny())
+        verify(mockCoinBank, times(2)).getBankableCoins(com.nhaarman.mockitokotlin2.any(), com.nhaarman.mockitokotlin2.any())
         verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
     }
 
@@ -171,7 +170,7 @@ class BankViewModelTest {
     fun testSelectionFlow() {
         val coins = (1..40).map { DataGenerator.generateCoin(received = it > 30) }
         var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(typedAny(), typedAny())).thenAnswer {
+        `when`(mockCoinBank.getBankableCoins(com.nhaarman.mockitokotlin2.any(), com.nhaarman.mockitokotlin2.any())).thenAnswer {
             listener = it.getArgument(1)
             println("Returning mocked registration")
             Mockito.mock(Registration::class.java)
@@ -181,11 +180,11 @@ class BankViewModelTest {
         assertNotNull(listener)
         listener?.invoke(Result.success(coins))
 
-        val collectedSelectionObserver = anyOfType<Observer<Int>>()
+        val collectedSelectionObserver = mock<Observer<Int>>()
         val selectedCaptor = argumentCaptor<Int>()
         vm.numCollectedSelected.observeForever(collectedSelectionObserver)
 
-        val actionsObserver = anyOfType<Observer<BankViewModel.BankAction>>()
+        val actionsObserver = mock<Observer<BankViewModel.BankAction>>()
         val actionsCaptor = argumentCaptor<BankViewModel.BankAction>()
         vm.actions.observeForever(actionsObserver)
 
@@ -200,7 +199,7 @@ class BankViewModelTest {
         assertFalse(vm.attemptSelect(SelectableItem(false, coins[26])))
         verifyNoMoreInteractions(collectedSelectionObserver)
         verify(actionsObserver, times(2)).onChanged(actionsCaptor.capture())
-        assertTrue(actionsCaptor.value is BankViewModel.BankAction.SelectionFull)
+        assertTrue(actionsCaptor.lastValue is BankViewModel.BankAction.SelectionFull)
 
         // Received coins should be selectable
         val item = SelectableItem(false, coins.last())
