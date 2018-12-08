@@ -1,18 +1,15 @@
 package com.tpb.coinz.view.home
 
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
@@ -30,7 +27,7 @@ import java.util.*
 
 class HomeViewModel(val config: ConfigProvider,
                     private val userCollection: UserCollection
-                    ) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener, KoinComponent {
+                    ) : BaseViewModel<HomeViewModel.HomeAction>(), com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener, KoinComponent {
 
 
     override val actions = ActionLiveData<HomeAction>()

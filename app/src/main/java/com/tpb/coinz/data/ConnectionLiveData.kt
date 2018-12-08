@@ -14,8 +14,10 @@ import androidx.lifecycle.LiveData
  */
 class ConnectionLiveData(val context: Context) : LiveData<Boolean>() {
 
+    @Suppress("DEPRECATION")
     override fun onActive() {
         super.onActive()
+        // CONNECTIVITY_ACTION broadcasts will only be received in the foreground on API >= N
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         context.registerReceiver(receiver, filter)
     }

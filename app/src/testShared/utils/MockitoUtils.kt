@@ -1,8 +1,10 @@
 package utils
 
+import androidx.lifecycle.Observer
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import kotlin.reflect.KClass
+import kotlin.reflect.full.primaryConstructor
 
 object MockitoUtils {
 
@@ -41,6 +43,17 @@ object MockitoUtils {
     @Suppress("UNCHECKED_CAST")
     private fun <T> castNull(): T = null as T
 
+    public fun <T> capturingObserver() = CapturingObserver<T>()
+
+    class CapturingObserver<T> : Observer<T> {
+
+        public val captured = mutableListOf<T>()
+
+        override fun onChanged(t: T) {
+            println("Captured value $t")
+            captured.add(t)
+        }
+    }
 
 }
 

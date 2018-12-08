@@ -2,18 +2,16 @@ package com.tpb.coinz
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.os.Looper
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.mapboxsdk.Mapbox
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.FireStoreChatCollection
-import com.tpb.coinz.data.coin.CoinCollector
+import com.tpb.coinz.data.coin.CoinCollectorImpl
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.bank.FireStoreCoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
@@ -26,7 +24,6 @@ import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.config.ConstantConfigProvider
 import com.tpb.coinz.data.location.GMSLocationProvider
 import com.tpb.coinz.data.location.LocationProvider
-import com.tpb.coinz.data.location.background.ForegroundLocationService
 import com.tpb.coinz.data.users.FireBaseUserCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.bank.BankViewModel
@@ -69,9 +66,9 @@ class App : Application() {
             }
         }
         val coinCollectionModule = module {
-            single {
+            single<com.tpb.coinz.data.coin.collection.CoinCollector> {
                 Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
-                CoinCollector(get(), get(), get(), get()) }
+                CoinCollectorImpl(get(), get(), get(), get()) }
             single<CoinCollection> { FireStoreCoinCollection(firestore) }
         }
         val connectivityModule = module {

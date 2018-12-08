@@ -8,7 +8,7 @@ import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
-import junit.framework.Assert.*
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -82,7 +82,7 @@ class BankViewModelTest {
         assertNotNull(listener)
         val bankableObserver = anyOfType<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
         vm.bankableCoins.observeForever(bankableObserver)
-        val coins = (1..10).map { DataGenerator.getCoin(received = it > 5) }
+        val coins = (1..10).map { DataGenerator.generateCoin(received = it > 5) }
         listener?.invoke(Result.success(coins))
 
         val bankableCaptor = argumentCaptor<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
@@ -169,7 +169,7 @@ class BankViewModelTest {
      */
     @Test
     fun testSelectionFlow() {
-        val coins = (1..40).map { DataGenerator.getCoin(received = it > 30) }
+        val coins = (1..40).map { DataGenerator.generateCoin(received = it > 30) }
         var listener: ((Result<List<Coin>>) -> Unit)? = null
         `when`(mockCoinBank.getBankableCoins(typedAny(), typedAny())).thenAnswer {
             listener = it.getArgument(1)

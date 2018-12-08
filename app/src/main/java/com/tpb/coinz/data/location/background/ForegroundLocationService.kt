@@ -10,9 +10,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.home.HomeActivity
 import org.koin.android.ext.android.inject
@@ -110,7 +110,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     }
 
     private fun pause() {
-        // If the app is in the foreground, the CoinCollector will still be running
+        // If the app is in the foreground, the CoinCollectorImpl will still be running
         // but we don't have to care about
         collector.removeCollectionListener(this)
     }

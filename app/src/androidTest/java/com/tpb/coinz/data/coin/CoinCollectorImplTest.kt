@@ -10,14 +10,13 @@ import org.junit.Test
 
 import org.junit.Before
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
-class CoinCollectorTest {
+class CoinCollectorImplTest {
 
     private val mockLocationProvider = object: LocationProvider {
         override fun addListener(listener: LocationListener) {
@@ -50,11 +49,11 @@ class CoinCollectorTest {
 
     private val emptyMap = Map(Calendar.getInstance(), mapOf(), mutableListOf(), mutableListOf())
 
-    lateinit var collector: CoinCollector
+    lateinit var collector: CoinCollectorImpl
 
     @Before
     fun initCollector() {
-        collector = CoinCollector(
+        collector = CoinCollectorImpl(
                 mockLocationProvider,
                 mockMapLoader,
                 mockMapStore,
@@ -68,7 +67,7 @@ class CoinCollectorTest {
      */
     @Test
     fun testLoadMapListeners() {
-        val mockListener = Mockito.mock(CoinCollector.CoinCollectorListener::class.java)
+        val mockListener = Mockito.mock(com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener::class.java)
         collector.addCollectionListener(mockListener)
         collector.loadMap()
         `when`(mockMapStore.getLatest(anyObject())).thenAnswer {

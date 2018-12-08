@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.CoinCollector
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.collection.CoinCollection
+import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
@@ -17,10 +17,9 @@ import timber.log.Timber
 // the constructor injected values have already been instantiated for HomeViewModel
 class MapViewModel(private val coinCollection: CoinCollection,
                    private val userCollection: UserCollection,
-                   private val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
+                   private val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
-
 
     private var markers: MutableMap<Coin, Marker> = HashMap()
 
@@ -30,12 +29,6 @@ class MapViewModel(private val coinCollection: CoinCollection,
         coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         coinCollector.addCollectionListener(this)
         coinCollector.loadMap()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        coinCollector.removeCollectionListener(this)
-        coinCollector.dispose()
     }
 
     override fun coinsCollected(collected: List<Coin>) {
@@ -66,6 +59,12 @@ class MapViewModel(private val coinCollection: CoinCollection,
 
     fun mapMarkers(markers: MutableMap<Coin, Marker>) {
         this.markers = markers
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        coinCollector.removeCollectionListener(this)
+        coinCollector.dispose()
     }
 
 

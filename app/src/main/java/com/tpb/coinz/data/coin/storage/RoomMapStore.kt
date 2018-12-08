@@ -49,7 +49,7 @@ class RoomMapStore(database: Database) : MapStore {
             dao.update(RoomMap(map))
             getLatest {
                 if (it.isSuccess) {
-                    Timber.i("CoinCollector Latest map ${it.getOrThrow().remainingCoins.size}")
+                    Timber.i("CoinCollectorImpl Latest map ${it.getOrThrow().remainingCoins.size}")
                 }
             }
         }
