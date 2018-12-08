@@ -17,9 +17,12 @@
     <string name="error_loading_threads">Error loading threads</string>
     <string name="error_banking_coins">Error banking coins</string>
     <string name="error_loading_coins">Error loading coins</string>
+    <string name="error_creating_thread">Error creating thread</string>
+    <string name="error_loading_user">Error loading user</string>
 
     <string name="error_empty_message">Can\'t send empty message</string>
     <string name="error_thread_to_self">You can\'t talk to yourself</string>
+
 
     <string name="recycler_section_collected_coins">Collected coinz</string>
     <string name="recycler_section_received_coins">Received coinz</string>

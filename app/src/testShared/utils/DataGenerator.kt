@@ -1,6 +1,8 @@
 package utils
 
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.tpb.coinz.data.chat.Message
+import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Map
@@ -33,4 +35,16 @@ object DataGenerator {
             Map(dateGenerated, rates, remainingCoins, collectedCoins)
 
     fun generateUser(uid: String = (id++).toString(), email: String = "test${id++}@test.com") = User(uid, email)
+
+    fun generateMessage(timestamp: Long = System.currentTimeMillis(),
+                        sender: User = generateUser(),
+                        message: String = "message #${id++}",
+                        coin: Coin? = null) = Message(timestamp, sender, message, coin)
+
+    fun generateThread(threadId: String = "thread_${id++}",
+                       creator: User = generateUser(),
+                       partner: User = generateUser(),
+                       updated: Long = System.currentTimeMillis()) = Thread(threadId, creator, partner, updated)
+
+
 }

@@ -43,6 +43,7 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
                 threads.postValue(allThreads)
                 actions.postValue(ThreadsAction.SetLoadingState(false))
             }.onFailure {
+                actions.postValue(ThreadsAction.SetLoadingState(false))
                 actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_threads, this::loadThreads))
             }
         }
@@ -56,21 +57,27 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
         } else {
             userCollection.retrieveUserFromEmail(userEmail) { result ->
                 result.onSuccess { user ->
-                    chatCollection.createThread(userCollection.getCurrentUser(), user) { threadResult ->
-                        threadResult.onSuccess {
-                            Timber.i("Creating thread")
-                            threads.postValue((threads.value ?: emptyList()) + it)
-                            threadIntents.postValue(it)
-                        }.onFailure {
-
-                        }
-
-                        actions.postValue(ThreadsAction.SetLoadingState(false))
-                    }
+                    createThread(user)
                 }.onFailure {
                     Timber.e("Couldn't retrieve user to create thread")
                     actions.postValue(ThreadsAction.SetLoadingState(false))
+                    actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_user) {createChat(userEmail)})
                 }
+            }
+        }
+    }
+
+    private fun createThread(user: User) {
+        chatCollection.createThread(userCollection.getCurrentUser(), user) { threadResult ->
+            threadResult.onSuccess {
+                Timber.i("Creating thread")
+                threads.postValue((threads.value ?: emptyList()) + it)
+                threadIntents.postValue(it)
+                actions.postValue(ThreadsAction.SetLoadingState(false))
+
+            }.onFailure {
+                actions.postValue(ThreadsAction.SetLoadingState(false))
+                actions.postValue(ThreadsAction.DisplayError(R.string.error_creating_thread) {createThread(user)})
             }
         }
     }
