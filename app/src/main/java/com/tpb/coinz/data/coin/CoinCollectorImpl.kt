@@ -9,27 +9,26 @@ import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationProvider
-import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.users.UserCollection
 import timber.log.Timber
 import java.util.*
 
-class CoinCollectorImpl(private val lp: LocationProvider, private val mapLoader: MapLoader, private val mapStore: MapStore, private val config: ConfigProvider) :
+class CoinCollectorImpl(private val lp: LocationProvider,
+                        private val mapLoader: MapLoader,
+                        private val mapStore: MapStore,
+                        private val config: ConfigProvider,
+                        private val coinCollection: CoinCollection,
+                        private val userCollection: UserCollection) :
         CoinCollector, LocationListener.SimpleLocationListener {
 
     private var map: Map? = null
 
     private val listeners: MutableSet<CoinCollector.CoinCollectorListener> = hashSetOf()
 
-    private var coinCollection: CoinCollection? = null
-    private var user: User? = null
-
-    override fun setCoinCollection(coinCollection: CoinCollection, user: User) {
-        this.coinCollection = coinCollection
-        this.user = user
-    }
 
     override fun loadMap() {
         lp.addListener(this)
+        if (map?.isValidForDay(Calendar.getInstance()) == true) return // We already have a valid map
         mapStore.getLatest { result ->
             result.onSuccess {
                 if (it.isValidForDay(Calendar.getInstance())) {
@@ -60,6 +59,7 @@ class CoinCollectorImpl(private val lp: LocationProvider, private val mapLoader:
 
     override fun addCollectionListener(listener: CoinCollector.CoinCollectorListener) {
         listeners.add(listener)
+        map?.let { listener.mapLoaded(it) }
     }
 
     override fun removeCollectionListener(listener: CoinCollector.CoinCollectorListener) {
@@ -92,19 +92,18 @@ class CoinCollectorImpl(private val lp: LocationProvider, private val mapLoader:
         if (collectable.isNotEmpty()) {
             Timber.i("Collecting coins $collectable from map ${map?.collectedCoins?.size}")
 
-            user?.let { user ->
-                coinCollection?.collectCoins(user, collectable) { result ->
-                    result.onSuccess { collected ->
-                        map?.let {
-                            Timber.i("Map prior to update ${it.remainingCoins.size}")
-                            it.remainingCoins.removeAll(collected)
-                            it.collectedCoins.addAll(collected)
-                            mapStore.update(it)
-                            listeners.forEach { l -> l.coinsCollected(collected) }
-                        }
+            coinCollection.collectCoins(userCollection.getCurrentUser(), collectable) { result ->
+                result.onSuccess { collected ->
+                    map?.let {
+                        Timber.i("Map prior to update ${it.remainingCoins.size}")
+                        it.remainingCoins.removeAll(collected)
+                        it.collectedCoins.addAll(collected)
+                        mapStore.update(it)
+                        listeners.forEach { l -> l.coinsCollected(collected) }
                     }
                 }
             }
         }
     }
+
 }

@@ -57,6 +57,7 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
         if (coins.count {!it.received} <= numBankable) {
             val successfullyBanked = mutableListOf<Coin>()
             var callCompleteCount = 0
+
             coins.forEach { coin ->
                 // We have to check that received as well as id to stop banking of a collected coin when we
                 // actually want to bank a received coin

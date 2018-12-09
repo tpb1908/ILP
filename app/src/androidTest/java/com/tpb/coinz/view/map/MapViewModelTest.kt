@@ -27,7 +27,6 @@ class MapViewModelTest {
     private lateinit var vm: MapViewModel
 
     companion object {
-        private val coinCollection = mock(CoinCollection::class.java)
         private val userCollection = mock(UserCollection::class.java)
         private val coinCollector = mock(CoinCollector::class.java)
         private val user = DataGenerator.generateUser()
@@ -36,9 +35,7 @@ class MapViewModelTest {
 
     @Before
     fun setUp() {
-        vm = MapViewModel(coinCollection, userCollection, coinCollector)
-        reset(coinCollection)
-        reset(userCollection)
+        vm = MapViewModel(coinCollector)
         reset(coinCollector)
 
         `when`(userCollection.getCurrentUser()).thenReturn(user)
@@ -48,7 +45,6 @@ class MapViewModelTest {
     @Test
     fun bind() {
         vm.bind()
-        verify(coinCollector, times(1)).setCoinCollection(coinCollection, user)
         verify(coinCollector, times(1)).addCollectionListener(vm)
         verify(coinCollector, times(1)).loadMap()
     }

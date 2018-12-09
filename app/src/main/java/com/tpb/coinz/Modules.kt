@@ -52,7 +52,7 @@ val coinBankModule = module {
 val coinCollectionModule = module {
     single<CoinCollector> {
         Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
-        CoinCollectorImpl(get(), get(), get(), get()) }
+        CoinCollectorImpl(get(), get(), get(), get(), get(), get()) }
     single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
 }
 val connectivityModule = module {
@@ -70,7 +70,7 @@ val userModule = module {
 }
 val viewModelModule = module(override = true) {
     viewModel { HomeViewModel(get(), get()) }
-    viewModel { MapViewModel(get(), get(), get()) }
+    viewModel { MapViewModel(get()) }
     viewModel { ThreadViewModel(get(), get(), get(), get()) }
     viewModel { ThreadsViewModel(get(), get()) }
     viewModel { BankViewModel(get(), get(), get()) }

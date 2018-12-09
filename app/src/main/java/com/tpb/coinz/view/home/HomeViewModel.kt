@@ -44,7 +44,6 @@ class HomeViewModel(val config: ConfigProvider,
 
     private val chatCollection: ChatCollection by inject()
     private var threadsRegistration: Registration? = null
-    private val coinCollection: CoinCollection by inject()
     private val coinCollector: CoinCollector by inject()
     private var bankRegistration: Registration? = null
     private val coinBank: CoinBank by inject()
@@ -63,7 +62,6 @@ class HomeViewModel(val config: ConfigProvider,
         GlobalScope.launch(Dispatchers.IO) {
 
             coinCollector.addCollectionListener(this@HomeViewModel)
-            coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
             coinCollector.loadMap()
 
             if (threadsRegistration == null) {

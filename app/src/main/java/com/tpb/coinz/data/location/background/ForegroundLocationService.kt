@@ -26,8 +26,6 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     private val SUMMARY_ID = 534
     private val group = "coin_collection_group"
 
-    private val userCollection: UserCollection by inject()
-    private val coinCollection: CoinCollection by inject()
     private val collector: CoinCollector by inject()
 
 
@@ -40,7 +38,6 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
         }
         moveToForeground()
         application.registerActivityLifecycleCallbacks(this)
-        collector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         collector.addCollectionListener(this)
     }
 

@@ -15,9 +15,7 @@ import timber.log.Timber
 
 // There is no need to delay heavy instantiations here as
 // the constructor injected values have already been instantiated for HomeViewModel
-class MapViewModel(private val coinCollection: CoinCollection,
-                   private val userCollection: UserCollection,
-                   private val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener {
+class MapViewModel(private val coinCollector: CoinCollector) : BaseViewModel<MapViewModel.MapAction>(), CoinCollector.CoinCollectorListener {
 
     val coins = MutableLiveData<List<Coin>>()
 
@@ -26,7 +24,6 @@ class MapViewModel(private val coinCollection: CoinCollection,
     override val actions = ActionLiveData<MapAction>()
 
     override fun bind() {
-        coinCollector.setCoinCollection(coinCollection, userCollection.getCurrentUser())
         coinCollector.addCollectionListener(this)
         coinCollector.loadMap()
     }
