@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
+import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService

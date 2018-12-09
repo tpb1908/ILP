@@ -40,7 +40,9 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
 
     fun openThread(thread: Thread) {
         this.thread = thread
-        chatRegistration = chatCollection.openThread(thread, this::messageUpdate)
+        if (chatRegistration == null) {
+            chatRegistration = chatCollection.openThread(thread, this::messageUpdate)
+        }
     }
 
     fun postTextMessage(message: String) {
@@ -61,7 +63,10 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
     fun transferCoin(coin: Coin) {
         Timber.i("Transferring $coin in thread $thread")
         thread?.let {
-            coinCollection.transferCoin(userCollection.getCurrentUser(), it.otherUser(userCollection.getCurrentUser()), coin) { result ->
+            coinCollection.transferCoin(
+                    userCollection.getCurrentUser(),
+                    it.otherUser(userCollection.getCurrentUser()),
+                    coin) { result ->
                 result.onSuccess { message ->
                     postMessage(message)
                 }.onFailure {
