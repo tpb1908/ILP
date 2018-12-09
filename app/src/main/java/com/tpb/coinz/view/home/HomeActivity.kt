@@ -177,12 +177,16 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun bindViewModel() {
+        println("Mock is $vm")
         vm.bind()
-
         vm.user.observe(this, Observer {
             user_email.text = it.email
         })
-        vm.collectionInfo.observe(this, collectionObserver)
+        vm.collectionInfo.observe(this, Observer {
+            map_collection_info.text =
+                    resources.getQuantityString(R.plurals.home_coin_collection_info,
+                            it.numCollected, it.numCollected, it.numRemaining)
+        })
         vm.coins.observe(this, Observer { coins ->
             home_minimap.getMapAsync {
                 vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coin -> coinToMarkerOption(this, coin) })).toMap().toMutableMap())
@@ -215,12 +219,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         })
     }
 
-
-
-    private val collectionObserver = Observer<MapInfo> {
-        map_collection_info.text =
-                resources.getQuantityString(R.plurals.home_coin_collection_info, it.numCollected, it.numCollected, it.numRemaining)
-    }
 
     private fun beginLoginFlow() {
         val providers = listOf(

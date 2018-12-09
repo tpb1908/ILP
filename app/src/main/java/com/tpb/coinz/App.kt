@@ -32,6 +32,7 @@ import com.tpb.coinz.view.map.MapViewModel
 import com.tpb.coinz.view.messaging.thread.ThreadViewModel
 import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import org.koin.android.ext.android.startKoin
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 import timber.log.Timber
@@ -49,48 +50,7 @@ class App : Application() {
     private fun init() {
         Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
-        val firestore = FirebaseFirestore.getInstance()
-        val chatModule = module {
-            single<ChatCollection> { FireStoreChatCollection(firestore) }
-        }
-        val configModule = module {
-            single<ConfigProvider> { ConstantConfigProvider }
-        }
-        val coinBankModule = module {
-            single<CoinBank> {
-                FireStoreCoinBank(
-                        getSharedPreferences("coinbank", Context.MODE_PRIVATE),
-                        firestore,
-                        get()
-                )
-            }
-        }
-        val coinCollectionModule = module {
-            single<com.tpb.coinz.data.coin.collection.CoinCollector> {
-                Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
-                CoinCollectorImpl(get(), get(), get(), get()) }
-            single<CoinCollection> { FireStoreCoinCollection(firestore) }
-        }
-        val connectivityModule = module {
-            single { ConnectionLiveData(this@App) }
-        }
-        val locationModule = module {
-            single<LocationProvider> { GMSLocationProvider(this@App) }
-        }
-        val mapModule = module {
-            single<MapStore> { SharedPrefsMapStore(getSharedPreferences("map_storage_prefs", Context.MODE_PRIVATE)) }
-            single<MapLoader> { MapDownloader() }
-        }
-        val userModule = module {
-            single<UserCollection> { FireBaseUserCollection(FirebaseAuth.getInstance(), firestore) }
-        }
-        val viewModelModule = module {
-            viewModel { HomeViewModel(get(), get()) }
-            viewModel { MapViewModel(get(), get(), get()) }
-            viewModel { ThreadViewModel(get(), get(), get(), get()) }
-            viewModel { ThreadsViewModel(get(), get()) }
-            viewModel { BankViewModel(get(), get(), get()) }
-        }
+
         startKoin(this, listOf(viewModelModule,
                 configModule,
                 connectivityModule,

@@ -8,6 +8,8 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
+apply plugin: "kotlin-allopen"
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -42,6 +44,10 @@ androidExtensions {
     experimental = true
 }
 
+allOpen {
+    annotation("com.tpb.coinz.OpenForTesting")
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -66,6 +72,9 @@ dependencies {
 
     def koin_version = '1.0.2'
     implementation "org.koin:koin-core:$koin_version"
+    androidTestImplementation("org.koin:koin-test:$koin_version", {
+        exclude group: 'org.mockito'
+    })
     testImplementation "org.koin:koin-test:$koin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -101,6 +110,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"
+    androidTestImplementation 'androidx.test:rules:1.1.1-alpha01'
 
 
 }

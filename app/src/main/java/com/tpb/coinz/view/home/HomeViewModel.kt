@@ -24,7 +24,6 @@ import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import java.util.*
 
-
 class HomeViewModel(val config: ConfigProvider,
                     private val userCollection: UserCollection
                     ) : BaseViewModel<HomeViewModel.HomeAction>(), com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener, KoinComponent {
