@@ -206,6 +206,9 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                     it.numCollected,
                     it.numRemaining)
         })
+        vm.totalScore.observe(this, Observer {
+            scoreboard_total_value.text = getString(R.string.text_total_score, it)
+        })
         vm.actions.observe(this, Observer {
             when (it) {
                 is HomeViewModel.HomeAction.BeginLoginFlow -> beginLoginFlow()

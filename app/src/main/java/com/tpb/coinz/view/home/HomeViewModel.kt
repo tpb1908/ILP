@@ -10,10 +10,12 @@ import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
+import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
+import com.tpb.coinz.scoreboardModule
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +28,7 @@ import java.util.*
 
 class HomeViewModel(val config: ConfigProvider,
                     private val userCollection: UserCollection
-                    ) : BaseViewModel<HomeViewModel.HomeAction>(), com.tpb.coinz.data.coin.collection.CoinCollector.CoinCollectorListener, KoinComponent {
+                    ) : BaseViewModel<HomeViewModel.HomeAction>(), CoinCollector.CoinCollectorListener, KoinComponent {
 
 
     override val actions = ActionLiveData<HomeAction>()
@@ -42,11 +44,15 @@ class HomeViewModel(val config: ConfigProvider,
     val bankInfo = MutableLiveData<BankInfo>()
     val recentlyBanked = MutableLiveData<List<Transaction>>()
 
+    val totalScore = MutableLiveData<Double>()
+
     private val chatCollection: ChatCollection by inject()
     private var threadsRegistration: Registration? = null
     private val coinCollector: CoinCollector by inject()
     private var bankRegistration: Registration? = null
     private val coinBank: CoinBank by inject()
+    private val scoreboard: Scoreboard by inject()
+    private var scoreboardRegistration: Registration? = null
 
     override fun bind() {
         if (userCollection.isSignedIn()) {
@@ -81,6 +87,13 @@ class HomeViewModel(val config: ConfigProvider,
                         Timber.i("Recently banked coins $rb")
                         recentlyBanked.postValue(rb)
                         postBankedInfo()
+                    }
+                }
+            }
+            if (scoreboardRegistration == null) {
+                scoreboardRegistration = scoreboard.getScore(userCollection.getCurrentUser()) {
+                    it.onSuccess {
+                        totalScore.postValue(it)
                     }
                 }
             }

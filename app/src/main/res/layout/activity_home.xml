@@ -46,6 +46,12 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@+id/map_collection_info" />
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/scoreboard_total_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/coin_bank_info"/>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

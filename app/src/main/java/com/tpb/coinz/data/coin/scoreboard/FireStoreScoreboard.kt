@@ -1,27 +1,36 @@
 package com.tpb.coinz.data.coin.scoreboard
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.FireStoreRegistration
 import com.tpb.coinz.data.util.Registration
+import timber.log.Timber
 
 class FireStoreScoreboard(val store: FirebaseFirestore): Scoreboard {
 
-    private val scores = "scores"
+    private val scoreboard = "scoreboard"
     private val all = "all"
 
     override fun increaseScore(user: User, increase: Double, callback: (Result<Double>) -> Unit) {
-        val doc = store.collection(scores).document(user.uid)
+        val doc = store.collection(scoreboard).document(user.uid)
         store.runTransaction { transaction ->
+            Timber.i("Updating score for ${user.email}")
             val snap = transaction.get(doc)
             val currentScore = snap.getDouble(all) ?: 0.0
-            transaction.update(doc, all, currentScore + increase)
+            Timber.i("Current score $currentScore, Increase $increase")
+            transaction.set(doc, mapOf(all to currentScore + increase), SetOptions.merge())
+        }.addOnCompleteListener {
+            if (it.isSuccessful) {
+
+            }
+            Timber.i("Transaction complete ${it.isSuccessful}")
         }
     }
 
     override fun getScore(user: User, listener: (Result<Double>) -> Unit): Registration =
-            FireStoreRegistration(store.collection(scores).document(user.uid).addSnapshotListener { ds, exception ->
+            FireStoreRegistration(store.collection(scoreboard).document(user.uid).addSnapshotListener { ds, exception ->
                 if (ds != null) {
                     listener(Result.success(ds.getDouble(all) ?: 0.0))
                 } else {

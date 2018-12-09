@@ -46,7 +46,7 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
         try {
             val req = LocationRequest()
             req.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            req.interval = TimeUnit.SECONDS.toMillis(1)
+            req.interval = TimeUnit.SECONDS.toMillis(3)
             fusedLocationProviderClient.requestLocationUpdates(req, this, Looper.myLooper())
             fusedLocationProviderClient.lastLocation?.addOnCompleteListener {
                 if (it.isSuccessful) lastLocation = it.result

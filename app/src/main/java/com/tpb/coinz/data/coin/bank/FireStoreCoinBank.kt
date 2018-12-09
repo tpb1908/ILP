@@ -18,7 +18,8 @@ import com.tpb.coinz.data.util.Registration
 import timber.log.Timber
 import java.util.*
 
-class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFirestore, val config: ConfigProvider) : FireStoreCoinManager(store), CoinBank {
+class FireStoreCoinBank(private val prefs: SharedPreferences,
+                        store: FirebaseFirestore, val config: ConfigProvider) : FireStoreCoinManager(store), CoinBank {
 
     private inline fun banked(user: User): CollectionReference = store.collection(collected).document(user.uid).collection(banked)
 
@@ -58,6 +59,8 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
             val successfullyBanked = mutableListOf<Coin>()
             var callCompleteCount = 0
 
+
+
             coins.forEach { coin ->
                 // We have to check that received as well as id to stop banking of a collected coin when we
                 // actually want to bank a received coin
@@ -70,7 +73,6 @@ class FireStoreCoinBank(private val prefs: SharedPreferences, store: FirebaseFir
                                     val map = Conversion.toMap(coin)
                                     map["bank_time"] = System.currentTimeMillis()
                                     map["banked_value"] = coin.value * rates[coin.currency]!!
-                                    //TODO: We have to make this change before attempting to update the banked values
                                     // otherwise their listeners will be called before numBankable changes
                                     numBankable -= 1
                                     banked(user).add(map).addOnCompleteListener { addTask ->

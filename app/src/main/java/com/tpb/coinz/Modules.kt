@@ -15,6 +15,8 @@ import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.coin.collection.FireStoreCoinCollection
 import com.tpb.coinz.data.coin.loading.MapDownloader
 import com.tpb.coinz.data.coin.loading.MapLoader
+import com.tpb.coinz.data.coin.scoreboard.FireStoreScoreboard
+import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.coin.storage.SharedPrefsMapStore
 import com.tpb.coinz.data.config.ConfigProvider
@@ -49,6 +51,11 @@ val coinBankModule = module {
         )
     }
 }
+
+val scoreboardModule = module {
+    single<Scoreboard> { FireStoreScoreboard(FirebaseFirestore.getInstance())}
+}
+
 val coinCollectionModule = module {
     single<CoinCollector> {
         Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
@@ -73,5 +80,5 @@ val viewModelModule = module(override = true) {
     viewModel { MapViewModel(get()) }
     viewModel { ThreadViewModel(get(), get(), get(), get()) }
     viewModel { ThreadsViewModel(get(), get()) }
-    viewModel { BankViewModel(get(), get(), get()) }
+    viewModel { BankViewModel(get(), get(), get(), get()) }
 }

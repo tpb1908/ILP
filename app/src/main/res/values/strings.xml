@@ -40,6 +40,7 @@
     <string name="text_coin_message">%1$s %2$f</string>
     <string name="text_recent_threads_header">Messages</string>
     <string name="text_banked_coins_header">Bank</string>
+    <string name="text_total_score">Total score %1$f</string>
 
     <string name="content_coin_icon">Icon for coin type</string>
 </resources>

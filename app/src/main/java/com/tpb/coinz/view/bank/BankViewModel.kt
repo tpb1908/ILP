@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
+import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.CompositeRegistration
@@ -12,7 +13,10 @@ import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 
 
-class BankViewModel(private val coinBank: CoinBank, private val userCollection: UserCollection, private val mapStore: MapStore) :
+class BankViewModel(private val coinBank: CoinBank,
+                    private val userCollection: UserCollection,
+                    private val mapStore: MapStore,
+                    private val scoreboard: Scoreboard) :
         BaseViewModel<BankViewModel.BankAction>(), SelectionManager<Coin> {
 
     val bankableCoins = MutableLiveData<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
@@ -69,6 +73,7 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
                         collectedCoins.removeAll(coins.map { SelectableItem(true, it) })
                         receivedCoins.removeAll(coins.map { SelectableItem(true, it) })
                         bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
+                        increaseScore(coins)
                     }.onFailure {
                         actions.postValue(BankAction.DisplayError(R.string.error_banking_coins, this::bankCoins))
                     }
@@ -81,6 +86,19 @@ class BankViewModel(private val coinBank: CoinBank, private val userCollection: 
 
         }
 
+    }
+
+    private fun increaseScore(bankedCoins: List<Coin>) {
+        mapStore.getLatest {
+            it.onSuccess {  map ->
+                val increase = bankedCoins.sumByDouble { coin ->
+                    coin.value * map.rates.getValue(coin.currency)
+                }
+                scoreboard.increaseScore(userCollection.getCurrentUser(), increase) {
+
+                }
+            }
+        }
     }
 
     override fun attemptSelect(item: SelectableItem<Coin>): Boolean {

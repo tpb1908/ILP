@@ -58,7 +58,9 @@ class App : Application() {
                 mapModule,
                 userModule,
                 chatModule,
-                coinBankModule, coinCollectionModule),
+                coinBankModule,
+                coinCollectionModule,
+                scoreboardModule),
                 logger = TimberKoinLogger)
 
     }
