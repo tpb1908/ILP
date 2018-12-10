@@ -5,13 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.coin.Currency
 import timber.log.Timber
 
 class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
     private var collectedCoins: List<SelectableItem<Coin>> = emptyList()
     private var receivedCoins: List<SelectableItem<Coin>> = emptyList()
-    private var isSelectionEnabled = true
+    private var rates: Map<Currency, Double>? = null
     var selectionManager: SelectionManager<Coin>? = null
 
     fun loadItems(newCollectedCoins: List<SelectableItem<Coin>>, newReceivedCoins: List<SelectableItem<Coin>>) {
@@ -21,9 +22,11 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun numSelectedCoins() = collectedCoins.count(SelectableItem<Coin>::selected) + receivedCoins.count(SelectableItem<Coin>::selected)
+    fun setRates(rates: Map<Currency, Double>) {
+        this.rates = rates
+    }
 
-    var onClick: (Coin) -> Unit = {}
+    fun numSelectedCoins() = collectedCoins.count(SelectableItem<Coin>::selected) + receivedCoins.count(SelectableItem<Coin>::selected)
 
     private fun select(vh: CoinViewHolder, position: Int) {
         val item = getStateForPosition(position)
@@ -67,13 +70,9 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
             val item = getStateForPosition(position)
             if (item.selected) holder.select() else holder.deselect()
             holder.itemView.setOnClickListener {
-                if (isSelectionEnabled) {
-                    select(holder, position)
-                } else {
-                    onClick(item.item)
-                }
+                select(holder, position)
             }
-            holder.coin = item.item
+            holder.setText(item.item, rates?.get(item.item.currency))
         } else {
             (holder as DividerViewHolder).text = holder.itemView.context.getString(
                     if (position == 0)
@@ -82,7 +81,6 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
                         R.string.recycler_section_collected_coins
             )
         }
-
     }
 
 }

@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.coin.storage.MapStore
@@ -22,6 +23,8 @@ class BankViewModel(private val coinBank: CoinBank,
 
     val bankableCoins = MutableLiveData<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
 
+    val rates = MutableLiveData<Map<Currency, Double>>()
+
     val numStillBankable = MutableLiveData<Int>()
 
     val numCollectedSelected = MutableLiveData<Int>()
@@ -38,7 +41,10 @@ class BankViewModel(private val coinBank: CoinBank,
     private val registrations = CompositeRegistration()
 
     override fun bind() {
-        if (!registrations.hasRegistrations()) loadBankableCoins()
+        if (!registrations.hasRegistrations()) {
+            loadBankableCoins()
+            loadConversions()
+        }
         super.bind()
     }
 
@@ -62,6 +68,16 @@ class BankViewModel(private val coinBank: CoinBank,
         })
         numStillBankable.postValue(coinBank.getNumBankable())
 
+    }
+
+    private fun loadConversions() {
+        mapStore.getLatest { result ->
+            result.onSuccess {
+                rates.postValue(it.rates)
+            }.onFailure {
+                actions.postValue(BankAction.DisplayError(R.string.error_loading_rates, this::loadConversions))
+            }
+        }
     }
 
     fun bankCoins() {
@@ -131,6 +147,8 @@ class BankViewModel(private val coinBank: CoinBank,
         super.onCleared()
         registrations.deregister()
     }
+
+
 
     sealed class BankAction {
         data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): BankAction()

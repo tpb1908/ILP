@@ -21,7 +21,7 @@
     <string name="error_loading_user">Error loading user</string>
     <string name="error_posting_message">Error posting message</string>
     <string name="error_sending_coin">Error sending coin</string>
-
+    <string name="error_loading_rates">Error loading conversion rates</string>
     <string name="error_empty_message">Can\'t send empty message</string>
     <string name="error_thread_to_self">You can\'t talk to yourself</string>
 

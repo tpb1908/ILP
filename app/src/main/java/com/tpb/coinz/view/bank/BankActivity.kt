@@ -12,7 +12,6 @@ import com.tpb.coinz.data.config.ConfigProvider
 import kotlinx.android.synthetic.main.activity_bank.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 
 class BankActivity : AppCompatActivity() {
@@ -34,6 +33,9 @@ class BankActivity : AppCompatActivity() {
     private fun bindViewModel() {
         vm.bankableCoins.observe(this, Observer {
             adapter.loadItems(it.first, it.second)
+        })
+        vm.rates.observe(this, Observer {
+            adapter.setRates(it)
         })
         vm.actions.observe(this, Observer { action ->
             when (action) {
@@ -72,9 +74,6 @@ class BankActivity : AppCompatActivity() {
     private fun initViews() {
         available_coins_recycler.adapter = adapter
         available_coins_recycler.layoutManager = LinearLayoutManager(this)
-        adapter.onClick = {
-            Toast.makeText(this, "${it.currency} clicked", Toast.LENGTH_LONG).show()
-        }
         bank_coins_button.setOnClickListener {
             if (adapter.numSelectedCoins() > 0) {
                 vm.bankCoins()
