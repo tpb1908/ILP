@@ -44,6 +44,11 @@
                 android:background="?attr/selectableItemBackground"
                 android:text="@string/action_bank" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/bank_selected_coins_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
 
 

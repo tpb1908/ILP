@@ -9,7 +9,10 @@ class CompositeRegistration constructor(private val registrations: MutableList<R
 
     fun add(registration: Registration) = registrations.add(registration)
 
+    fun hasRegistrations(): Boolean = registrations.isNotEmpty()
+
     override fun deregister() {
         registrations.forEach(Registration::deregister)
+        registrations.clear()
     }
 }

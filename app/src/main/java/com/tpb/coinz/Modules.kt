@@ -31,6 +31,7 @@ import com.tpb.coinz.view.map.MapViewModel
 import com.tpb.coinz.view.messaging.thread.ThreadViewModel
 import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 import timber.log.Timber
@@ -71,10 +72,10 @@ val coinBankModule = module {
 val scoreboardModule = module {
     single<Scoreboard> { FireStoreScoreboard(FirebaseFirestore.getInstance())}
 }
-val viewModelModule = module(override = true) {
-    viewModel { HomeViewModel(get(), get()) }
-    viewModel { MapViewModel(get()) }
-    viewModel { ThreadViewModel(get(), get(), get(), get()) }
-    viewModel { ThreadsViewModel(get(), get()) }
-    viewModel { BankViewModel(get(), get(), get(), get()) }
+val viewModelModule = module {
+    viewModel<HomeViewModel>()
+    viewModel<MapViewModel>()
+    viewModel<ThreadViewModel>()
+    viewModel<ThreadsViewModel>()
+    viewModel<BankViewModel>()
 }

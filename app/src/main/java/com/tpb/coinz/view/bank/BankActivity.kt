@@ -11,12 +11,13 @@ import com.tpb.coinz.R
 import com.tpb.coinz.data.config.ConfigProvider
 import kotlinx.android.synthetic.main.activity_bank.*
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 
 class BankActivity : AppCompatActivity() {
 
-    private val vm: BankViewModel by inject()
+    private val vm: BankViewModel by viewModel()
 
     val config: ConfigProvider by inject()
 
@@ -32,7 +33,6 @@ class BankActivity : AppCompatActivity() {
 
     private fun bindViewModel() {
         vm.bankableCoins.observe(this, Observer {
-            Timber.i("Available coins changed $it")
             adapter.loadItems(it.first, it.second)
         })
         vm.actions.observe(this, Observer { action ->
@@ -57,7 +57,13 @@ class BankActivity : AppCompatActivity() {
                     config.dailyBankLimit - it, config.dailyBankLimit - it, it)
         })
         vm.numCollectedSelected.observe(this, Observer {
-            //TODO: Display this text somewhere
+            if (it == 0) {
+                bank_selected_coins_text.visibility = View.GONE
+            } else {
+                bank_selected_coins_text.text = getString(R.string.text_selected_coins, it)
+                bank_selected_coins_text.visibility = View.VISIBLE
+            }
+
         })
         adapter.selectionManager = vm
         vm.bind()

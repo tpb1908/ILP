@@ -23,7 +23,6 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
 
     fun numSelectedCoins() = collectedCoins.count(SelectableItem<Coin>::selected) + receivedCoins.count(SelectableItem<Coin>::selected)
 
-
     var onClick: (Coin) -> Unit = {}
 
     private fun select(vh: CoinViewHolder, position: Int) {

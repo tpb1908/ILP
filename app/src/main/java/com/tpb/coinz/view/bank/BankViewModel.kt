@@ -11,6 +11,7 @@ import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.CompositeRegistration
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
+import timber.log.Timber
 
 
 class BankViewModel(private val coinBank: CoinBank,
@@ -30,13 +31,14 @@ class BankViewModel(private val coinBank: CoinBank,
     private var numCollectedCoinsSelected = 0
         set(value) {
             field = value
+            Timber.i("numCollectedCoinsSelected $value")
             numCollectedSelected.postValue(value)
         }
 
     private val registrations = CompositeRegistration()
 
     override fun bind() {
-        if (firstBind) loadBankableCoins()
+        if (!registrations.hasRegistrations()) loadBankableCoins()
         super.bind()
     }
 
@@ -73,6 +75,7 @@ class BankViewModel(private val coinBank: CoinBank,
                         collectedCoins.removeAll(coins.map { SelectableItem(true, it) })
                         receivedCoins.removeAll(coins.map { SelectableItem(true, it) })
                         bankableCoins.postValue(Pair(collectedCoins, receivedCoins))
+                        numCollectedCoinsSelected -= coins.count { !it.received }
                         increaseScore(coins)
                     }.onFailure {
                         actions.postValue(BankAction.DisplayError(R.string.error_banking_coins, this::bankCoins))
