@@ -35,24 +35,24 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     }
 
     private fun loadThreads() {
-        actions.postValue(ThreadsAction.SetLoadingState(true))
+        loadingState.postValue(true)
         threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) { result ->
             result.onSuccess {
                 Timber.i("Retrieved threads $it")
                 allThreads.addAll(it)
                 threads.postValue(allThreads)
-                actions.postValue(ThreadsAction.SetLoadingState(false))
+                loadingState.postValue(false)
             }.onFailure {
-                actions.postValue(ThreadsAction.SetLoadingState(false))
+                loadingState.postValue(false)
                 actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_threads, this::loadThreads))
             }
         }
     }
 
     fun createChat(userEmail: String) {
-        actions.postValue(ThreadsAction.SetLoadingState(true))
+        loadingState.postValue(true)
         if (userCollection.getCurrentUser().email == userEmail) {
-            actions.postValue(ThreadsAction.SetLoadingState(false))
+            loadingState.postValue(false)
             actions.postValue(ThreadsAction.DisplayMessage(R.string.error_thread_to_self))
         } else {
             userCollection.retrieveUserFromEmail(userEmail) { result ->
@@ -60,7 +60,7 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
                     createThread(user)
                 }.onFailure {
                     Timber.e("Couldn't retrieve user to create thread")
-                    actions.postValue(ThreadsAction.SetLoadingState(false))
+                    loadingState.postValue(false)
                     actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_user) {createChat(userEmail)})
                 }
             }
@@ -73,10 +73,10 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
                 Timber.i("Creating thread")
                 threads.postValue((threads.value ?: emptyList()) + it)
                 threadIntents.postValue(it)
-                actions.postValue(ThreadsAction.SetLoadingState(false))
+                loadingState.postValue(false)
 
             }.onFailure {
-                actions.postValue(ThreadsAction.SetLoadingState(false))
+                loadingState.postValue(false)
                 actions.postValue(ThreadsAction.DisplayError(R.string.error_creating_thread) {createThread(user)})
             }
         }
@@ -97,7 +97,6 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     }
 
     sealed class ThreadsAction {
-        data class SetLoadingState(val loading: Boolean) : ThreadsAction()
         data class DisplayMessage(@StringRes val message: Int) : ThreadsAction()
         data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): ThreadsAction()
     }

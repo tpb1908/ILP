@@ -10,6 +10,7 @@ import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
+import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -30,22 +31,27 @@ class BankViewModelTest {
         private val mockMapStore: MapStore = mock()
         private val mockScoreboard: Scoreboard = mock()
         private val actionObserver = mock<Observer<BankViewModel.BankAction>>()
+        private val loadingStateObserver = mock<Observer<Boolean>>()
 
         private val testUser = User("uid", "test@test.com")
 
     }
 
     private lateinit var actionCaptor: KArgumentCaptor<BankViewModel.BankAction>
+    private lateinit var loadingStateCaptor: KArgumentCaptor<Boolean>
 
     @Before
     fun setUp() {
         actionCaptor = argumentCaptor()
-        reset(mockCoinBank, mockUserCollection, mockMapStore, actionObserver)
+        loadingStateCaptor = argumentCaptor()
+        reset(mockCoinBank, mockUserCollection, mockMapStore, actionObserver, loadingStateObserver)
         `when`(mockUserCollection.getCurrentUser()).thenAnswer {
             println("Returning test user")
             testUser
         }
         vm = BankViewModel(mockCoinBank, mockUserCollection, mockMapStore, mockScoreboard)
+        vm.loadingState.observeForever(loadingStateObserver)
+        vm.actions.observeForever(actionObserver)
     }
 
     /**
@@ -54,11 +60,9 @@ class BankViewModelTest {
     @Test
     fun getBankableCoinsLoadingState() {
         `when`(mockCoinBank.getBankableCoins(any(), any())).thenReturn(mock())
-        vm.actions.observeForever(actionObserver)
         vm.bind()
-        verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
-        assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.SetLoadingState)
-        assertTrue((actionCaptor.lastValue as BankViewModel.BankAction.SetLoadingState).loading)
+        verify(loadingStateObserver, times(1)).onChanged(loadingStateCaptor.capture())
+        assertTrue("Loading state should be true", loadingStateCaptor.lastValue)
     }
 
     /**
@@ -107,12 +111,12 @@ class BankViewModelTest {
 
         verify(bankableObserver, times(0)).onChanged(com.nhaarman.mockitokotlin2.any())
 
-        vm.actions.observeForever(actionObserver)
         listener?.invoke(Result.failure(Exception()))
-        verify(actionObserver, times(3)).onChanged(actionCaptor.capture())
-        assertTrue(actionCaptor.allValues[0] is BankViewModel.BankAction.SetLoadingState)
-        assertTrue(actionCaptor.allValues[1] is BankViewModel.BankAction.DisplayError)
-        assertTrue(actionCaptor.allValues[2] is BankViewModel.BankAction.SetLoadingState)
+        verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
+        assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.DisplayError)
+        verify(loadingStateObserver, times(2)).onChanged(loadingStateCaptor.capture())
+        assertTrue(loadingStateCaptor.firstValue)
+        assertFalse(loadingStateCaptor.secondValue)
     }
 
     /**
@@ -128,16 +132,14 @@ class BankViewModelTest {
         }
         vm.bind()
         assertNotNull(listener)
-        vm.actions.observeForever(actionObserver)
         listener?.invoke(Result.failure(Exception()))
-        verify(actionObserver, times(3)).onChanged(actionCaptor.capture())
-        assertTrue(actionCaptor.allValues[1] is BankViewModel.BankAction.DisplayError)
+        verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
+        assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.DisplayError)
 
         reset(actionObserver)
-        val callback = (actionCaptor.allValues[1] as BankViewModel.BankAction.DisplayError).retry
+        val callback = (actionCaptor.lastValue as BankViewModel.BankAction.DisplayError).retry
         callback.invoke()
         verify(mockCoinBank, times(2)).getBankableCoins(any(), any())
-        verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
     }
 
     @Test
@@ -172,8 +174,7 @@ class BankViewModelTest {
         val selectedCaptor = argumentCaptor<Int>()
         vm.numCollectedSelected.observeForever(collectedSelectionObserver)
 
-        vm.actions.observeForever(actionObserver)
-
+git
         // Attempt to select 25 user-collected coins which are not currently selected
         coins.subList(0, 25).forEach {
             assertTrue(vm.attemptSelect(SelectableItem(false, it)))
@@ -184,7 +185,7 @@ class BankViewModelTest {
         // No more than 25 user-collected should be selected
         assertFalse(vm.attemptSelect(SelectableItem(false, coins[26])))
         verifyNoMoreInteractions(collectedSelectionObserver)
-        verify(actionObserver, times(2)).onChanged(actionCaptor.capture())
+        verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
         assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.SelectionFull)
 
         // Received coins should be selectable

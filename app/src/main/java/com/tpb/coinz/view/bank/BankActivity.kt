@@ -37,7 +37,6 @@ class BankActivity : AppCompatActivity() {
         })
         vm.actions.observe(this, Observer { action ->
             when (action) {
-                is BankViewModel.BankAction.SetLoadingState -> bank_loading_bar.visibility = if (action.loading) View.VISIBLE else View.GONE
                 is BankViewModel.BankAction.SelectionFull -> {
 
                 }
@@ -48,6 +47,9 @@ class BankActivity : AppCompatActivity() {
                         action.retry()
                     }.show()
             }
+        })
+        vm.loadingState.observe(this, Observer {
+            bank_loading_bar.visibility = if (it) View.VISIBLE else View.GONE
         })
         vm.numStillBankable.observe(this, Observer {
             bank_coins_text.text = resources.getQuantityString(

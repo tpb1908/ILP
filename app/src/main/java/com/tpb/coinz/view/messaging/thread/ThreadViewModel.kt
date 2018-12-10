@@ -79,9 +79,9 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
     fun loadCoinsForTransfer() {
         val numStillBankable = coinBank.getNumBankable()
         if (numStillBankable == 0) {
-            actions.postValue(ThreadAction.SetLoadingState(true))
+            loadingState.postValue(true)
             coinCollection.getCollectedCoins(userCollection.getCurrentUser()) { result ->
-                actions.postValue(ThreadAction.SetLoadingState(false))
+                loadingState.postValue(false)
                 result.onSuccess {
                     actions.postValue(ThreadAction.ShowCoinsDialog(it))
                 }.onFailure {
@@ -95,9 +95,9 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
 
     private fun messageUpdate(change: Result<List<Message>>) {
         change.onSuccess {
-            actions.postValue(ThreadAction.SetLoadingState(true))
+            loadingState.postValue(true)
             messages.postValue((messages.value ?: emptyList()) + it)
-            actions.postValue(ThreadAction.SetLoadingState(false))
+            loadingState.postValue(false)
         }
     }
 
@@ -107,7 +107,6 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
     }
 
     sealed class ThreadAction {
-        data class SetLoadingState(val isLoading: Boolean) : ThreadAction()
         data class ShowCoinsDialog(val coins: List<Coin>) : ThreadAction()
         data class DisplayBankDialog(val numStillBankable: Int) : ThreadAction()
         data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): ThreadAction()

@@ -44,7 +44,7 @@ class BankViewModel(private val coinBank: CoinBank,
     private val receivedCoins = mutableListOf<SelectableItem<Coin>>()
 
     private fun loadBankableCoins() {
-        actions.postValue(BankAction.SetLoadingState(true))
+        loadingState.postValue(true)
         registrations.add(coinBank.getBankableCoins(userCollection.getCurrentUser()) { result ->
             result.onSuccess { coins ->
                 collectedCoins.clear()
@@ -56,14 +56,14 @@ class BankViewModel(private val coinBank: CoinBank,
                 actions.postValue(BankAction.DisplayError(R.string.error_loading_coins, this::loadBankableCoins))
             }
 
-            actions.postValue(BankAction.SetLoadingState(false))
+            loadingState.postValue(false)
         })
         numStillBankable.postValue(coinBank.getNumBankable())
 
     }
 
     fun bankCoins() {
-        actions.postValue(BankAction.SetLoadingState(true))
+        loadingState.postValue(false)
         val selected = (collectedCoins + receivedCoins).filter { it.selected }.map { it.item }
         mapStore.getLatest { result ->
             result.onSuccess { map ->
@@ -77,11 +77,11 @@ class BankViewModel(private val coinBank: CoinBank,
                     }.onFailure {
                         actions.postValue(BankAction.DisplayError(R.string.error_banking_coins, this::bankCoins))
                     }
-                    actions.postValue(BankAction.SetLoadingState(false))
+                    loadingState.postValue(false)
                 }
             }.onFailure {
                 actions.postValue(BankAction.DisplayError(R.string.error_banking_coins, this::bankCoins))
-                actions.postValue(BankAction.SetLoadingState(false))
+                loadingState.postValue(false)
             }
 
         }
@@ -130,7 +130,6 @@ class BankViewModel(private val coinBank: CoinBank,
     }
 
     sealed class BankAction {
-        data class SetLoadingState(val loading: Boolean) : BankAction()
         data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): BankAction()
         object SelectionFull : BankAction()
     }

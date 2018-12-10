@@ -62,9 +62,6 @@ class ThreadActivity : AppCompatActivity() {
         vm.bind()
         vm.actions.observe(this, Observer { action ->
             when (action) {
-                is ThreadViewModel.ThreadAction.SetLoadingState -> {
-                    thread_loading_bar.visibility = if (action.isLoading) View.VISIBLE else View.GONE
-                }
                 is ThreadViewModel.ThreadAction.ShowCoinsDialog -> {
                     showCoinsDialog(action.coins)
                 }
@@ -80,6 +77,9 @@ class ThreadActivity : AppCompatActivity() {
                     thread_message_input.text = null
                 }
             }
+        })
+        vm.loadingState.observe(this, Observer {
+            thread_loading_bar.visibility = if (it) View.VISIBLE else View.GONE
         })
         vm.messages.observe(this, Observer {
             adapter.setMessages(it)

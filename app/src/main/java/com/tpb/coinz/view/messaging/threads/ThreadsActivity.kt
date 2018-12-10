@@ -52,13 +52,17 @@ class ThreadsActivity : AppCompatActivity() {
             adapter.setThreads(it)
         })
         vm.actions.observe(this, Observer { action ->
-            if (action is ThreadsViewModel.ThreadsAction.SetLoadingState) {
-                messages_loading_bar.visibility = if (action.loading) View.VISIBLE else View.GONE
-            } else if (action is ThreadsViewModel.ThreadsAction.DisplayError) {
-                Snackbar.make(findViewById(android.R.id.content), action.message, Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
+            if (action is ThreadsViewModel.ThreadsAction.DisplayError) {
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        action.message,
+                        Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
                     action.retry()
                 }.show()
             }
+        })
+        vm.loadingState.observe(this, Observer {
+            messages_loading_bar.visibility = if (it) View.VISIBLE else View.GONE
         })
     }
 
