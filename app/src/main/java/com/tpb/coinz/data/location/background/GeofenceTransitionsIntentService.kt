@@ -6,6 +6,7 @@ import android.os.Build
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.tpb.coinz.BuildConfig
+import com.tpb.coinz.view.ForegroundLocationService
 import timber.log.Timber
 
 //https://developer.android.com/training/location/geofencing
@@ -26,16 +27,9 @@ class GeofenceTransitionsIntentService : IntentService(ServiceName) {
             Timber.e("GeoFence error code ${event.errorCode}")
             return
         }
-
         val transition = event.geofenceTransition
         if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Timber.i("Starting foreground service")
-                startForegroundService(Intent(this, ForegroundLocationService::class.java))
-            } else {
-                Timber.i("Starting service")
-                startService(Intent(this, ForegroundLocationService::class.java))
-            }
+            ForegroundLocationService.start(this)
         } else if (transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             Timber.i("Exiting Geofence area")
             stopService(Intent(this, ForegroundLocationService::class.java))

@@ -40,7 +40,7 @@ android {
     }
 }
 
-androidExtensions {
+androidExtensions { // For @Parcelable annotation on data classes
     experimental = true
 }
 
@@ -72,24 +72,18 @@ dependencies {
 
     def koin_version = '1.0.2'
     implementation "org.koin:koin-core:$koin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.koin:koin-androidx-scope:$koin_version"
+    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
     androidTestImplementation("org.koin:koin-test:$koin_version", {
         exclude group: 'org.mockito'
     })
     testImplementation "org.koin:koin-test:$koin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-
-    // AndroidX (based on koin-android)
-    implementation "org.koin:koin-androidx-scope:$koin_version"
-    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
-
-    def lifecycle_version = "2.0.0"
 
     // ViewModel and LiveData
+    def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
-
-    // optional - Test helpers for LiveData
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1"
@@ -99,14 +93,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:17.1.3'
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
 
-
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.7.2'
-
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.google.android.gms:play-services-fitness:16.0.1'
 
-    def room_version = "2.0.0"
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.7.2'
 
+
+
+    def room_version = "2.0.0"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"

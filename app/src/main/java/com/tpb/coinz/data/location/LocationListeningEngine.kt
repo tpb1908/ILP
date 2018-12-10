@@ -26,7 +26,7 @@ class LocationListeningEngine(private val locationProvider: LocationProvider) : 
     }
 
     override fun removeLocationUpdates() {
-        locationProvider.pause()
+        locationProvider.removeListener(this)
     }
 
     override fun isConnected(): Boolean = connected

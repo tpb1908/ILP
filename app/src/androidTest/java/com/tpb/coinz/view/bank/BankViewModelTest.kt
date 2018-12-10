@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import com.nhaarman.mockitokotlin2.*
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.bank.CoinBank
+import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
@@ -27,6 +28,7 @@ class BankViewModelTest {
         private val mockCoinBank: CoinBank = mock()
         private val mockUserCollection: UserCollection = mock()
         private val mockMapStore: MapStore = mock()
+        private val mockScoreboard: Scoreboard = mock()
         private val actionObserver = mock<Observer<BankViewModel.BankAction>>()
 
         private val testUser = User("uid", "test@test.com")
@@ -43,7 +45,7 @@ class BankViewModelTest {
             println("Returning test user")
             testUser
         }
-        vm = BankViewModel(mockCoinBank, mockUserCollection, mockMapStore)
+        vm = BankViewModel(mockCoinBank, mockUserCollection, mockMapStore, mockScoreboard)
     }
 
     /**

@@ -23,8 +23,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.*
 import com.tpb.coinz.data.ConnectionLiveData
@@ -34,6 +36,7 @@ import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.view.ForegroundLocationService
 import com.tpb.coinz.view.bank.BankActivity
 import com.tpb.coinz.view.map.MapActivity
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
@@ -45,6 +48,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 import kotlin.math.max
+import kotlin.math.min
 
 class HomeActivity : AppCompatActivity(), PermissionsListener {
 
@@ -68,7 +72,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         if (savedInstanceState == null) {
             moveToCoinArea()
             moveToUserLocation()
-
         }
 
     }
@@ -162,7 +165,9 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         val geofencingClient = LocationServices.getGeofencingClient(this)
         val bounds = config.collectionAreaBounds
         val center = bounds.center
-        val radius = max(bounds.longitudeSpan, bounds.latitudeSpan)
+
+        val radius = bounds.toLatLngs().map { it.distanceTo(center) }.max() ?: 0.0
+
         val fence = Geofence.Builder().setRequestId("coinz_geofence_id")
                 .setCircularRegion(center.latitude, center.longitude, radius.toFloat())
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
@@ -174,6 +179,16 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
             addGeofence(fence)
         }.build(), PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+        locationProvider.addListener(object : LocationListener.SimpleLocationListener {
+            override fun locationUpdate(location: Location) {
+                Timber.i("Checking whether ForegroundLocationService should start")
+                Timber.i("Center $center, location $location, radius $radius, distance ${center.distanceTo(LatLng(location))}")
+                if(center.distanceTo(LatLng(location)) < radius) {
+                    ForegroundLocationService.start(this@HomeActivity)
+                }
+                locationProvider.removeListener(this)
+            }
+        })
 
     }
 
@@ -298,13 +313,11 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     override fun onStop() {
         super.onStop()
         home_minimap.onStop()
-        locationProvider.stop()
     }
 
     public override fun onPause() {
         super.onPause()
         home_minimap.onPause()
-        locationProvider.pause()
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

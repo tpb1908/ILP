@@ -1,11 +1,13 @@
 package com.tpb.coinz.data.coin
 
 import com.nhaarman.mockitokotlin2.*
+import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.config.ConstantConfigProvider
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.data.users.UserCollection
 import org.junit.Test
 
 import org.junit.Before
@@ -19,6 +21,8 @@ class CoinCollectorImplTest {
         private val mockLocationProvider: LocationProvider = mock()
         private val mockMapLoader: MapLoader = mock()
         private val mockMapStore: MapStore = mock()
+        private val mockCoinCollection: CoinCollection = mock()
+        private val mockUserCollection: UserCollection = mock()
         private val map = DataGenerator.generateMap()
     }
 
@@ -29,7 +33,9 @@ class CoinCollectorImplTest {
                 mockLocationProvider,
                 mockMapLoader,
                 mockMapStore,
-                ConstantConfigProvider
+                ConstantConfigProvider,
+                mockCoinCollection,
+                mockUserCollection
         )
     }
 

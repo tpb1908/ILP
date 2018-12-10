@@ -4,6 +4,8 @@ import android.location.Location
 
 interface LocationListener {
 
+
+
     fun locationUpdate(location: Location)
 
     fun locationAvailable()

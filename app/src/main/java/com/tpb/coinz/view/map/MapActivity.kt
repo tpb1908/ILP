@@ -180,13 +180,11 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     override fun onStop() {
         super.onStop()
         mapview.onStop()
-        locationProvider.stop()
     }
 
     public override fun onPause() {
         super.onPause()
         mapview.onPause()
-        locationProvider.pause()
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

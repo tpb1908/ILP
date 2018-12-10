@@ -56,10 +56,6 @@ class GMSLocationProvider(context: Context) : LocationProvider, LocationCallback
         }
     }
 
-    override fun pause() {
-        fusedLocationProviderClient.removeLocationUpdates(this)
-    }
-
     override fun stop() {
         fusedLocationProviderClient.removeLocationUpdates(this)
     }

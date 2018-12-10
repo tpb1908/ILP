@@ -61,7 +61,7 @@ class LocationListeningEngineTest {
     @Test
     fun removeLocationUpdates() {
         lle.removeLocationUpdates()
-        verify(mockLocationProvider, times(1)).pause()
+        verify(mockLocationProvider, times(1)).removeListener(lle)
     }
 
     @Test

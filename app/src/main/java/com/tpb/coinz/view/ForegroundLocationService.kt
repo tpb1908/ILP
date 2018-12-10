@@ -1,4 +1,4 @@
-package com.tpb.coinz.data.location.background
+package com.tpb.coinz.view
 
 import android.app.*
 import android.content.Context
@@ -9,13 +9,13 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Map
-import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
-import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.home.HomeActivity
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 
 class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener, Application.ActivityLifecycleCallbacks {
@@ -31,8 +31,21 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
 
     override fun onBind(p0: Intent?): IBinder? = null
 
+    companion object {
+        fun start(context: Context) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Timber.i("Starting foreground service")
+                context.startForegroundService(Intent(context, ForegroundLocationService::class.java))
+            } else {
+                Timber.i("Starting service")
+                context.startService(Intent(context, ForegroundLocationService::class.java))
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+        Timber.i("Location service starting")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
@@ -55,6 +68,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setSmallIcon(R.drawable.ic_coins)
                 .setContentTitle("title for notification")
                 .setContentText("App is watching you")
                 .setGroup(group)
@@ -107,8 +121,8 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     }
 
     private fun pause() {
-        // If the app is in the foreground, the CoinCollectorImpl will still be running
-        // but we don't have to care about
+        // If the app is in the foreground, the CoinCollector will still be running
+        // but we don't want to post notifications
         collector.removeCollectionListener(this)
     }
 

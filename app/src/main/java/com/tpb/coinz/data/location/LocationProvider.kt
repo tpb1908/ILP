@@ -10,8 +10,6 @@ interface LocationProvider {
 
     fun start()
 
-    fun pause()
-
     fun stop()
 
     fun lastLocationUpdate(): Location?

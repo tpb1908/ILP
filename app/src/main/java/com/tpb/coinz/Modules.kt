@@ -36,12 +36,29 @@ import org.koin.dsl.module.module
 import timber.log.Timber
 
 
+val commonModule = module {
+    single<ConfigProvider> { ConstantConfigProvider }
+    single<UserCollection> { FireBaseUserCollection(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance()) }
+    single { ConnectionLiveData(androidContext()) }
+    single<LocationProvider> { GMSLocationProvider(androidContext()) }
+}
+
+val mapModule = module {
+    single<MapStore> { SharedPrefsMapStore(androidContext().getSharedPreferences("map_storage_prefs", Context.MODE_PRIVATE)) }
+    single<MapLoader> { MapDownloader() }
+}
+
+val coinCollectionModule = module {
+    single<CoinCollector> {
+        Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
+        CoinCollectorImpl(get(), get(), get(), get(), get(), get()) }
+    single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
+}
+
 val chatModule = module {
     single<ChatCollection> { FireStoreChatCollection(FirebaseFirestore.getInstance()) }
 }
-val configModule = module {
-    single<ConfigProvider> { ConstantConfigProvider }
-}
+
 val coinBankModule = module {
     single<CoinBank> {
         FireStoreCoinBank(
@@ -51,29 +68,8 @@ val coinBankModule = module {
         )
     }
 }
-
 val scoreboardModule = module {
     single<Scoreboard> { FireStoreScoreboard(FirebaseFirestore.getInstance())}
-}
-
-val coinCollectionModule = module {
-    single<CoinCollector> {
-        Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
-        CoinCollectorImpl(get(), get(), get(), get(), get(), get()) }
-    single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
-}
-val connectivityModule = module {
-    single { ConnectionLiveData(androidContext()) }
-}
-val locationModule = module {
-    single<LocationProvider> { GMSLocationProvider(androidContext()) }
-}
-val mapModule = module {
-    single<MapStore> { SharedPrefsMapStore(androidContext().getSharedPreferences("map_storage_prefs", Context.MODE_PRIVATE)) }
-    single<MapLoader> { MapDownloader() }
-}
-val userModule = module {
-    single<UserCollection> { FireBaseUserCollection(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance()) }
 }
 val viewModelModule = module(override = true) {
     viewModel { HomeViewModel(get(), get()) }
