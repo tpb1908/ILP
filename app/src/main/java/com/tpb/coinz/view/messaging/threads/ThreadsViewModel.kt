@@ -29,13 +29,14 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     private var threadsRegistration: Registration? = null
 
     override fun bind() {
-        if (threadsRegistration == null) {
+        if (threadsRegistration == null) { // Check that we aren't already receiving updates
             loadThreads()
         }
     }
 
     private fun loadThreads() {
         loadingState.postValue(true)
+        // Register to receive live updates to threads which the user is part of
         threadsRegistration = chatCollection.openThreads(userCollection.getCurrentUser()) { result ->
             result.onSuccess {
                 Timber.i("Retrieved threads $it")

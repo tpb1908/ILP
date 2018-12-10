@@ -30,7 +30,6 @@ class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
     override fun getItemCount(): Int = messages.size
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        holder.message = messages[position]
-        holder.setMessageType(isCurrentUser(messages[position].sender))
+        holder.setContent(messages[position], isCurrentUser(messages[position].sender))
     }
 }

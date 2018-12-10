@@ -76,6 +76,7 @@ class ThreadsActivity : AppCompatActivity() {
     }
 
     private val addChatClick = View.OnClickListener {
+        // Create a simple dialog with an AutoCompleteTextview
         val edit = AutoCompleteTextView(this)
         val container = FrameLayout(this)
         val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -85,8 +86,7 @@ class ThreadsActivity : AppCompatActivity() {
         container.addView(edit)
 
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line)
-        adapter.setNotifyOnChange(true)
-        edit.setAdapter(adapter)
+        adapter.setNotifyOnChange(true) // changes to adapter data should call notifyDataSetChanged
         edit.addTextChangedListener(object : SimpleTextWatcher() {
             override fun onTextChanged(text: String) {
                 vm.searchUsers(text)
@@ -96,13 +96,16 @@ class ThreadsActivity : AppCompatActivity() {
             adapter.clear()
             adapter.addAll(users.map { user -> user.email })
         })
+        edit.setAdapter(adapter)
         edit.setHint(R.string.hint_chat_creation_email)
         edit.maxLines = 1
+        // Display the dialog
         AlertDialog.Builder(this)
                 .setTitle(R.string.title_chat_creation_dialog)
                 .setView(container)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     vm.createChat(edit.text.toString())
+                    // Remove all observers belonging to this activity lifecycle (of which there is only the one above)
                     vm.userSearchResults.removeObservers(this)
                 }.show()
     }
