@@ -51,9 +51,10 @@ class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(s
         // Unfortunately there is no way to move a document in one operation
         // Instead we load the coin, changed received to true, write the coin to the receiver, and then remove the original
 
-        coins(from).whereEqualTo("id", coin.id).get().addOnCompleteListener { getTask ->
+        coins(from).whereEqualTo("id", coin.id).whereEqualTo("received", coin.received).get().addOnCompleteListener { getTask ->
             Timber.i("Transferring coin $coin from $from to $to")
-            // If there's more than one result, something has gone horribly wrong
+            // If there's more than one result, the user has received two of the same coin, and it doesn't matter which
+            // we send
             getTask.result?.documents?.firstOrNull()?.let { ds ->
                 ds.data?.apply {
                     coins(to).add(toMap(coin.copy(received = true))).addOnCompleteListener { addTask ->

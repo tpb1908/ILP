@@ -174,7 +174,6 @@ class BankViewModelTest {
         val selectedCaptor = argumentCaptor<Int>()
         vm.numCollectedSelected.observeForever(collectedSelectionObserver)
 
-git
         // Attempt to select 25 user-collected coins which are not currently selected
         coins.subList(0, 25).forEach {
             assertTrue(vm.attemptSelect(SelectableItem(false, it)))

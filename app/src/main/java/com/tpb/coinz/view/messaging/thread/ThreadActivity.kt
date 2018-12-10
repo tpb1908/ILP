@@ -49,13 +49,11 @@ class ThreadActivity : AppCompatActivity() {
             }
         }
         thread_add_coin.setOnClickListener {
-
             vm.loadCoinsForTransfer()
         }
 
         thread_messages_recycler.layoutManager = LinearLayoutManager(this)
         thread_messages_recycler.adapter = adapter
-
     }
 
     private fun bindViewModel() {
@@ -69,7 +67,10 @@ class ThreadActivity : AppCompatActivity() {
                     showBankingRequirementDialog(action.numStillBankable)
                 }
                 is ThreadViewModel.ThreadAction.DisplayError -> {
-                    Snackbar.make(findViewById(android.R.id.content), action.message, Snackbar.LENGTH_LONG).setAction(R.string.action_retry) {
+                    Snackbar.make(findViewById(android.R.id.content),
+                            action.message,
+                            Snackbar.LENGTH_LONG
+                    ).setAction(R.string.action_retry) {
                         action.retry()
                     }.show()
                 }
