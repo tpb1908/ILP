@@ -1,5 +1,6 @@
 package com.tpb.coinz.data.coin
 
+import androidx.annotation.ColorInt
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 /**
@@ -16,7 +17,7 @@ data class Coin(val id: String,
                 val value: Double,
                 val currency: Currency,
                 val markerSymbol: Int,
-                val markerColor: Int,
+                @ColorInt val markerColor: Int,
                 val location: LatLng,
                 val received: Boolean = false)
 

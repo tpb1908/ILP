@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -56,9 +57,11 @@ class ThreadsActivity : AppCompatActivity() {
                 Snackbar.make(
                         findViewById(android.R.id.content),
                         action.message,
-                        Snackbar.LENGTH_INDEFINITE).setAction(R.string.action_retry) {
+                        Snackbar.LENGTH_LONG).setAction(R.string.action_retry) {
                     action.retry()
                 }.show()
+            } else if (action is ThreadsViewModel.ThreadsAction.DisplayMessage) {
+                Toast.makeText(this, getString(action.message, *action.formatArgs), Toast.LENGTH_SHORT).show()
             }
         })
         vm.loadingState.observe(this, Observer {

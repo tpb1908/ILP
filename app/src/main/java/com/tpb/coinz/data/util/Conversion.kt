@@ -4,7 +4,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
-import com.tpb.coinz.data.users.User
 
 object Conversion {
 

@@ -38,13 +38,11 @@ class NewLoginTest {
 
     @Rule
     @JvmField
-    var mGrantPermissionRule =
-            GrantPermissionRule.grant(
+    var mGrantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
                     "android.permission.ACCESS_FINE_LOCATION")
 
     @Test
     fun newLoginTest() {
-
 
 
         val testEmail = "test${Random.nextInt(1000,50000)}@test.com"

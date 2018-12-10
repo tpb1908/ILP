@@ -4,15 +4,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.capture
 import com.nhaarman.mockitokotlin2.mock
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.users.UserCollection
-import org.junit.Assert.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

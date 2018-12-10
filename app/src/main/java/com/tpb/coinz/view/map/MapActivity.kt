@@ -15,14 +15,13 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.R
-import com.tpb.coinz.asCameraUpdate
-import com.tpb.coinz.coinToMarkerOption
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.view.map.MapUtils.coinToMarkerOption
 import kotlinx.android.synthetic.main.activity_map.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel

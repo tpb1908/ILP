@@ -10,7 +10,6 @@ import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
-import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule

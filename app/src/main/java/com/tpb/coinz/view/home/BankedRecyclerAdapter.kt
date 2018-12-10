@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tpb.coinz.R
-import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Transaction
 import kotlinx.android.synthetic.main.viewholder_coin_simple.view.*

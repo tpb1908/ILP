@@ -1,24 +1,21 @@
 package com.tpb.coinz.view.messaging.thread
 
-import android.view.Display
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.nhaarman.mockitokotlin2.mock
-import com.tpb.coinz.data.chat.ChatCollection
-import com.tpb.coinz.data.users.UserCollection
-import org.junit.Test
-
 import com.nhaarman.mockitokotlin2.*
 import com.tpb.coinz.R
+import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
-import org.junit.Assert.*
+import com.tpb.coinz.data.users.UserCollection
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.mockito.Mockito.`when`
 import utils.DataGenerator
-import java.lang.Exception
 
 class ThreadViewModelTest {
 

@@ -18,7 +18,9 @@ class App : Application() {
 
 
     private fun init() {
-        Mapbox.getInstance(this, "pk.eyJ1IjoidHBiMTkwOCIsImEiOiJjam1vd25pZm0xNWQzM3ZvZWtpZ3hmdmQ5In0.YMMSu09MMG3QPZ4m6_zndQ")
+        // Initialise MapBox with key in gradle.properties
+        Mapbox.getInstance(this, BuildConfig.MapBoxAPIKey)
+
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
 
         startKoin(this, listOf(viewModelModule,
@@ -32,6 +34,9 @@ class App : Application() {
 
     }
 
+    /**
+     * Logs Koin events via Timber
+     */
     private object TimberKoinLogger : org.koin.log.Logger {
         override fun debug(msg: String) = Timber.d(msg)
 

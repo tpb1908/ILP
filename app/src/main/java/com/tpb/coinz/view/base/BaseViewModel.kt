@@ -14,7 +14,7 @@ abstract class BaseViewModel<T> : ViewModel() {
 
     val loadingState = MutableLiveData<Boolean>()
 
-    protected var firstBind = true
+    private var firstBind = true
     open fun bind() {
         firstBind = false
     }

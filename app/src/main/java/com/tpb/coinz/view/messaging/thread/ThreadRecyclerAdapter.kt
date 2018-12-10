@@ -19,17 +19,6 @@ class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun addMessage(message: Message) {
-        messages.add(message)
-        notifyItemInserted(messages.size - 1)
-    }
-
-    fun addMessages(newMessages: List<Message>) {
-        val currentLength = messages.size
-        messages.addAll(newMessages)
-        notifyItemRangeInserted(currentLength, messages.size - 1)
-    }
-
     override fun getItemViewType(position: Int): Int {
         return if (isCurrentUser(messages[position].sender)) R.layout.viewholder_message_sent else R.layout.viewholder_message_received
     }

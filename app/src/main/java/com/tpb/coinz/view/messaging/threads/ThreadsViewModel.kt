@@ -53,28 +53,36 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
         loadingState.postValue(true)
         if (userCollection.getCurrentUser().email == userEmail) {
             loadingState.postValue(false)
-            actions.postValue(ThreadsAction.DisplayMessage(R.string.error_thread_to_self))
+            actions.postValue(ThreadsAction.DisplayMessage(R.string.error_thread_to_self, emptyArray()))
         } else {
-            userCollection.retrieveUserFromEmail(userEmail) { result ->
-                result.onSuccess { user ->
-                    createThread(user)
-                }.onFailure {
-                    Timber.e("Couldn't retrieve user to create thread")
-                    loadingState.postValue(false)
-                    actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_user) {createChat(userEmail)})
+            // Check that the thread doesn't already exist
+            val existing = allThreads.filter { it.partner.email == userEmail }
+            if (existing.isEmpty()) {
+                // Check that the user actually exists and attempt to create the thread
+                userCollection.retrieveUserFromEmail(userEmail) { result ->
+                    result.onSuccess { user ->
+                        createThread(user)
+                    }.onFailure {
+                        Timber.e("Couldn't retrieve user to create thread")
+                        loadingState.postValue(false)
+                        actions.postValue(ThreadsAction.DisplayError(R.string.error_loading_user) {createChat(userEmail)})
+                    }
                 }
+            } else {
+                actions.postValue(ThreadsAction.DisplayMessage(R.string.error_thread_already_exists, arrayOf(userEmail)))
+                loadingState.postValue(false)
             }
+
         }
     }
 
     private fun createThread(user: User) {
         chatCollection.createThread(userCollection.getCurrentUser(), user) { threadResult ->
             threadResult.onSuccess {
-                Timber.i("Creating thread")
-                threads.postValue((threads.value ?: emptyList()) + it)
-                threadIntents.postValue(it)
+                Timber.i("Created thread $it")
+                // New thread will appear in the list via the threadsRegistration
                 loadingState.postValue(false)
-
+                threadIntents.postValue(it) // Open the new thread
             }.onFailure {
                 loadingState.postValue(false)
                 actions.postValue(ThreadsAction.DisplayError(R.string.error_creating_thread) {createThread(user)})
@@ -82,7 +90,10 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
         }
     }
 
-
+    /**
+     * Search for a [User] by a partial email and return any matching
+     * users via [userSearchResults]
+     */
     fun searchUsers(partialEmail: String) {
         userCollection.searchUsersByEmail(partialEmail) { result ->
             result.onSuccess { userSearchResults.postValue(it) }
@@ -97,7 +108,7 @@ class ThreadsViewModel(private val chatCollection: ChatCollection,
     }
 
     sealed class ThreadsAction {
-        data class DisplayMessage(@StringRes val message: Int) : ThreadsAction()
+        data class DisplayMessage(@StringRes val message: Int, val formatArgs: Array<Any>) : ThreadsAction()
         data class DisplayError(@StringRes val message: Int, val retry: () -> Unit): ThreadsAction()
     }
 }

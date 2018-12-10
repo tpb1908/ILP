@@ -1,6 +1,5 @@
 package com.tpb.coinz.view.messaging.threads
 
-import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.nhaarman.mockitokotlin2.*
@@ -9,11 +8,10 @@ import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
-import org.junit.Before
-import org.junit.Test
-
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.mockito.Mockito.`when`
 import utils.DataGenerator
 

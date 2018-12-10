@@ -15,30 +15,29 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
-import com.firebase.ui.auth.data.model.User
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.tpb.coinz.*
-import com.tpb.coinz.data.ConnectionLiveData
+import com.tpb.coinz.BuildConfig
+import com.tpb.coinz.R
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.config.ConfigProvider
-import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.view.ForegroundLocationService
 import com.tpb.coinz.view.bank.BankActivity
 import com.tpb.coinz.view.map.MapActivity
+import com.tpb.coinz.view.map.MapUtils.coinToMarkerOption
+import com.tpb.coinz.view.map.asCameraUpdate
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsRecyclerAdapter
@@ -46,9 +45,6 @@ import kotlinx.android.synthetic.main.activity_home.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
-
-import kotlin.math.max
-import kotlin.math.min
 
 class HomeActivity : AppCompatActivity(), PermissionsListener {
 
@@ -241,9 +237,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
     private fun beginLoginFlow() {
         val providers = listOf(
-                AuthUI.IdpConfig.EmailBuilder().build(),
-                AuthUI.IdpConfig.PhoneBuilder().build(),
-                AuthUI.IdpConfig.GoogleBuilder().build())
+                AuthUI.IdpConfig.EmailBuilder().build())
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()

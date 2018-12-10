@@ -8,22 +8,20 @@ import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.coin.bank.CoinBank
-import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.data.util.Registration
-import com.tpb.coinz.scoreboardModule
 import com.tpb.coinz.view.base.ActionLiveData
 import com.tpb.coinz.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
+import timber.log.Timber
 import java.util.*
 
 class HomeViewModel(val config: ConfigProvider,
@@ -92,8 +90,8 @@ class HomeViewModel(val config: ConfigProvider,
             }
             if (scoreboardRegistration == null) {
                 scoreboardRegistration = scoreboard.getScore(userCollection.getCurrentUser()) {
-                    it.onSuccess {
-                        totalScore.postValue(it)
+                    it.onSuccess { score ->
+                        totalScore.postValue(score)
                     }
                 }
             }

@@ -2,7 +2,6 @@ package com.tpb.coinz.data.coin.collection
 
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Map
-import com.tpb.coinz.data.users.User
 
 
 /**

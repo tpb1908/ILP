@@ -2,7 +2,6 @@ package com.tpb.coinz.data.location.background
 
 import android.app.IntentService
 import android.content.Intent
-import android.os.Build
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.tpb.coinz.BuildConfig

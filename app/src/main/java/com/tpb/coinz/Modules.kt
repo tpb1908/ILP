@@ -1,7 +1,6 @@
 package com.tpb.coinz
 
 import android.content.Context
-import android.os.Looper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.ConnectionLiveData
@@ -32,11 +31,11 @@ import com.tpb.coinz.view.messaging.thread.ThreadViewModel
 import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
-import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
-import timber.log.Timber
 
-
+/**
+ * Commonly used data classes
+ */
 val commonModule = module {
     single<ConfigProvider> { ConstantConfigProvider }
     single<UserCollection> { FireBaseUserCollection(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance()) }
@@ -44,14 +43,19 @@ val commonModule = module {
     single<LocationProvider> { GMSLocationProvider(androidContext()) }
 }
 
+/**
+ * Classes used in loading and storing maps
+ */
 val mapModule = module {
-    single<MapStore> { SharedPrefsMapStore(androidContext().getSharedPreferences("map_storage_prefs", Context.MODE_PRIVATE)) }
+    single<MapStore> { SharedPrefsMapStore(androidContext().getSharedPreferences("mapstorage", Context.MODE_PRIVATE)) }
     single<MapLoader> { MapDownloader() }
 }
 
+/**
+ * Classes used in collection of coins
+ */
 val coinCollectionModule = module {
     single<CoinCollector> {
-        Timber.i("Instantiating coin collector. On main thread? ${Looper.myLooper() == Looper.getMainLooper()}")
         CoinCollectorImpl(get(), get(), get(), get(), get(), get()) }
     single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
 }
@@ -72,6 +76,9 @@ val coinBankModule = module {
 val scoreboardModule = module {
     single<Scoreboard> { FireStoreScoreboard(FirebaseFirestore.getInstance())}
 }
+/**
+ * ViewModels are automatically instantiated with constructor injection
+ */
 val viewModelModule = module {
     viewModel<HomeViewModel>()
     viewModel<MapViewModel>()
