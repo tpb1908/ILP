@@ -2,7 +2,6 @@ package com.tpb.coinz.view.map
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.view.View
@@ -13,6 +12,7 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.R
 import com.tpb.coinz.data.ConnectionLiveData
@@ -21,6 +21,7 @@ import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.isNightModeEnabled
 import com.tpb.coinz.view.map.MapUtils.coinToMarkerOption
 import kotlinx.android.synthetic.main.activity_map.*
 import org.koin.android.ext.android.inject
@@ -30,20 +31,20 @@ import timber.log.Timber
 
 class MapActivity : AppCompatActivity(), PermissionsListener {
 
-    val locationProvider: LocationProvider by inject()
+    private val locationProvider: LocationProvider by inject()
 
     private val connection: ConnectionLiveData by inject()
 
-    val config: ConfigProvider by inject()
+    private val config: ConfigProvider by inject()
 
     private lateinit var permissionsManager: PermissionsManager
-
 
     private val vm: MapViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
+        if(isNightModeEnabled()) mapview.setStyleUrl(Style.DARK)
         mapview.onCreate(savedInstanceState)
         bindViewModel()
 
@@ -65,7 +66,9 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         vm.bind()
         vm.coins.observe(this, Observer<List<Coin>> { coins ->
             mapview.getMapAsync {
-                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coin -> coinToMarkerOption(this, coin) })).toMap().toMutableMap())
+                val markers = coins.map { coin -> coinToMarkerOption(this, coin) }
+                // Add MarkerOptions to map and map the Markers to Coins
+                vm.setMapMarkers(coins.zip(it.addMarkers(markers)).toMap().toMutableMap())
             }
         })
         vm.actions.observe(this, Observer {
@@ -109,9 +112,6 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
     private fun moveToCoinArea() {
         mapview.getMapAsync {
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(config.collectionAreaBounds, 10))
-            it.addPolygon(config.collectionAreaPolygon
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.TRANSPARENT))
         }
 
     }
@@ -130,8 +130,8 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
         moveToCoinArea()
     }
 
+    // Move to the camera to the last known user location
     private val myLocationOnClick: View.OnClickListener = View.OnClickListener {
-        //TODO: First click for location, second for zoom
         mapview.getMapAsync { map ->
             locationProvider.lastLocationUpdate()?.apply {
                 map.animateCamera(this.asCameraUpdate())
@@ -160,11 +160,13 @@ class MapActivity : AppCompatActivity(), PermissionsListener {
 
     override fun onBackPressed() {
         mapview.getMapAsync {
+            // Return the current camera position
             setResult(Activity.RESULT_OK, Intent().putExtra(getString(R.string.extra_camera_position), it.cameraPosition))
             super.onBackPressed()
         }
     }
 
+    // Lifecycle methods
     public override fun onResume() {
         super.onResume()
         mapview.onResume()

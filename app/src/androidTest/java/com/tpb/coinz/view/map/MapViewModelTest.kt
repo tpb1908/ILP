@@ -86,7 +86,7 @@ class MapViewModelTest {
     fun messageOnAllCollected() {
         vm.mapLoaded(map)
         val markers = map.remainingCoins.associate { Pair(it, mock(Marker::class.java)) }.toMutableMap()
-        vm.mapMarkers(markers)
+        vm.setMapMarkers(markers)
         val actionObserver = mock<Observer<MapViewModel.MapAction>>()
         val actionCaptor = argumentCaptor<MapViewModel.MapAction>()
         vm.actions.observeForever(actionObserver)

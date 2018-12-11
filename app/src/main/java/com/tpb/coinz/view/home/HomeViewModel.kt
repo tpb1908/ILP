@@ -31,6 +31,12 @@ class HomeViewModel(val config: ConfigProvider,
 
     override val actions = ActionLiveData<HomeAction>()
 
+    private var loadCount = 0
+        set(value) {
+            field = value
+            loadingState.postValue(value > 0)
+        }
+
     val collectionInfo = MutableLiveData<MapInfo>()
     val coins = MutableLiveData<List<Coin>>()
     private var markers: MutableMap<Coin, Marker> = HashMap()
@@ -65,27 +71,35 @@ class HomeViewModel(val config: ConfigProvider,
         // We can initialise everything but the UserCollection in the background off the UI thread
         // as inject() is lazy, everything is constructed within the Coroutine
         GlobalScope.launch(Dispatchers.IO) {
-
+            loadCount++
             coinCollector.addCollectionListener(this@HomeViewModel)
             coinCollector.loadMap()
 
             if (threadsRegistration == null) {
+                loadCount++
                 threadsRegistration = chatCollection.openRecentThreads(userCollection.getCurrentUser(), 10) {
                     Timber.i("Received new threads $it")
                     it.onSuccess { newThreads ->
                         Timber.i("Retrieved threads $newThreads")
                         allThreads.addAll(newThreads)
                         threads.postValue(allThreads)
+                        loadCount--
+                    }.onFailure {
+                        loadCount--
                     }
                 }
             }
             postBankedInfo()
             if (bankRegistration == null) {
+                loadCount++
                 bankRegistration = coinBank.getRecentlyBankedCoins(userCollection.getCurrentUser(), 10) {
                     it.onSuccess { rb ->
                         Timber.i("Recently banked coins $rb")
                         recentlyBanked.postValue(rb)
                         postBankedInfo()
+                        loadCount--
+                    }.onFailure {
+                        loadCount--
                     }
                 }
             }
@@ -121,15 +135,17 @@ class HomeViewModel(val config: ConfigProvider,
     override fun mapLoaded(map: Map) {
         coins.postValue(map.remainingCoins)
         collectionInfo.postValue(MapInfo(map.collectedCoins.size, map.remainingCoins.size))
+        loadCount--
     }
 
     override fun notifyReloading() {
+        loadCount++
         actions.postValue(HomeAction.ClearMarkers)
         coins.postValue(emptyList())
         markers.clear()
     }
 
-    fun mapMarkers(markers: MutableMap<Coin, Marker>) {
+    fun setMapMarkers(markers: MutableMap<Coin, Marker>) {
         this.markers = markers
     }
 
@@ -158,6 +174,4 @@ class HomeViewModel(val config: ConfigProvider,
         object ClearMarkers : HomeAction()
         data class RemoveMarker(val marker: Marker) : HomeAction()
     }
-
-
 }

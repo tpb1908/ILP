@@ -14,6 +14,8 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Set theme automatically based on time of day. As we have location permissions
+        // this will be determined by local sunrise/set times
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO)
         init()
     }
@@ -22,7 +24,6 @@ class App : Application() {
     private fun init() {
         // Initialise MapBox with key in gradle.properties
         Mapbox.getInstance(this, BuildConfig.MapBoxAPIKey)
-
         Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else CrashlyticsTree)
 
         startKoin(this, listOf(viewModelModule,

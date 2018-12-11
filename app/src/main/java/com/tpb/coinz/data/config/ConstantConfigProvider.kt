@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.config
 
-import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 
@@ -20,6 +19,4 @@ object ConstantConfigProvider : ConfigProvider {
         get() = 25
     override val collectionAreaBounds: LatLngBounds
         get() = LatLngBounds.Builder().includes(points).build()
-    override val collectionAreaPolygon: PolygonOptions
-        get() = PolygonOptions().addAll(points)
 }

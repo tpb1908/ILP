@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
-import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
@@ -23,6 +23,7 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.tpb.coinz.BuildConfig
@@ -33,6 +34,7 @@ import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
+import com.tpb.coinz.isNightModeEnabled
 import com.tpb.coinz.view.ForegroundLocationService
 import com.tpb.coinz.view.bank.BankActivity
 import com.tpb.coinz.view.map.MapActivity
@@ -73,7 +75,11 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
+        if (isNightModeEnabled()) {
+            home_minimap.setStyleUrl(Style.DARK)
+        }
         home_minimap.onCreate(savedInstanceState)
+
         home_minimap.getMapAsync {
             it.addOnMapClickListener { latLng ->
                 val cameraPosition = it.cameraPosition
@@ -121,9 +127,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     private fun moveToCoinArea() {
         home_minimap.getMapAsync {
             it.animateCamera(CameraUpdateFactory.newLatLngBounds(config.collectionAreaBounds, 10))
-            it.addPolygon(config.collectionAreaPolygon
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.TRANSPARENT))
         }
     }
 
@@ -131,7 +134,9 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         Timber.i("Moving to user location")
         locationProvider.addListener(object : LocationListener.SimpleLocationListener {
             override fun locationUpdate(location: Location) {
-                home_minimap.getMapAsync { it.animateCamera(location.asCameraUpdate()) }
+                home_minimap.getMapAsync {
+                    it.animateCamera(location.asCameraUpdate())
+                }
                 locationProvider.removeListener(this)
             }
         })
@@ -189,21 +194,22 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun bindViewModel() {
-        println("Mock is $vm")
         vm.bind()
         vm.user.observe(this, Observer {
             user_email.text = it.email
         })
+        vm.coins.observe(this, Observer { coins ->
+            home_minimap.getMapAsync {
+                val markers = coins.map { coin -> coinToMarkerOption(this, coin) }
+                // Add MarkerOptions to map and map the Markers to Coins
+                vm.setMapMarkers(coins.zip(it.addMarkers(markers)).toMap().toMutableMap())
+            }
+        })
+        // Observers for displaying text and passing data to adapters
         vm.collectionInfo.observe(this, Observer {
             map_collection_info.text =
                     resources.getQuantityString(R.plurals.home_coin_collection_info,
                             it.numCollected, it.numCollected, it.numRemaining)
-        })
-        vm.coins.observe(this, Observer { coins ->
-            home_minimap.getMapAsync {
-                vm.mapMarkers(coins.zip(it.addMarkers(coins.map { coin -> coinToMarkerOption(this, coin) })).toMap().toMutableMap())
-            }
-
         })
         vm.threads.observe(this, Observer {
             threadsAdapter.setThreads(it)
@@ -221,6 +227,9 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         vm.totalScore.observe(this, Observer {
             scoreboard_total_value.text = getString(R.string.text_total_score, it)
         })
+        vm.loadingState.observe(this, Observer {
+            home_loading_bar.visibility = if(it) View.VISIBLE else View.GONE
+        })
         vm.actions.observe(this, Observer {
             when (it) {
                 is HomeViewModel.HomeAction.BeginLoginFlow -> beginLoginFlow()
@@ -236,11 +245,14 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
 
 
     private fun beginLoginFlow() {
+        // Open the Firebase login UI for login with email
         val providers = listOf(
                 AuthUI.IdpConfig.EmailBuilder().build())
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
+                        .setTheme(R.style.AppTheme)
+                        .setLogo(R.drawable.ic_coins)
                         .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
                         .setAvailableProviders(providers)
                         .build(),
@@ -266,7 +278,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
             } else {
                 vm.userLoginFailed()
             }
-        } else if (requestCode == rcMap) {
+        } else if (requestCode == rcMap) { // returning from map activity
             if (data?.hasExtra(getString(R.string.extra_camera_position)) == true) {
                 val position = data.getParcelableExtra<CameraPosition>(getString(R.string.extra_camera_position))
                 home_minimap.getMapAsync {
@@ -290,6 +302,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
         initLocationSystem()
     }
 
+    // Lifecycle methods
     public override fun onResume() {
         super.onResume()
         home_minimap.onResume()

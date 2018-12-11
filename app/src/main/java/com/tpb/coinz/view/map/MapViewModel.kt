@@ -52,7 +52,7 @@ class MapViewModel(private val coinCollector: CoinCollector) : BaseViewModel<Map
         coins.postValue(emptyList())
     }
 
-    fun mapMarkers(markers: MutableMap<Coin, Marker>) {
+    fun setMapMarkers(markers: MutableMap<Coin, Marker>) {
         this.markers = markers
     }
 

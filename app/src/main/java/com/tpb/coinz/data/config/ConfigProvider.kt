@@ -1,6 +1,5 @@
 package com.tpb.coinz.data.config
 
-import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 
 interface ConfigProvider {
@@ -12,7 +11,5 @@ interface ConfigProvider {
     val dailyBankLimit: Int
 
     val collectionAreaBounds: LatLngBounds
-
-    val collectionAreaPolygon: PolygonOptions
 
 }
