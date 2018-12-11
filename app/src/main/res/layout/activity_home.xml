@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="@string/text_recent_threads_header"
-            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/home_minimap" />
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="@string/text_banked_coins_header"
-            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recent_threads_recycler" />

@@ -7,6 +7,9 @@ import com.tpb.coinz.R
 import com.tpb.coinz.data.chat.Message
 import com.tpb.coinz.data.users.User
 
+/**
+ * Adapter to display a messaging thread with the current user on the right
+ */
 class ThreadRecyclerAdapter : RecyclerView.Adapter<MessageViewHolder>() {
 
     private val messages = mutableListOf<Message>()

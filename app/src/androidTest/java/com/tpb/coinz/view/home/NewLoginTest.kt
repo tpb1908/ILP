@@ -52,20 +52,6 @@ class NewLoginTest {
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         Thread.sleep(500)
 
-        val supportVectorDrawablesButton = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)))
-        supportVectorDrawablesButton.perform(scrollTo(), click())
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        Thread.sleep(500)
 
         val textInputEditText = onView(
                 allOf(withId(R.id.email),

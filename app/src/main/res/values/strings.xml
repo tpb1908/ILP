@@ -45,5 +45,7 @@
     <string name="text_thread_users">%1$s to %2$s</string>
     <string name="text_thread_last_update">Last updated %1$s</string>
     <string name="content_coin_icon">Icon for coin type</string>
+    <string name="title_coin_send_dialog">Select coin to send</string>
+    <string name="title_banking_error_dialog">Bank error</string>
 
 </resources>

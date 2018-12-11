@@ -248,9 +248,7 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private fun openThread(thread: Thread) {
-        val intent = Intent(this, ThreadActivity::class.java)
-        intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
-        startActivity(intent)
+        startActivity(ThreadActivity.createIntent(this, thread))
     }
 
 
@@ -265,7 +263,6 @@ class HomeActivity : AppCompatActivity(), PermissionsListener {
                     Timber.i("Response details ${response?.idpToken} User details ${it.uid}")
                     vm.userLoggedIn(it.uid, it.email!!)
                 }
-
             } else {
                 vm.userLoginFailed()
             }

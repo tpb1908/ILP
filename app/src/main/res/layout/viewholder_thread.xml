@@ -8,11 +8,11 @@
         android:id="@+id/viewholder_thread_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Material.Notification.Emphasis" />
+        android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle" />
 
     <TextView
         android:id="@+id/viewholder_thread_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Material.Notification.Info" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 </LinearLayout>

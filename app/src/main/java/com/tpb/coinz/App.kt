@@ -2,6 +2,7 @@ package com.tpb.coinz
 
 import android.app.Application
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import com.crashlytics.android.Crashlytics
 import com.mapbox.mapboxsdk.Mapbox
 import org.koin.android.ext.android.startKoin
@@ -13,6 +14,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO)
         init()
     }
 

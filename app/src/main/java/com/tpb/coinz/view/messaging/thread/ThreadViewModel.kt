@@ -36,11 +36,12 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
     private var chatRegistration: Registration? = null
 
     override fun bind() {
+        // Nothing to do here as thread is passed via Intent to ThreadActivity
     }
 
     fun openThread(thread: Thread) {
         this.thread = thread
-        if (chatRegistration == null) {
+        if (chatRegistration == null ) {
             chatRegistration = chatCollection.openThread(thread, this::messageUpdate)
         }
     }
@@ -52,7 +53,7 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
 
     private fun postMessage(message: Message) {
         chatCollection.postMessage(message) {
-            if (it.isFailure || !it.getOrDefault(true)) {
+            if (it.isFailure) {
                 actions.postValue(ThreadAction.DisplayError(R.string.error_posting_message) {postMessage(message)})
             } else {
                 actions.postValue(ThreadAction.ClearMessageEntry)
@@ -83,6 +84,7 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
             coinCollection.getCollectedCoins(userCollection.getCurrentUser()) { result ->
                 loadingState.postValue(false)
                 result.onSuccess {
+                    loadingState.postValue(false)
                     actions.postValue(ThreadAction.ShowCoinsDialog(it))
                 }.onFailure {
                     actions.postValue(ThreadAction.DisplayError(R.string.error_loading_coins) {loadCoinsForTransfer()})

@@ -1,6 +1,5 @@
 package com.tpb.coinz.view.messaging.threads
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -70,9 +69,7 @@ class ThreadsActivity : AppCompatActivity() {
     }
 
     private fun openThread(thread: Thread) {
-        val intent = Intent(this, ThreadActivity::class.java)
-        intent.putExtra(ThreadActivity.EXTRA_THREAD, thread)
-        startActivity(intent)
+        startActivity(ThreadActivity.createIntent(this, thread))
     }
 
     private val addChatClick = View.OnClickListener {

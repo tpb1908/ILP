@@ -104,11 +104,11 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
     }
 
 
-    override fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit) {
+    override fun postMessage(message: Message, callback: (Result<Unit>) -> Unit) {
         openThread?.let {
             messages(it).add(message).addOnCompleteListener { task ->
                 callback(if (task.isSuccessful)
-                    Result.success(true)
+                    Result.success(Unit)
                 else
                     Result.failure(CoinzException.UnknownException()))
             }
@@ -129,7 +129,10 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         // descending order
         // If the index doesn't exist, the snapshot listener will be called once, but updates will not be received
         // https://github.com/invertase/react-native-firebase/issues/568
-        val query = store.collection(threads).whereArrayContains("participants", user.uid).orderBy("last_updated", Query.Direction.DESCENDING).limit(count.toLong())
+        val query = store.collection(threads)
+                .whereArrayContains("participants", user.uid)
+                .orderBy("last_updated", Query.Direction.DESCENDING)
+                .limit(count.toLong())
         Timber.i("Getting recent threads for user $user")
         return FireStoreRegistration(query.addSnapshotListener(ThreadsSnapshotListener(listener)))
 

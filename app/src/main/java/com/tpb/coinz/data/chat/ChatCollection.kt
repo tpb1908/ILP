@@ -29,7 +29,7 @@ interface ChatCollection {
      * @param message The message to post from the thread creator to the thread partner
      * @param callback Result callback for success of sending the message
      */
-    fun postMessage(message: Message, callback: (Result<Boolean>) -> Unit)
+    fun postMessage(message: Message, callback: (Result<Unit>) -> Unit)
 
     /**
      * Add a listener for changes to the threads for the current user

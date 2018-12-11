@@ -46,9 +46,9 @@ class MapDownloader : MapLoader {
             val map = convert(json)
             listeners.forEach { it(Result.success(map)) }
             listeners.clear()
-        } catch (ioe: IOException) {
-            Timber.e(ioe, "MapDownloader exception")
-            listeners.forEach { it(Result.failure(ioe)) }
+        } catch (e: Exception) {
+            Timber.e(e, "MapDownloader exception")
+            listeners.forEach { it(Result.failure(e)) }
             listeners.clear()
         }
     }

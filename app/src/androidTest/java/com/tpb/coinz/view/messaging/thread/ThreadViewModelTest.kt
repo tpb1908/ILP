@@ -60,14 +60,14 @@ class ThreadViewModelTest {
     fun postMessageSuccess() {
         vm.openThread(thread)
 
-        val postCallbackCaptor = argumentCaptor<(Result<Boolean>) -> Unit>()
+        val postCallbackCaptor = argumentCaptor<(Result<Unit>) -> Unit>()
         vm.postTextMessage(messageText)
 
         verify(chatCollection, times(1)).postMessage(any(), postCallbackCaptor.capture())
 
         vm.actions.observeForever(actionObserver)
 
-        postCallbackCaptor.lastValue.invoke(Result.success(true))
+        postCallbackCaptor.lastValue.invoke(Result.success(Unit))
 
         verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
         assertTrue(actionCaptor.lastValue is ThreadViewModel.ThreadAction.ClearMessageEntry)
@@ -77,14 +77,14 @@ class ThreadViewModelTest {
     fun postMessageFailure() {
         vm.openThread(thread)
 
-        val postCallbackCaptor = argumentCaptor<(Result<Boolean>) -> Unit>()
+        val postCallbackCaptor = argumentCaptor<(Result<Unit>) -> Unit>()
         vm.postTextMessage(messageText)
 
         verify(chatCollection, times(1)).postMessage(any(), postCallbackCaptor.capture())
 
         vm.actions.observeForever(actionObserver)
 
-        postCallbackCaptor.lastValue.invoke(Result.success(false))
+        postCallbackCaptor.lastValue.invoke(Result.failure(Exception()))
 
         verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
         assertTrue(actionCaptor.lastValue is ThreadViewModel.ThreadAction.DisplayError)

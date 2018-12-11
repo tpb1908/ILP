@@ -59,10 +59,11 @@ class HomeViewModel(val config: ConfigProvider,
         } else {
             actions.postValue(HomeAction.BeginLoginFlow)
         }
-
     }
 
     private fun initInBackground() {
+        // We can initialise everything but the UserCollection in the background off the UI thread
+        // as inject() is lazy, everything is constructed within the Coroutine
         GlobalScope.launch(Dispatchers.IO) {
 
             coinCollector.addCollectionListener(this@HomeViewModel)

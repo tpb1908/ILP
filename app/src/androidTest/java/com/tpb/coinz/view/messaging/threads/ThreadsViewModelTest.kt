@@ -134,8 +134,6 @@ class ThreadsViewModelTest {
         assertTrue("ViewModel should post loading state", loadingStateCaptor.firstValue)
         assertFalse("ViewModel should post false loading state", loadingStateCaptor.secondValue)
 
-        verify(threadsObserver, times(1)).onChanged(threadsCaptor.capture())
-        assertEquals(thread, threadsCaptor.lastValue.last())
         verify(threadIntentObserver, times(1)).onChanged(threadIntentCaptor.capture())
         assertEquals(thread, threadIntentCaptor.lastValue)
 
