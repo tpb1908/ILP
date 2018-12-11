@@ -15,7 +15,6 @@ data class Thread(val threadId: String, val creator: User, val partner: User, va
 
     /**
      * Given one [User] from the [Thread], returns the other [User]
-     * //TODO: Is this used anywhere outside of [com.tpb.coinz.view.messaging.thread.ThreadViewModel.transferCoin]?
      */
     fun otherUser(user: User): User = if (user == creator) partner else creator
 

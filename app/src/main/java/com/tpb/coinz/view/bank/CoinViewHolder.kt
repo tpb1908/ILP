@@ -3,12 +3,11 @@ package com.tpb.coinz.view.bank
 import android.view.View
 import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.Currency
 import kotlinx.android.synthetic.main.viewholder_coin.view.*
 
 class CoinViewHolder(val view: View) : SelectableViewHolder(view) {
     fun setText(coin: Coin, rate: Double?) {
-        view.viewholder_coin_icon.setImageResource(Currency.getImageId(coin.currency))
+        view.viewholder_coin_icon.setImageResource(coin.currency.img)
         if (rate == null) {
             view.viewholder_coin_value.text = String.format("%.2f", coin.value)
         } else {

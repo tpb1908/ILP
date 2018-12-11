@@ -11,6 +11,7 @@ import com.tpb.coinz.data.coin.FireStoreCoinManager
 import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
+import com.tpb.coinz.data.util.CoinzException
 import com.tpb.coinz.data.util.Conversion
 import com.tpb.coinz.data.util.Conversion.fromMap
 import com.tpb.coinz.data.util.FireStoreRegistration
@@ -25,6 +26,10 @@ class FireStoreCoinBank(private val prefs: SharedPreferences,
 
     private val maxBankable = config.dailyBankLimit
 
+    /**
+     * Number of coins which can still be banked for the day
+     * Changes are a written to shared preferences for retrieval on app restart
+     */
     private var numBankable = 0
         set(value) {
             field = value
@@ -32,6 +37,9 @@ class FireStoreCoinBank(private val prefs: SharedPreferences,
             prefs.edit().putInt("num_bankable", value).apply()
         }
 
+    /**
+     * The current day
+     */
     private var bankDay: Calendar = Calendar.getInstance()
         set(value) {
             field = value
@@ -58,8 +66,6 @@ class FireStoreCoinBank(private val prefs: SharedPreferences,
         if (coins.count {!it.received} <= numBankable) {
             val successfullyBanked = mutableListOf<Coin>()
             var callCompleteCount = 0
-
-
 
             coins.forEach { coin ->
                 // We have to check that received as well as id to stop banking of a collected coin when we
@@ -100,7 +106,7 @@ class FireStoreCoinBank(private val prefs: SharedPreferences,
                         }
             }
         } else {
-            callback(Result.failure(Exception())) // TODO Proper error
+            callback(Result.failure(CoinzException.InvalidArgumentException()))
         }
     }
 
@@ -129,9 +135,11 @@ class FireStoreCoinBank(private val prefs: SharedPreferences,
                 convertQuerySnapshot(qs, exception, listener)
             })
 
+    // Converts the documents in a query snapshot to
     private fun convertQuerySnapshot(qs: QuerySnapshot?, exception: FirebaseFirestoreException?, listener: (Result<List<Transaction>>) -> Unit) {
         if (qs != null) {
             val transactions = mutableListOf<Transaction>()
+            // Convert document data to Transactions
             qs.documents.forEach { ds ->
                 ds.data?.let {
                     val time = it["bank_time"] as Long

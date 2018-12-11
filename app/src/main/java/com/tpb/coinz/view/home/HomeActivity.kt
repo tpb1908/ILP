@@ -33,10 +33,11 @@ import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.data.location.background.ForegroundLocationService
 import com.tpb.coinz.data.location.background.GeofenceTransitionsIntentService
 import com.tpb.coinz.isNightModeEnabled
-import com.tpb.coinz.view.ForegroundLocationService
 import com.tpb.coinz.view.bank.BankActivity
+import com.tpb.coinz.view.base.BaseActivity
 import com.tpb.coinz.view.map.MapActivity
 import com.tpb.coinz.view.map.MapUtils.coinToMarkerOption
 import com.tpb.coinz.view.map.asCameraUpdate
@@ -48,7 +49,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class HomeActivity : AppCompatActivity(), PermissionsListener {
+class HomeActivity : BaseActivity(), PermissionsListener {
 
     private val rcLogin = 5534
     private val rcMap = 6543

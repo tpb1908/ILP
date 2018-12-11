@@ -3,18 +3,18 @@ package com.tpb.coinz.view.bank
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tpb.coinz.R
 import com.tpb.coinz.data.config.ConfigProvider
+import com.tpb.coinz.view.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_bank.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class BankActivity : AppCompatActivity() {
+class BankActivity : BaseActivity() {
 
     private val vm: BankViewModel by viewModel()
 

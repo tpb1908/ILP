@@ -1,10 +1,9 @@
-package com.tpb.coinz.view
+package com.tpb.coinz.data.location.background
 
 import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -18,7 +17,7 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 
-class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener, Application.ActivityLifecycleCallbacks {
+class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener {
 
     private val id = 353
     private var rootNotif: Notification? = null
@@ -27,11 +26,20 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     private val group = "coin_collection_group"
 
     private val collector: CoinCollector by inject()
-
+    private val totalCollected = mutableListOf<Coin>()
 
     override fun onBind(p0: Intent?): IBinder? = null
 
     companion object {
+
+        private var listener: ((Boolean) -> Unit)? = null
+        var isActivityInForeground: Boolean = false
+            set(value) {
+                field = value
+                listener?.invoke(value)
+            }
+
+
         fun start(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 Timber.i("Starting foreground service")
@@ -50,8 +58,16 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
             createNotificationChannel()
         }
         moveToForeground()
-        application.registerActivityLifecycleCallbacks(this)
         collector.addCollectionListener(this)
+        listener = {
+            if (it) {
+                collector.addCollectionListener(this)
+            } else {
+                // If the app is in the foreground, the CoinCollector will still be running
+                // but we don't want to post notifications
+                collector.removeCollectionListener(this)
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -62,6 +78,13 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
     }
 
     private fun moveToForeground() {
+        createRootNotif(getString(R.string.text_collecting_in_background),
+                getString(R.string.content_collecting_in_background)
+        )
+        startForeground(id, rootNotif)
+    }
+
+    private fun createRootNotif(title: String, content: String) {
         val notifIntent = Intent(this, HomeActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notifIntent, 0)
         rootNotif = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -69,87 +92,57 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setSmallIcon(R.drawable.ic_coins)
-                .setContentTitle("title for notification")
-                .setContentText("App is watching you")
+                .setContentTitle(title)
+                .setContentText(content)
                 .setGroup(group)
                 .setContentIntent(pendingIntent).build()
-        startForeground(id, rootNotif)
     }
 
-    private fun updateSummaryNotification(collected: List<Coin>): Notification {
+    private fun updateSummaryNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Summary notification")
-                .setContentText("Some summary information")
+                .setContentTitle(getString(R.string.text_collecting_in_background))
+                .setContentText(resources.getQuantityString(
+                        R.plurals.text_total_collected_in_background,
+                        totalCollected.size, totalCollected.size))
                 .setGroup(group)
                 .setGroupSummary(true)
                 .build()
     }
 
     override fun coinsCollected(collected: List<Coin>) {
-        //TODO: Notification group for collected notifications
-        //TODO: Generate summary
         //https://developer.android.com/training/notify-user/group
         NotificationManagerCompat.from(this).apply {
             collected.forEach {
                 notify(it.markerColor, NotificationCompat.Builder(this@ForegroundLocationService, CHANNEL_ID)
                         .setContentTitle(it.currency.name)
                         .setContentText(it.id)
+                        .setSmallIcon(it.currency.img)
                         .setGroup(group)
                         .build())
             }
-            notify(SUMMARY_ID, updateSummaryNotification(collected))
+            totalCollected.addAll(collected)
+            notify(SUMMARY_ID, updateSummaryNotification())
         }
     }
 
     override fun mapLoaded(map: Map) {
+        createRootNotif(getString(R.string.text_collecting_in_background),
+                getString(R.string.content_collecting_in_background)
+        )
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(id, rootNotif)
     }
 
     override fun notifyReloading() {
+        createRootNotif(getString(R.string.text_reloading_map), "")
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(id, rootNotif)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        application.unregisterActivityLifecycleCallbacks(this)
         collector.removeCollectionListener(this)
         collector.dispose()
+        listener = null
     }
 
-    private var activityCount = 0
 
-    private fun run() {
-        collector.addCollectionListener(this)
-    }
-
-    private fun pause() {
-        // If the app is in the foreground, the CoinCollector will still be running
-        // but we don't want to post notifications
-        collector.removeCollectionListener(this)
-    }
-
-    override fun onActivityPaused(p0: Activity?) {
-        activityCount--
-        if (activityCount == 0) run()
-    }
-
-    override fun onActivityResumed(activity: Activity?) {
-        activityCount++
-        pause()
-    }
-
-    // We don't care about any of these
-    override fun onActivityDestroyed(p0: Activity?) {
-
-    }
-
-    override fun onActivityStarted(p0: Activity?) {
-    }
-
-    override fun onActivitySaveInstanceState(p0: Activity?, p1: Bundle?) {
-    }
-
-    override fun onActivityStopped(p0: Activity?) {
-    }
-
-    override fun onActivityCreated(p0: Activity?, p1: Bundle?) {
-    }
 }

@@ -26,15 +26,14 @@ import javax.net.ssl.HttpsURLConnection
  */
 class MapDownloader : MapLoader {
 
-    private var listeners: ArrayList<(Result<Map>) -> Unit> = arrayListOf()
+    private var listener: (Result<Map>) -> Unit = {}
 
     override fun loadCoins(date: Calendar, listener: (Result<Map>) -> Unit) {
-        listeners.add(listener)
+        this.listener = listener
         GlobalScope.launch(Dispatchers.IO) {
             // launch download on the IO threadpool
             loadCoinsFromUrl(date)
         }
-
     }
 
     private fun loadCoinsFromUrl(date: Calendar) {
@@ -43,13 +42,10 @@ class MapDownloader : MapLoader {
             val urlString = "https://homepages.inf.ed.ac.uk/stg/coinz/$datePath/coinzmap.geojson"
             val stream = downloadUrl(urlString)
             val json = JsonParser().parse(InputStreamReader(stream, "UTF-8")) as JsonObject
-            val map = convert(json)
-            listeners.forEach { it(Result.success(map)) }
-            listeners.clear()
+            listener(Result.success(convert(json)))
         } catch (e: Exception) {
             Timber.e(e, "MapDownloader exception")
-            listeners.forEach { it(Result.failure(e)) }
-            listeners.clear()
+            listener(Result.failure(e))
         }
     }
 
@@ -74,11 +70,8 @@ class MapDownloader : MapLoader {
     }
 
     private fun convert(obj: JsonObject): Map {
-
         val ratesObj = obj.getAsJsonObject("rates")
-        val rates = ratesObj.entrySet().map {
-            Currency.fromString(it.key) to it.value.asDouble
-        }.toMap()
+        val rates = ratesObj.entrySet().associate { Pair(Currency.valueOf(it.key), it.value.asDouble) }
 
         val features = obj.getAsJsonArray("features")
 
@@ -89,7 +82,7 @@ class MapDownloader : MapLoader {
             val properties = feature.getAsJsonObject("properties")
             val id = properties.getAsJsonPrimitive("id").asString
             val value = properties.getAsJsonPrimitive("value").asDouble
-            val currency = Currency.fromString(properties.getAsJsonPrimitive("currency").asString)
+            val currency = Currency.valueOf(properties.getAsJsonPrimitive("currency").asString)
             val markerSymbol = properties.getAsJsonPrimitive("marker-symbol").asInt
             val markerColor = Color.parseColor(properties.getAsJsonPrimitive("marker-color").asString)
             val coordinates = feature.getAsJsonObject("geometry").getAsJsonArray("coordinates")

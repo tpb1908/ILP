@@ -21,6 +21,7 @@ class App : Application() {
     }
 
 
+
     private fun init() {
         // Initialise MapBox with key in gradle.properties
         Mapbox.getInstance(this, BuildConfig.MapBoxAPIKey)

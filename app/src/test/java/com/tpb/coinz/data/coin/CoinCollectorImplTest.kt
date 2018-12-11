@@ -3,6 +3,7 @@ package com.tpb.coinz.data.coin
 import com.nhaarman.mockitokotlin2.*
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
+import com.tpb.coinz.data.coin.collection.CoinCollectorImpl
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.config.ConstantConfigProvider

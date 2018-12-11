@@ -6,7 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.FireStoreChatCollection
-import com.tpb.coinz.data.coin.CoinCollectorImpl
+import com.tpb.coinz.data.coin.collection.CoinCollectorImpl
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.bank.FireStoreCoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
@@ -56,7 +56,8 @@ val mapModule = module {
  */
 val coinCollectionModule = module {
     single<CoinCollector> {
-        CoinCollectorImpl(get(), get(), get(), get(), get(), get()) }
+        CoinCollectorImpl(get(), get(), get(), get(), get(), get())
+    }
     single<CoinCollection> { FireStoreCoinCollection(FirebaseFirestore.getInstance()) }
 }
 

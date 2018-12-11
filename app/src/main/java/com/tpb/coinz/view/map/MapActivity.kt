@@ -6,7 +6,6 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -22,6 +21,7 @@ import com.tpb.coinz.data.location.LocationListener
 import com.tpb.coinz.data.location.LocationListeningEngine
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.isNightModeEnabled
+import com.tpb.coinz.view.base.BaseActivity
 import com.tpb.coinz.view.map.MapUtils.coinToMarkerOption
 import kotlinx.android.synthetic.main.activity_map.*
 import org.koin.android.ext.android.inject
@@ -29,7 +29,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 
-class MapActivity : AppCompatActivity(), PermissionsListener {
+class MapActivity : BaseActivity(), PermissionsListener {
 
     private val locationProvider: LocationProvider by inject()
 

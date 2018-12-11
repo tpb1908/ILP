@@ -14,7 +14,6 @@ import timber.log.Timber
 
 class FireStoreCoinCollection(store: FirebaseFirestore) : FireStoreCoinManager(store), CoinCollection {
 
-
     override fun collectCoins(user: User, coins: List<Coin>, callback: (Result<List<Coin>>) -> Unit) {
         Timber.i("Collecting coins $coins for $user")
         val collected = mutableListOf<Coin>()

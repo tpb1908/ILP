@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="home_coin_collection_info">
-        <item quantity="zero">%1$d coinz collected. %2$d remaining</item>
         <item quantity="one">%1$d coin collected. %2$d remaining</item>
         <item quantity="other">%1$d coinz collected. %2$d remaining</item>
     </plurals>
 
     <plurals name="bank_coins_banked_info">
-        <item quantity="zero">%1$d coinz banked. %2$d remaining</item>
         <item quantity="one">%1$d coin banked. %2$d remaining</item>
         <item quantity="other">%1$d coinz banked. %2$d remaining</item>
     </plurals>
@@ -15,6 +13,11 @@
     <plurals name="error_spare_change">
         <item quantity="one">You can\'t send coins until you have reached your daily banking limit.\nYou can bank %1$d more coin</item>
         <item quantity="other">You can\'t send coins until you have reached your daily banking limit.\nYou can bank %1$d more coinz</item>
+    </plurals>
+
+    <plurals name="text_total_collected_in_background">
+        <item quantity="one">%1$d coin collected</item>
+        <item quantity="other">%1$d coinz collected</item>
     </plurals>
 
 </resources>

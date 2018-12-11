@@ -8,19 +8,19 @@ import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tpb.coinz.R
 import com.tpb.coinz.SimpleTextWatcher
 import com.tpb.coinz.data.chat.Thread
+import com.tpb.coinz.view.base.BaseActivity
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import kotlinx.android.synthetic.main.activity_messages.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ThreadsActivity : AppCompatActivity() {
+class ThreadsActivity : BaseActivity() {
 
     val vm: ThreadsViewModel by viewModel()
 

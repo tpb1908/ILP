@@ -36,7 +36,7 @@ object Conversion {
 
 
     fun fromMap(map: Map<String, Any>): Coin {
-        return Coin(map["id"] as String, map["value"] as Double, Currency.fromString(map["currency"] as String),
+        return Coin(map["id"] as String, map["value"] as Double, Currency.valueOf(map["currency"] as String),
                 (map["markerSymbol"] as Long).toInt(), (map["markerColor"] as Long).toInt(),
                 latLngFromMap(map),
                 map["received"] as Boolean)

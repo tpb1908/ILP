@@ -8,7 +8,6 @@ import android.widget.SimpleAdapter
 import android.widget.Toast
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,13 +15,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.tpb.coinz.R
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
-import com.tpb.coinz.data.coin.Currency
+import com.tpb.coinz.view.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_thread.*
 import kotlinx.android.synthetic.main.dialog_coin_selection.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ThreadActivity : AppCompatActivity() {
+class ThreadActivity : BaseActivity() {
 
     private val vm: ThreadViewModel by viewModel()
 
@@ -120,7 +119,7 @@ class ThreadActivity : AppCompatActivity() {
             // which is why listitem_dialog_coin uses an ImageView and a TextView rather than a TextView and
             // compound drawable
             val adapter = SimpleAdapter(context, coins.map {
-                mapOf("img" to Currency.getImageId(it.currency), "value" to "${it.currency} | ${it.value}")
+                mapOf("img" to it.currency.img, "value" to "${it.currency} | ${it.value}")
             },
                     R.layout.listitem_dialog_coin, arrayOf("img", "value"),
                     intArrayOf(R.id.listitem_coin_image, R.id.listitem_coin_info))

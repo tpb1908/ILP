@@ -1,9 +1,9 @@
-package com.tpb.coinz.data.coin
+package com.tpb.coinz.data.coin.collection
 
 import android.location.Location
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.tpb.coinz.data.coin.collection.CoinCollection
-import com.tpb.coinz.data.coin.collection.CoinCollector
+import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.loading.MapLoader
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.config.ConfigProvider

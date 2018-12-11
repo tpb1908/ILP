@@ -47,5 +47,7 @@
     <string name="content_coin_icon">Icon for coin type</string>
     <string name="title_coin_send_dialog">Select coin to send</string>
     <string name="title_banking_error_dialog">Bank error</string>
-
+    <string name="text_reloading_map">Reloading map</string>
+    <string name="text_collecting_in_background">Collecting</string>
+    <string name="content_collecting_in_background">Coinz will be collected in background</string>
 </resources>

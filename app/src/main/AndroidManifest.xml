@@ -38,7 +38,7 @@
         <activity android:name=".view.scoreboard.ScoreBoardActivity" />
 
         <service android:name=".data.location.background.GeofenceTransitionsIntentService"/>
-        <service android:name=".view.ForegroundLocationService" />
+        <service android:name=".data.location.background.ForegroundLocationService" />
     </application>
 
 </manifest>

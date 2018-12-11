@@ -5,10 +5,12 @@ import android.content.Intent
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.tpb.coinz.BuildConfig
-import com.tpb.coinz.view.ForegroundLocationService
 import timber.log.Timber
 
 //https://developer.android.com/training/location/geofencing
+/**
+ * IntentService to receive GeoFence transition events from Google Play services
+ */
 class GeofenceTransitionsIntentService : IntentService(ServiceName) {
 
     companion object {
@@ -28,6 +30,7 @@ class GeofenceTransitionsIntentService : IntentService(ServiceName) {
         }
         val transition = event.geofenceTransition
         if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            // ForegroundLocationService handles foreground notification requirements for different API levels
             ForegroundLocationService.start(this)
         } else if (transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             Timber.i("Exiting Geofence area")

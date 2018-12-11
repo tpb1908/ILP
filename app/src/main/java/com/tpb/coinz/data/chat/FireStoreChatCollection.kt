@@ -10,10 +10,9 @@ import timber.log.Timber
 
 class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollection {
 
-    init {
-        Timber.i("Koin: chat collection instantiated")
-    }
-
+    /**
+     * Currently open thread
+     */
     private var openThread: Thread? = null
     private var newMessageListener: ((Result<List<Message>>) -> Unit)? = null
 
@@ -75,20 +74,19 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
         override fun onEvent(snapshot: QuerySnapshot?, exception: FirebaseFirestoreException?) {
             Timber.i("Change to threads")
             val threads = mutableListOf<Thread>()
-            //TODO: Deletion and proper change notification
             snapshot?.documentChanges?.forEach { change ->
+                // Documents which have been added since the last event
                 if (change.type == DocumentChange.Type.ADDED) {
                     val doc = change.document
                     Timber.i("Thread downloaded $doc")
                     val participants = doc["participants"] as List<String>
                     val emails = doc["participant_emails"] as List<String>
                     threads.add(Thread(doc.id,
-
                             User(participants[0], emails[0]),
                             User(participants[1], emails[1]),
                             if (doc.contains("last_updated")) doc["last_updated"] as Long else doc["created"] as Long))
                 } else {
-                    //TODO: For the moment, this should never happen, as we have not way to delete threads
+                    // This shouldn't happen as we have no way to delete threads in app
                     Timber.e("Document changed $change")
                 }
             }
@@ -112,7 +110,7 @@ class FireStoreChatCollection(private val store: FirebaseFirestore) : ChatCollec
                 else
                     Result.failure(CoinzException.UnknownException()))
             }
-            // The last_updated stamp isn't really important
+            // The last_updated stamp isn't important enough to return an error if it failures
             store.collection(threads).document(it.threadId).set(mapOf("last_updated" to message.timestamp), SetOptions.merge())
         }
     }
