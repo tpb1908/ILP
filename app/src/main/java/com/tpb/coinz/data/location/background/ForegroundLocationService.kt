@@ -12,6 +12,7 @@ import com.tpb.coinz.R
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.collection.CoinCollector
+import com.tpb.coinz.data.location.steps.StepTracker
 import com.tpb.coinz.view.home.HomeActivity
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -27,6 +28,8 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
 
     private val collector: CoinCollector by inject()
     private val totalCollected = mutableListOf<Coin>()
+
+    private val stepTracker: StepTracker by inject()
 
     override fun onBind(p0: Intent?): IBinder? = null
 
@@ -60,6 +63,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
         moveToForeground()
         collector.addCollectionListener(this)
         listener = {
+            // When an application is in the foreground, we don't want to display notificaitons
             if (it) {
                 // If the app is in the foreground, the CoinCollector will still be running
                 // but we don't want to post notifications
@@ -70,6 +74,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
                 collector.addCollectionListener(this)
             }
         }
+        stepTracker.startStepTracking()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -145,6 +150,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
         collector.removeCollectionListener(this)
         collector.dispose()
         listener = null
+        stepTracker.stopStepTracking()
     }
 
 

@@ -1,6 +1,7 @@
 package com.tpb.coinz
 
 import android.content.Context
+import android.hardware.SensorManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.ConnectionLiveData
@@ -22,6 +23,8 @@ import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.config.ConstantConfigProvider
 import com.tpb.coinz.data.location.GMSLocationProvider
 import com.tpb.coinz.data.location.LocationProvider
+import com.tpb.coinz.data.location.steps.SensorManagerStepTracker
+import com.tpb.coinz.data.location.steps.StepTracker
 import com.tpb.coinz.data.users.FireBaseUserCollection
 import com.tpb.coinz.data.users.UserCollection
 import com.tpb.coinz.view.bank.BankViewModel
@@ -30,6 +33,7 @@ import com.tpb.coinz.view.map.MapViewModel
 import com.tpb.coinz.view.messaging.thread.ThreadViewModel
 import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
 import com.tpb.coinz.view.scoreboard.ScoreboardViewModel
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
@@ -42,6 +46,7 @@ val commonModule = module {
     single<UserCollection> { FireBaseUserCollection(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance()) }
     single { ConnectionLiveData(androidContext()) }
     single<LocationProvider> { GMSLocationProvider(androidContext()) }
+    single<StepTracker> { SensorManagerStepTracker(androidApplication().getSystemService(Context.SENSOR_SERVICE) as SensorManager)}
 }
 
 /**

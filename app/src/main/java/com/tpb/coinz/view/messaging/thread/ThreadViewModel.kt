@@ -79,7 +79,7 @@ class ThreadViewModel(private val chatCollection: ChatCollection,
 
     fun loadCoinsForTransfer() {
         val numStillBankable = coinBank.getNumBankable()
-        if (numStillBankable == 0) {
+        if (numStillBankable == 0 || true) {
             loadingState.postValue(true)
             coinCollection.getCollectedCoins(userCollection.getCurrentUser()) { result ->
                 loadingState.postValue(false)
