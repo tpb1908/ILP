@@ -8,7 +8,6 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.FireStoreCoinManager
-import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.config.ConfigProvider
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.CoinzException

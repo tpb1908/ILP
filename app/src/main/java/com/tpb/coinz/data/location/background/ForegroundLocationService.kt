@@ -61,11 +61,13 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
         collector.addCollectionListener(this)
         listener = {
             if (it) {
-                collector.addCollectionListener(this)
-            } else {
                 // If the app is in the foreground, the CoinCollector will still be running
                 // but we don't want to post notifications
+                Timber.i("Removing listener")
                 collector.removeCollectionListener(this)
+            } else {
+                Timber.i("Adding listener")
+                collector.addCollectionListener(this)
             }
         }
     }
@@ -105,6 +107,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
                         R.plurals.text_total_collected_in_background,
                         totalCollected.size, totalCollected.size))
                 .setGroup(group)
+                .setSmallIcon(R.drawable.ic_coins)
                 .setGroupSummary(true)
                 .build()
     }
@@ -115,7 +118,7 @@ class ForegroundLocationService : Service(), CoinCollector.CoinCollectorListener
             collected.forEach {
                 notify(it.markerColor, NotificationCompat.Builder(this@ForegroundLocationService, CHANNEL_ID)
                         .setContentTitle(it.currency.name)
-                        .setContentText(it.id)
+                        .setContentText(it.value.toString())
                         .setSmallIcon(it.currency.img)
                         .setGroup(group)
                         .build())

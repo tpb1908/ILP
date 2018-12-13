@@ -12,9 +12,12 @@ import kotlin.random.Random
 
 object DataGenerator {
 
-    private var id: Int = 0
-
-    fun generateCoin(cid: Int = id++,
+    private var counter: Int = 0
+        get() {
+            return ++field
+        }
+    
+    fun generateCoin(cid: Int = counter,
                      value: Double = Random.nextDouble(),
                      currency: Currency = Currency.values().random(),
                      markerSymbol: Int = Currency.values().indexOf(currency),
@@ -34,14 +37,14 @@ object DataGenerator {
                     collectedCoins: MutableList<Coin> = mutableListOf()) =
             Map(dateGenerated, rates, remainingCoins, collectedCoins)
 
-    fun generateUser(uid: String = (id++).toString(), email: String = "test${id++}@test.com") = User(uid, email)
+    fun generateUser(uid: String = (counter).toString(), email: String = "test$counter@test.com") = User(uid, email)
 
     fun generateMessage(timestamp: Long = System.currentTimeMillis(),
                         sender: User = generateUser(),
-                        message: String = "message #${id++}",
+                        message: String = "message #$counter",
                         coin: Coin? = null) = Message(timestamp, sender, message, coin)
 
-    fun generateThread(threadId: String = "thread_${id++}",
+    fun generateThread(threadId: String = "thread_$counter",
                        creator: User = generateUser(),
                        partner: User = generateUser(),
                        updated: Long = System.currentTimeMillis()) = Thread(threadId, creator, partner, updated)

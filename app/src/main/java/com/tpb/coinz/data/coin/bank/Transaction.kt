@@ -1,4 +1,6 @@
-package com.tpb.coinz.data.coin
+package com.tpb.coinz.data.coin.bank
+
+import com.tpb.coinz.data.coin.Coin
 
 /**
  * Data class representing the transaction of banking a [Coin]

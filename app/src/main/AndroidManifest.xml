@@ -36,6 +36,7 @@
         <activity android:name="com.tpb.coinz.view.messaging.threads.ThreadsActivity" />
         <activity android:name="com.tpb.coinz.view.messaging.thread.ThreadActivity" />
         <activity android:name=".view.scoreboard.ScoreBoardActivity" />
+        <activity android:name=".view.scoreboard.ScoreboardActivity" />
 
         <service android:name=".data.location.background.GeofenceTransitionsIntentService"/>
         <service android:name=".data.location.background.ForegroundLocationService" />

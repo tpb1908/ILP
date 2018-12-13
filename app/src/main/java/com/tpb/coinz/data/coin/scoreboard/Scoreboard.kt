@@ -9,4 +9,6 @@ interface Scoreboard {
 
     fun getScore(user: User, listener: (Result<Double>) -> Unit): Registration
 
+    fun getScores(listener: (Result<List<Score>>) -> Unit): Registration
+
 }

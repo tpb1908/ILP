@@ -6,10 +6,10 @@ import com.tpb.coinz.view.base.ActionLiveData
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.mockito.Mockito.*
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 
 class ActionLiveDataTest {
 
@@ -24,6 +24,9 @@ class ActionLiveDataTest {
         ld = ActionLiveData()
     }
 
+    /**
+     * Test that [ActionLiveData] passes its posted value to an observer
+     */
     @Test
     fun testObserverTriggered() {
         val string = "some_string"
@@ -32,6 +35,9 @@ class ActionLiveDataTest {
         verify(observer, times(1)).onChanged(string)
     }
 
+    /**
+     * Test that [ActionLiveData] removes the value after it has been observed once
+     */
     @Test
     fun testValueCleared() {
         val string = "some_string"

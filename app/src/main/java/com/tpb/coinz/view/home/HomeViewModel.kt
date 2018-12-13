@@ -6,7 +6,7 @@ import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.Thread
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Map
-import com.tpb.coinz.data.coin.Transaction
+import com.tpb.coinz.data.coin.bank.Transaction
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollector
 import com.tpb.coinz.data.coin.scoreboard.Scoreboard

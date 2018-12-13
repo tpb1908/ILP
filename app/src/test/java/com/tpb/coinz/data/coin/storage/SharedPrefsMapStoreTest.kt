@@ -5,11 +5,11 @@ import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.tpb.coinz.data.coin.Currency
 import com.tpb.coinz.data.coin.Map
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Test
-
-import org.junit.Assert.*
 import org.junit.BeforeClass
+import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -50,17 +50,21 @@ class SharedPrefsMapStoreTest {
     fun setUp() {
         map.clear()
         sharedPrefsMapStore = SharedPrefsMapStore(prefs)
-
-
     }
 
+    /**
+     * Test that [SharedPrefsMapStore.store] writes the map to shared preferences
+     */
     @Test
     fun store() {
         val testMap = Map(Calendar.getInstance(), mapOf(), mutableListOf(), mutableListOf())
         sharedPrefsMapStore.store(testMap)
-        assertTrue("Mock prefs map should contain map key", map.containsKey("map"))
+        assertTrue("Mock prefs map should contain map key", map.keys.size == 1)
     }
 
+    /**
+     * Test that [SharedPrefsMapStore.update] updates the stored map
+     */
     @Test
     fun update() {
         val firstMap = Map(Calendar.getInstance(), mapOf(), mutableListOf(), mutableListOf())
@@ -72,8 +76,9 @@ class SharedPrefsMapStoreTest {
         assertNotEquals("Stored map JSON should differ", firstStoredValue, newStoredValue)
     }
 
-
-
+    /**
+     * Test that [SharedPrefsMapStore.getLatest] returns the stored map when it exists
+     */
     @Test
     fun getLatestSuccess() {
         val testMap = Map(Calendar.getInstance(), mapOf(), mutableListOf(), mutableListOf())
@@ -83,6 +88,9 @@ class SharedPrefsMapStoreTest {
         verify(mockCallback, times(1)).invoke(Result.success(testMap))
     }
 
+    /**
+     * Test that [SharedPrefsMapStore.getLatest] returns a failure if no map is stored
+     */
     @Test
     fun getLatestFailure() {
         val mockCallback = mock<((Result<Map>) -> Unit)>()

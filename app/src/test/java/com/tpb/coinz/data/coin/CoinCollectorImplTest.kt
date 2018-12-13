@@ -9,9 +9,8 @@ import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.config.ConstantConfigProvider
 import com.tpb.coinz.data.location.LocationProvider
 import com.tpb.coinz.data.users.UserCollection
-import org.junit.Test
-
 import org.junit.Before
+import org.junit.Test
 import utils.DataGenerator
 
 class CoinCollectorImplTest {
@@ -58,6 +57,9 @@ class CoinCollectorImplTest {
         verify(mockListener, times(1)).mapLoaded(map)
     }
 
+    /**
+     * Test that the [CoinCollectorImpl] attempts to load via [MapLoader] if [MapStore] returns a failure
+     */
     @Test
     fun testLoadFromNetwork() {
         collector.loadMap()
@@ -71,20 +73,10 @@ class CoinCollectorImplTest {
 
 
     @Test
-    fun addCollectionListener() {
-    }
-
-    @Test
-    fun removeCollectionListener() {
-    }
-
-    @Test
     fun dispose() {
-
+        collector.dispose()
+        verify(mockLocationProvider, times(1)).removeListener(any())
     }
 
-    @Test
-    fun locationUpdate() {
 
-    }
 }

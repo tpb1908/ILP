@@ -25,6 +25,7 @@
     <string name="error_empty_message">Can\'t send empty message</string>
     <string name="error_thread_to_self">You can\'t talk to yourself</string>
     <string name="error_thread_already_exists">Thread with %1$s already exists</string>
+    <string name="error_loading_scoreboard">Error loading scoreboard</string>
 
     <string name="recycler_section_collected_coins">Collected coinz</string>
     <string name="recycler_section_received_coins">Received coinz</string>
@@ -50,4 +51,5 @@
     <string name="text_reloading_map">Reloading map</string>
     <string name="text_collecting_in_background">Collecting</string>
     <string name="content_collecting_in_background">Coinz will be collected in background</string>
+    <string name="content_score">%1$s %2$f</string>
 </resources>

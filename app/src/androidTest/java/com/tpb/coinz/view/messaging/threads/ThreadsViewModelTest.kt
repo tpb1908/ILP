@@ -55,6 +55,10 @@ class ThreadsViewModelTest {
         vm.loadingState.observeForever(loadingStateObserver)
     }
 
+    /**
+     * Test that the [ThreadsViewModel] posts loaded threads to [ThreadsViewModel.threads] and cancels its loading state
+     * when threads are loaded from [ChatCollection]
+     */
     @Test
     fun testThreadLoadingSuccess() {
         vm.bind()
@@ -79,6 +83,10 @@ class ThreadsViewModelTest {
         assertFalse("ViewModel should post false loading state", loadingStateCaptor.lastValue)
     }
 
+    /**
+     * Test that the [ThreadsViewModel] posts an error message and retry action when thread loading fails. Also test that
+     * the retry action attempts to load the threads again
+     */
     @Test
     fun testThreadLoadingFailure() {
         vm.bind()
@@ -107,6 +115,10 @@ class ThreadsViewModelTest {
 
     }
 
+    /**
+     * Test that the new thread is added to [ThreadsViewModel.threads] and opened via [ThreadsViewModel.threadIntents]
+     * when it is successfully created
+     */
     @Test
     fun createChatSuccess() {
         val partner = DataGenerator.generateUser()
@@ -139,6 +151,9 @@ class ThreadsViewModelTest {
 
     }
 
+    /**
+     * Test that the [ThreadsViewModel] posts an error message when the search for the requested email fails
+     */
     @Test
     fun createChatUserSearchFailure() {
 
@@ -158,6 +173,9 @@ class ThreadsViewModelTest {
 
     }
 
+    /**
+     * Test that the [ThreadsViewModel] posts an error message when thread creation fails
+     */
     @Test
     fun createChatThreadFailure() {
 
@@ -179,12 +197,16 @@ class ThreadsViewModelTest {
 
         threadCallbackCaptor.lastValue.invoke(Result.failure(java.lang.Exception()))
 
+        verifyNoMoreInteractions(threadIntentObserver)
         verify(actionObserver, atLeastOnce()).onChanged(actionCaptor.capture())
         assertTrue(actionCaptor.lastValue is ThreadsViewModel.ThreadsAction.DisplayError)
         assertEquals(R.string.error_creating_thread, (actionCaptor.lastValue as ThreadsViewModel.ThreadsAction.DisplayError).message)
 
     }
 
+    /**
+     * Test that the [ThreadsViewModel] posts an error message when the user attempts to start a chat with themselves
+     */
     @Test
     fun createChatWithSelf() {
 

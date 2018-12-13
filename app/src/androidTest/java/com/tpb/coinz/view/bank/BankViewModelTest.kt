@@ -4,13 +4,14 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.nhaarman.mockitokotlin2.*
 import com.tpb.coinz.data.coin.Coin
+import com.tpb.coinz.data.coin.Map
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.scoreboard.Scoreboard
 import com.tpb.coinz.data.coin.storage.MapStore
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.users.UserCollection
-import com.tpb.coinz.data.util.Registration
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,23 +32,29 @@ class BankViewModelTest {
         private val mockScoreboard: Scoreboard = mock()
         private val actionObserver = mock<Observer<BankViewModel.BankAction>>()
         private val loadingStateObserver = mock<Observer<Boolean>>()
-
+        //TODO this looks disgusting and isn't very clear, I should probably move the view info into an explicit class
+        private val bankableObserver = mock<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
         private val testUser = User("uid", "test@test.com")
 
     }
 
     private lateinit var actionCaptor: KArgumentCaptor<BankViewModel.BankAction>
     private lateinit var loadingStateCaptor: KArgumentCaptor<Boolean>
+    private lateinit var bankableCaptor: KArgumentCaptor<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>
+    private lateinit var bankableCoinsCallbackCaptor: KArgumentCaptor<(Result<List<Coin>>) -> Unit>
 
     @Before
     fun setUp() {
         actionCaptor = argumentCaptor()
         loadingStateCaptor = argumentCaptor()
-        reset(mockCoinBank, mockUserCollection, mockMapStore, actionObserver, loadingStateObserver)
+        bankableCaptor = argumentCaptor()
+        bankableCoinsCallbackCaptor = argumentCaptor()
+        reset(mockCoinBank, mockUserCollection, mockMapStore, actionObserver, loadingStateObserver, bankableObserver)
         `when`(mockUserCollection.getCurrentUser()).thenAnswer {
             println("Returning test user")
             testUser
         }
+        `when`(mockCoinBank.getBankableCoins(any(), bankableCoinsCallbackCaptor.capture())).thenReturn(mock())
         vm = BankViewModel(mockCoinBank, mockUserCollection, mockMapStore, mockScoreboard)
         vm.loadingState.observeForever(loadingStateObserver)
         vm.actions.observeForever(actionObserver)
@@ -58,7 +65,6 @@ class BankViewModelTest {
      */
     @Test
     fun getBankableCoinsLoadingState() {
-        `when`(mockCoinBank.getBankableCoins(any(), any())).thenReturn(mock())
         vm.bind()
         verify(loadingStateObserver, times(1)).onChanged(loadingStateCaptor.capture())
         assertTrue("Loading state should be true", loadingStateCaptor.lastValue)
@@ -70,19 +76,13 @@ class BankViewModelTest {
      */
     @Test
     fun getBankableCoinsSuccess() {
-        var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(any(), any())).thenAnswer {
-            listener = it.getArgument(1)
-            mock<Registration>()
-        }
+
         vm.bind()
-        assertNotNull(listener)
-        val bankableObserver = mock<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
         vm.bankableCoins.observeForever(bankableObserver)
         val coins = (1..10).map { DataGenerator.generateCoin(received = it > 5) }
-        listener?.invoke(Result.success(coins))
+        bankableCoinsCallbackCaptor.lastValue.invoke(Result.success(coins))
 
-        val bankableCaptor = argumentCaptor<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>()
+
         verify(bankableObserver, times(1)).onChanged(bankableCaptor.capture())
         assertTrue("First list should be collected coins", bankableCaptor.lastValue.first.all { !it.item.received })
         assertTrue("Second list should be received coins", bankableCaptor.lastValue.second.all { it.item.received })
@@ -97,20 +97,13 @@ class BankViewModelTest {
      */
     @Test
     fun getBankableCoinsFailure() {
-        var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(any(), any())).thenAnswer {
-            listener = it.getArgument(1)
-            println("Returning mocked registration")
-            mock<Registration>()
-        }
         vm.bind()
-        assertNotNull(listener)
-        val bankableObserver = mock<Observer<Pair<List<SelectableItem<Coin>>, List<SelectableItem<Coin>>>>>()
+
         vm.bankableCoins.observeForever(bankableObserver)
 
         verify(bankableObserver, times(0)).onChanged(com.nhaarman.mockitokotlin2.any())
 
-        listener?.invoke(Result.failure(Exception()))
+        bankableCoinsCallbackCaptor.lastValue.invoke(Result.failure(Exception()))
         verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
         assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.DisplayError)
         verify(loadingStateObserver, times(2)).onChanged(loadingStateCaptor.capture())
@@ -124,14 +117,8 @@ class BankViewModelTest {
      */
     @Test
     fun testRetryOnFailedLoad() {
-        var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(any(), any())).thenAnswer {
-            listener = it.getArgument(1)
-            mock<Registration>()
-        }
         vm.bind()
-        assertNotNull(listener)
-        listener?.invoke(Result.failure(Exception()))
+        bankableCoinsCallbackCaptor.lastValue.invoke(Result.failure(Exception()))
         verify(actionObserver, times(1)).onChanged(actionCaptor.capture())
         assertTrue(actionCaptor.lastValue is BankViewModel.BankAction.DisplayError)
 
@@ -142,12 +129,35 @@ class BankViewModelTest {
     }
 
     @Test
-    fun getNumStillBankable() {
-    }
-
-
-    @Test
     fun bankCoins() {
+        vm.bind()
+        val coins = (1..40).map { DataGenerator.generateCoin(received = true) }
+        bankableCoinsCallbackCaptor.lastValue.invoke(Result.success(coins))
+        vm.bankableCoins.observeForever(bankableObserver)
+        verify(bankableObserver, times(1)).onChanged(bankableCaptor.capture())
+        val selectable = bankableCaptor.lastValue.second
+        val selected = selectable.subList(0, 10)
+        selected.forEach {
+            assertTrue(vm.attemptSelect(it))
+        }
+
+        val map = DataGenerator.generateMap()
+        `when`(mockMapStore.getLatest(any())).thenAnswer {
+            (it.arguments[0] as ((Result<Map>) -> Unit)).invoke(Result.success(map))
+        }
+        vm.bankCoins()
+
+
+
+        val bankCaptor = argumentCaptor<((Result<List<Coin>>) -> Unit)>()
+        verify(mockCoinBank, times(1)).bankCoins(eq(testUser), eq(selected.map { it.item }), eq(map.rates), bankCaptor.capture())
+        bankCaptor.lastValue.invoke(Result.success(coins))
+
+        verify(bankableObserver, times(2)).onChanged(bankableCaptor.capture())
+        //TODO
+//        val bankable = bankableCaptor.lastValue.second
+//        assertTrue("Bankable coins shouldn't contain any of the banked coins",
+//                bankable.containsAll(selectable-selected))
     }
 
     /**
@@ -159,15 +169,9 @@ class BankViewModelTest {
     @Test
     fun testSelectionFlow() {
         val coins = (1..40).map { DataGenerator.generateCoin(received = it > 30) }
-        var listener: ((Result<List<Coin>>) -> Unit)? = null
-        `when`(mockCoinBank.getBankableCoins(any(), any())).thenAnswer {
-            listener = it.getArgument(1)
-            mock<Registration>()
-        }
         `when`(mockCoinBank.getNumBankable()).thenReturn(25)
         vm.bind()
-        assertNotNull(listener)
-        listener?.invoke(Result.success(coins))
+        bankableCoinsCallbackCaptor.lastValue.invoke(Result.success(coins))
 
         val collectedSelectionObserver = mock<Observer<Int>>()
         val selectedCaptor = argumentCaptor<Int>()
@@ -201,7 +205,5 @@ class BankViewModelTest {
         }
         verify(collectedSelectionObserver, times(25)).onChanged(selectedCaptor.capture())
     }
-
-
 
 }

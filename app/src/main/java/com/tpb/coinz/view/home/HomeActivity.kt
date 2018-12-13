@@ -8,7 +8,6 @@ import android.location.Location
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
@@ -44,6 +43,7 @@ import com.tpb.coinz.view.map.asCameraUpdate
 import com.tpb.coinz.view.messaging.thread.ThreadActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsActivity
 import com.tpb.coinz.view.messaging.threads.ThreadsRecyclerAdapter
+import com.tpb.coinz.view.scoreboard.ScoreboardActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -76,10 +76,10 @@ class HomeActivity : BaseActivity(), PermissionsListener {
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
+        home_minimap.onCreate(savedInstanceState)
         if (isNightModeEnabled()) {
             home_minimap.setStyleUrl(Style.DARK)
         }
-        home_minimap.onCreate(savedInstanceState)
 
         home_minimap.getMapAsync {
             it.addOnMapClickListener { latLng ->
@@ -123,6 +123,9 @@ class HomeActivity : BaseActivity(), PermissionsListener {
             startActivity(Intent(this, BankActivity::class.java))
         }
 
+        user_info_card.setOnClickListener {
+            startActivity(Intent(this, ScoreboardActivity::class.java))
+        }
     }
 
     private fun moveToCoinArea() {
@@ -168,7 +171,7 @@ class HomeActivity : BaseActivity(), PermissionsListener {
         val bounds = config.collectionAreaBounds
         val center = bounds.center
 
-        val radius = bounds.toLatLngs().map { it.distanceTo(center) }.max() ?: 0.0
+        val radius = (bounds.toLatLngs().map { it.distanceTo(center) }.max() ?: 0.0) + config.collectionDistance
 
         val fence = Geofence.Builder().setRequestId("coinz_geofence_id")
                 .setCircularRegion(center.latitude, center.longitude, radius.toFloat())

@@ -2,7 +2,6 @@ package com.tpb.coinz.data.coin.bank
 
 import com.tpb.coinz.data.coin.Coin
 import com.tpb.coinz.data.coin.Currency
-import com.tpb.coinz.data.coin.Transaction
 import com.tpb.coinz.data.users.User
 import com.tpb.coinz.data.util.Registration
 

@@ -10,8 +10,12 @@ class CompositeRegistrationTest {
 
     private val registrations = (1..10).map { Mockito.mock(Registration::class.java) }
 
+    /**
+     * Test that [Registration]s added to [CompositeRegistration] are deregistered when
+     * [CompositeRegistration] is deregistered
+     */
     @Test
-    fun add() {
+    fun addAndDeregister() {
         val composite = CompositeRegistration()
         registrations.forEach {
             composite.add(it)

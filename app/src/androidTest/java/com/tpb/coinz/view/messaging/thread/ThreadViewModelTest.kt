@@ -56,6 +56,9 @@ class ThreadViewModelTest {
         verify(chatCollection, times(1)).openThread(eq(thread), any())
     }
 
+    /**
+     * Test that [ThreadViewModel] posts an action to clear the text entry area when a message is successfully sent
+     */
     @Test
     fun postMessageSuccess() {
         vm.openThread(thread)
@@ -73,6 +76,9 @@ class ThreadViewModelTest {
         assertTrue(actionCaptor.lastValue is ThreadViewModel.ThreadAction.ClearMessageEntry)
     }
 
+    /**
+     * Test that [ThreadViewModel] posts an action to display an error when a message fails to send
+     */
     @Test
     fun postMessageFailure() {
         vm.openThread(thread)
@@ -92,6 +98,9 @@ class ThreadViewModelTest {
 
     }
 
+    /**
+     * Test that the [ThreadViewModel] attempts to post a message when a coin is successfully sent
+     */
     @Test
     fun transferCoinSuccess() {
         val coin = DataGenerator.generateCoin()
@@ -106,6 +115,9 @@ class ThreadViewModelTest {
         verify(chatCollection, times(1)).postMessage(eq(message), any())
     }
 
+    /**
+     * Test that the [ThreadViewModel] posts an action to display an error when [CoinCollection.transferCoin] fails
+     */
     @Test
     fun transferCoinFailure() {
         val coin = DataGenerator.generateCoin()
@@ -125,6 +137,10 @@ class ThreadViewModelTest {
         assertEquals(R.string.error_sending_coin, (actionCaptor.lastValue as ThreadViewModel.ThreadAction.DisplayError).message)
     }
 
+    /**
+     * Test that the [ThreadViewModel] does not display the coin selection dialog, and instead posts an action for an
+     * information message, if the user attempts to send coins without first having banked 25 coins for the day
+     */
     @Test
     fun loadCoinsForTransferBeforeBankingComplete() {
         `when`(coinBank.getNumBankable()).thenReturn(10) // anything > 0

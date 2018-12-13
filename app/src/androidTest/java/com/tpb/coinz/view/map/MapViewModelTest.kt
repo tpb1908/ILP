@@ -47,6 +47,10 @@ class MapViewModelTest {
         verify(coinCollector, times(1)).loadMap()
     }
 
+    /**
+     * Test that [MapViewModel] attempts to load the current [Map] and posts the loaded coins to
+     * [MapViewModel.coins]
+     */
     @Test
     fun mapLoaded() {
         val captor = argumentCaptor<CoinCollector.CoinCollectorListener>()
@@ -64,6 +68,10 @@ class MapViewModelTest {
     }
 
 
+    /**
+     * Test that the [MapViewModel] posts actions to clear markers and notify the user that the map is being reloaded
+     * when the [CoinCollector.CoinCollectorListener.notifyReloading] method is called
+     */
     @Test
     fun notifyReloading() {
         val actionObserver = mock<Observer<MapViewModel.MapAction>>()
@@ -82,6 +90,10 @@ class MapViewModelTest {
         assertTrue(coinCaptor.lastValue.isEmpty())
     }
 
+    /**
+     * Test that the [MapViewModel] posts an action to [MapViewModel.actions] to display a message that all coins
+     * have been collected
+     */
     @Test
     fun messageOnAllCollected() {
         vm.mapLoaded(map)

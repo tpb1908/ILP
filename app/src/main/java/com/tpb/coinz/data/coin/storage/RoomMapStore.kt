@@ -8,11 +8,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+/**
+ * This store isn't used as we only need to store a single map
+ *
+ */
 class RoomMapStore(database: Database) : MapStore {
 
     private val dao: MapDao = database.mapDao()
 
-    //TODO: Rewrite the store
     @androidx.room.Database(entities = [RoomMap::class], version = 2)
     @TypeConverters(MapTypeConverter::class)
     abstract class Database : RoomDatabase() {

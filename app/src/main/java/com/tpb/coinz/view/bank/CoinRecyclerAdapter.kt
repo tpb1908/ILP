@@ -18,7 +18,6 @@ class CoinRecyclerAdapter : RecyclerView.Adapter<SelectableViewHolder>() {
     fun loadItems(newCollectedCoins: List<SelectableItem<Coin>>, newReceivedCoins: List<SelectableItem<Coin>>) {
         collectedCoins = newCollectedCoins
         receivedCoins = newReceivedCoins
-        //TODO: Diff and notify for exact changes
         notifyDataSetChanged()
     }
 

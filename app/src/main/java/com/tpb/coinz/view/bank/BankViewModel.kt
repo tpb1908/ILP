@@ -82,6 +82,7 @@ class BankViewModel(private val coinBank: CoinBank,
 
     fun bankCoins() {
         loadingState.postValue(false)
+        Timber.i("Coins $collectedCoins, $receivedCoins")
         val selected = (collectedCoins + receivedCoins).filter { it.selected }.map { it.item }
         mapStore.getLatest { result ->
             result.onSuccess { map ->

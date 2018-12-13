@@ -72,6 +72,7 @@ class CoinCollectorImpl(private val lp: LocationProvider,
 
 
     override fun locationUpdate(location: Location) {
+        Timber.i("Location received by CoinCollector $location")
         map?.let { m ->
             if (m.isValidForDay(Calendar.getInstance())) {
                 collect(m.remainingCoins.filter { collectable(it, location) })

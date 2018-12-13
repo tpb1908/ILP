@@ -139,16 +139,6 @@ class NewLoginTest {
 
         textView.check(matches(withText(testEmail)))
 
-        val textView2 = onView(
-                allOf(withId(R.id.map_collection_info), withText("0 coinz collected. 50 remaining"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.user_info_card),
-                                        0),
-                                1),
-                        isDisplayed()))
-        textView2.check(matches(withText("0 coinz collected. 50 remaining")))
-
         val textView3 = onView(
                 allOf(withId(R.id.coin_bank_info), withText("0 coinz banked. 25 remaining"),
                         childAtPosition(

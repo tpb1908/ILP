@@ -22,6 +22,7 @@ class LocationListeningEngine(private val locationProvider: LocationProvider) : 
     }
 
     override fun requestLocationUpdates() {
+        locationProvider.addListener(this)
         locationProvider.start()
     }
 

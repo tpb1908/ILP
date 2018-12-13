@@ -6,11 +6,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tpb.coinz.data.ConnectionLiveData
 import com.tpb.coinz.data.chat.ChatCollection
 import com.tpb.coinz.data.chat.FireStoreChatCollection
-import com.tpb.coinz.data.coin.collection.CoinCollectorImpl
 import com.tpb.coinz.data.coin.bank.CoinBank
 import com.tpb.coinz.data.coin.bank.FireStoreCoinBank
 import com.tpb.coinz.data.coin.collection.CoinCollection
 import com.tpb.coinz.data.coin.collection.CoinCollector
+import com.tpb.coinz.data.coin.collection.CoinCollectorImpl
 import com.tpb.coinz.data.coin.collection.FireStoreCoinCollection
 import com.tpb.coinz.data.coin.loading.MapDownloader
 import com.tpb.coinz.data.coin.loading.MapLoader
@@ -29,6 +29,7 @@ import com.tpb.coinz.view.home.HomeViewModel
 import com.tpb.coinz.view.map.MapViewModel
 import com.tpb.coinz.view.messaging.thread.ThreadViewModel
 import com.tpb.coinz.view.messaging.threads.ThreadsViewModel
+import com.tpb.coinz.view.scoreboard.ScoreboardViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
@@ -86,4 +87,5 @@ val viewModelModule = module {
     viewModel<ThreadViewModel>()
     viewModel<ThreadsViewModel>()
     viewModel<BankViewModel>()
+    viewModel<ScoreboardViewModel>()
 }

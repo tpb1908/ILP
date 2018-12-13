@@ -7,11 +7,12 @@ abstract class BaseViewModel<T> : ViewModel() {
 
     /**
      * [ActionLiveData] for emitting actions to the view
-     *
      */
     abstract val actions: ActionLiveData<T>
-    //TODO: The SetLoadingState 'actions' should probably not be actions as we want loading state to be preserved on config change
 
+    /**
+     * [MutableLiveData] boolean for whether or not the [ViewModel] is in a loading state
+     */
     val loadingState = MutableLiveData<Boolean>()
 
     private var firstBind = true

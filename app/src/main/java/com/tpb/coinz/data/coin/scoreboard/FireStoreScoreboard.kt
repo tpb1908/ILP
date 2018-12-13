@@ -20,7 +20,10 @@ class FireStoreScoreboard(val store: FirebaseFirestore): Scoreboard {
             val snap = transaction.get(doc)
             val currentScore = snap.getDouble(all) ?: 0.0
             Timber.i("Current score $currentScore, Increase $increase")
-            transaction.set(doc, mapOf(all to currentScore + increase), SetOptions.merge())
+            transaction.set(doc,
+                    mapOf(all to currentScore + increase, "email" to user.email),
+                    SetOptions.merge()
+            )
         }.addOnCompleteListener {
             if (it.isSuccessful) {
 
@@ -33,6 +36,20 @@ class FireStoreScoreboard(val store: FirebaseFirestore): Scoreboard {
             FireStoreRegistration(store.collection(scoreboard).document(user.uid).addSnapshotListener { ds, exception ->
                 if (ds != null) {
                     listener(Result.success(ds.getDouble(all) ?: 0.0))
+                } else {
+                    listener(Result.failure(Conversion.convertFireStoreException(exception)))
+                }
+            })
+
+    override fun getScores(listener: (Result<List<Score>>) -> Unit): Registration =
+            FireStoreRegistration(store.collection(scoreboard).addSnapshotListener { qs, exception ->
+                if (qs != null) {
+                    val scores = mutableListOf<Score>()
+                    qs.documents.forEach { ds ->
+                        scores.add(Score(User(ds.id, ds.getString("email")!!), ds.getDouble(all) ?: 0.0))
+                    }
+                    scores.sortByDescending { it.score }
+                    listener(Result.success(scores))
                 } else {
                     listener(Result.failure(Conversion.convertFireStoreException(exception)))
                 }
